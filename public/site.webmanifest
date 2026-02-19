@@ -1,0 +1,16 @@
+{
+  "name": "독립점수",
+  "short_name": "독립점수",
+  "description": "수입과 구조로 보는 독립 가능성 진단",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

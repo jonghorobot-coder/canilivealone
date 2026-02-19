@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #171717;
+  line-height: 1.6;
+  background: #f5f5f5;
+}
+
+/* 카드 공통 */
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Primary 버튼 - emerald-600 */
+.btn-primary {
+  background: #059669;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: #047857;
+}
+
+.btn-primary:active {
+  background: #047857;
+}
+
+.btn-primary:disabled {
+  background: #e5e5e5;
+  color: #a3a3a3;
+  cursor: not-allowed;
+}
+
+/* Secondary 버튼 - outline 스타일 */
+.btn-secondary {
+  background: transparent;
+  color: #525252;
+  font-weight: 600;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background: #f5f5f5;
+  border-color: #a3a3a3;
+}
+
+/* 입력 필드 */
+.input-field {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  color: #191f28;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: #166534;
+  background: white;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1);
+}
+
+.input-field::placeholder {
+  color: #9ca3af;
+}
+
+/* iOS 확대 방지 */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* 스크롤바 숨김 */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* 구분선 */
+.divider {
+  height: 1px;
+  background: #e5e5e5;
+}
+
+/* 숫자 고정폭 */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 원형 점수 게이지 */
+.score-ring-bg {
+  fill: none;
+  stroke: #e5e5e5;
+  stroke-width: 3;
+}
+
+.score-ring-progress {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 1s ease-out;
+}
+
+.score-ring-progress.emerald { stroke: #059669; }
+.score-ring-progress.amber { stroke: #f59e0b; }
+.score-ring-progress.rose { stroke: #ef4444; }
+
+/* 인덱스 바 */
+.index-bar {
+  height: 6px;
+  background: #e5e5e5;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.index-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease-out;
+}
+
+.index-bar-fill.emerald { background: #059669; }
+.index-bar-fill.amber { background: #f59e0b; }
+.index-bar-fill.rose { background: #ef4444; }
+
+/* 배지 */
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #f5f5f5;
+  color: #525252;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes overlaySlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-overlay-bg {
+  animation: overlayFadeIn 0.25s ease-out forwards;
+}
+
+.animate-overlay-content {
+  animation: overlaySlideUp 0.3s ease-out forwards;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+@keyframes optionSlideIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-option-in {
+  animation: optionSlideIn 0.25s ease-out forwards;
+}
+
+@keyframes scoreReveal {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-score-reveal {
+  animation: scoreReveal 0.5s ease-out forwards;
+}
+
+@keyframes gradeReveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-grade-reveal {
+  animation: gradeReveal 0.4s ease-out forwards;
+}
+
+@keyframes halfwayPop {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-halfway-pop {
+  animation: halfwayPop 0.3s ease-out forwards;
+}
