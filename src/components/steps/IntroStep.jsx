@@ -46,7 +46,7 @@ export function IntroStep() {
       </section>
 
       {/* 하단 통계 */}
-      <footer className="mt-8 pt-8 pb-4 border-t border-neutral-100">
+      <footer className="mt-12 pt-8 pb-4 border-t border-neutral-100">
         <div className="flex items-center">
           <div className="text-center flex-1 pr-4 border-r border-neutral-100">
             <span className="text-[22px] font-semibold text-neutral-800 block tabular-nums tracking-tight">2분</span>
