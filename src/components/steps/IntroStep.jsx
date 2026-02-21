@@ -210,7 +210,7 @@ export function IntroStep() {
           </button>
 
           <p className="mt-4 text-[13px] text-neutral-400 text-center">
-            입력 정보는 저장되지 않습니다
+            재무 자립도 분석 리포트 제공
           </p>
         </section>
 
