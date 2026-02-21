@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const STORAGE_KEY = 'can-i-live-alone-data';
+const STORAGE_KEY = 'canilivealone-data';
 
 export function useLocalStorage(initialState) {
   const [state, setState] = useState(() => {
