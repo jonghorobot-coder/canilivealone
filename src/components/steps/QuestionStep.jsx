@@ -76,27 +76,27 @@ export function QuestionStep({ question }) {
       {/* 카테고리 인트로 오버레이 */}
       {showModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-overlay-bg px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 animate-overlay-bg px-4"
           onClick={handleCloseModal}
         >
           <div
-            className="w-full max-w-[480px] bg-white rounded-[16px] shadow-[0_12px_32px_rgba(0,0,0,0.12)] p-8 text-center animate-overlay-content"
+            className="w-full max-w-[400px] bg-white rounded-[14px] shadow-[0_12px_32px_rgba(0,0,0,0.1)] p-7 text-center animate-overlay-content"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-16 h-16 mx-auto bg-[#F3F4F6] border border-[#E5E7EB] rounded-[14px] flex items-center justify-center">
-              <span className="text-[22px] font-bold text-[#111827] tabular-nums">
+            <div className="w-14 h-14 mx-auto bg-[#F3F4F6] border border-[#E5E7EB] rounded-[12px] flex items-center justify-center">
+              <span className="text-[20px] font-bold text-[#0F3D2E] tabular-nums">
                 {categoryOrder[currentCategory] || 1}
               </span>
             </div>
-            <h2 className="text-[22px] font-bold text-[#111827] mt-5">
+            <h2 className="text-[20px] font-bold text-neutral-800 mt-4 tracking-tight">
               {categoryInfo.label}
             </h2>
-            <p className="text-[15px] text-[#4B5563] mt-2 leading-[1.6]">
+            <p className="text-[14px] text-neutral-500 mt-2 leading-[1.6]">
               {categoryInfo.description}
             </p>
             <button
               onClick={handleCloseModal}
-              className="btn-primary w-full h-[52px] text-[16px] font-semibold rounded-[12px] mt-6"
+              className="btn-primary w-full h-[48px] text-[15px] font-semibold rounded-[10px] mt-5"
             >
               진단 시작
             </button>
@@ -107,8 +107,8 @@ export function QuestionStep({ question }) {
       {/* 절반 진행 토스트 */}
       {showHalfwayToast && (
         <div className="fixed top-20 left-1/2 z-40 -translate-x-1/2 animate-halfway-pop">
-          <div className="bg-white text-neutral-700 px-4 py-2 rounded-lg border border-neutral-200 shadow-sm">
-            <span className="text-sm font-medium">절반 이상 진행되었습니다</span>
+          <div className="bg-white text-neutral-600 px-4 py-2.5 rounded-[10px] border border-neutral-100 shadow-sm">
+            <span className="text-[13px] font-medium tracking-tight">절반 이상 진행되었습니다</span>
           </div>
         </div>
       )}
@@ -136,12 +136,12 @@ export function QuestionStep({ question }) {
               onClick={() => handleSelect(option.value)}
               style={{ animationDelay: `${index * 0.04}s` }}
               className={`
-                w-full p-4 rounded-lg text-left transition-colors duration-150
+                w-full p-4 rounded-[10px] text-left transition-colors duration-150
                 focus:outline-none animate-option-in
                 ${
                   selectedValue === option.value
-                    ? 'bg-white border-2 border-emerald-600'
-                    : 'bg-white border border-neutral-200 hover:border-neutral-300'
+                    ? 'bg-white border-2 border-[#0F3D2E]'
+                    : 'bg-white border border-neutral-100 hover:border-neutral-200'
                 }
               `}
             >
@@ -151,7 +151,7 @@ export function QuestionStep({ question }) {
                   transition-colors duration-150
                   ${
                     selectedValue === option.value
-                      ? 'border-emerald-600 bg-emerald-600'
+                      ? 'border-[#0F3D2E] bg-[#0F3D2E]'
                       : 'border-neutral-300'
                   }
                 `}>
@@ -162,15 +162,15 @@ export function QuestionStep({ question }) {
                   )}
                 </div>
                 <div className="flex-1">
-                  <span className={`text-sm font-medium block ${
+                  <span className={`text-[14px] font-medium block tracking-tight ${
                     selectedValue === option.value
-                      ? 'text-emerald-700'
-                      : 'text-neutral-800'
+                      ? 'text-[#0F3D2E]'
+                      : 'text-neutral-700'
                   }`}>
                     {option.label}
                   </span>
                   {option.description && (
-                    <span className="text-xs text-neutral-500 mt-0.5 block">
+                    <span className="text-[12px] text-neutral-400 mt-0.5 block">
                       {option.description}
                     </span>
                   )}

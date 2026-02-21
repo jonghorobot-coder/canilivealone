@@ -1,8 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
-import html2canvas from 'html2canvas';
+import { useSearchParams } from 'react-router-dom';
+import { domToPng } from 'modern-screenshot';
 import { useSurvey } from '../../hooks/useSurvey';
 import { calculateResult } from '../../utils/calculate';
 import { AnalyticsEvents } from '../../utils/analytics';
+import { saveResultToServer, fetchResultById } from '../../utils/saveResult';
+import { supabase } from '../../lib/supabase';
 
 const LOADING_DURATION = 2500;
 
@@ -14,32 +17,32 @@ const LOADING_MESSAGES = [
 ];
 
 const GRADE_STYLES = {
-  '안정 독립': { bg: 'bg-emerald-50', border: 'border-emerald-600', text: 'text-emerald-600' },
-  '관리 가능': { bg: 'bg-gray-100', border: 'border-gray-300', text: 'text-gray-600' },
-  '불안정': { bg: 'bg-amber-50', border: 'border-amber-500', text: 'text-amber-600' },
-  '위험': { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-500' },
-  '독립 비권장': { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-500' },
+  '매우 안정': { bg: 'bg-[#E8F3EF]', border: 'border-[#0F3D2E]', text: 'text-[#0F3D2E]' },
+  '안정': { bg: 'bg-[#E8F3EF]', border: 'border-[#0F3D2E]', text: 'text-[#0F3D2E]' },
+  '주의': { bg: 'bg-[#FFF7E5]', border: 'border-[#C58A00]', text: 'text-[#9A6B00]' },
+  '위험': { bg: 'bg-[#FDECEC]', border: 'border-[#B42318]', text: 'text-[#912018]' },
+  '매우 위험': { bg: 'bg-[#FDECEC]', border: 'border-[#B42318]', text: 'text-[#912018]' },
 };
 
 const GRADE_DETAILS = {
-  '안정 독립': {
-    summary: '현재 재정 구조로 안정적인 독립 생활이 가능합니다.',
-    details: '수입 대비 지출 비율이 적정하며, 비상 상황에 대한 대비가 갖추어져 있습니다.',
+  '매우 안정': {
+    summary: '현재 재정 구조로 매우 안정적인 독립 생활이 가능합니다.',
+    details: '수입 대비 지출 비율이 적정하며, 비상 상황에 대한 대비가 충분히 갖춰져 있습니다.',
   },
-  '관리 가능': {
-    summary: '독립은 가능하나, 지출 관리에 주의가 필요합니다.',
-    details: '기본적인 독립 조건은 갖추고 있으나, 일부 항목에서 개선의 여지가 있습니다.',
+  '안정': {
+    summary: '독립 생활이 가능하며, 기본적인 재정 안전망이 갖춰져 있습니다.',
+    details: '안정적인 독립 조건을 갖추고 있으나, 지속적인 관리가 권장됩니다.',
   },
-  '불안정': {
-    summary: '독립 생활 유지에 리스크가 있습니다.',
+  '주의': {
+    summary: '독립은 가능하지만, 일부 리스크 요인에 주의가 필요합니다.',
     details: '현재 상태로 독립을 시작할 경우, 예상치 못한 지출이나 수입 변동에 취약할 수 있습니다.',
   },
   '위험': {
-    summary: '현재 상태로는 독립이 어렵습니다.',
+    summary: '현재 상태로는 독립 생활 유지에 어려움이 예상됩니다.',
     details: '재정 안정성이 부족한 상태입니다. 독립을 서두르기보다는 안정적인 수입 확보와 지출 구조 개선을 우선적으로 진행하시기 바랍니다.',
   },
-  '독립 비권장': {
-    summary: '현재 상태에서는 독립을 권장하지 않습니다.',
+  '매우 위험': {
+    summary: '독립을 권장하지 않습니다. 재정 안정화가 우선입니다.',
     details: '현재 재정 상태로는 독립 생활 유지가 어려울 것으로 분석됩니다.',
   },
 };
@@ -52,6 +55,33 @@ const CATEGORY_LABELS = {
   leisure: '여가비',
   misc: '생활 잡비',
   savings: '저축·비상금',
+};
+
+// ShareCard 전용 스타일
+const SHARE_GRADE_STYLES = {
+  '매우 안정': { bg: '#E8F3EF', border: '#0F3D2E', text: '#0F3D2E' },
+  '안정': { bg: '#E8F3EF', border: '#0F3D2E', text: '#0F3D2E' },
+  '주의': { bg: '#FFF7E5', border: '#C58A00', text: '#9A6B00' },
+  '위험': { bg: '#FDECEC', border: '#B42318', text: '#912018' },
+  '매우 위험': { bg: '#FDECEC', border: '#B42318', text: '#912018' },
+};
+
+const GRADE_VERDICT = {
+  '매우 안정': '매우 안정적인 독립이 가능합니다',
+  '안정': '안정적인 독립이 가능합니다',
+  '주의': '독립 전 준비가 필요합니다',
+  '위험': '재정 개선이 필요합니다',
+  '매우 위험': '독립을 권장하지 않습니다',
+};
+
+const CATEGORY_RISK_LABELS = {
+  housing: '주거',
+  food: '식비',
+  fixed: '고정',
+  transport: '교통',
+  leisure: '여가',
+  misc: '잡비',
+  savings: '저축',
 };
 
 function useAnimatedCount(targetValue, duration = 1000, enabled = true) {
@@ -108,7 +138,7 @@ function AnalysisLoading() {
       <div className="text-center">
         <div className="relative w-12 h-12 mx-auto mb-6">
           <div className="absolute inset-0 border-2 border-gray-100 rounded-full" />
-          <div className="absolute inset-0 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+          <div className="absolute inset-0 border-2 border-[#0F3D2E] border-t-transparent rounded-full animate-spin" />
         </div>
         <p className="text-[18px] font-bold text-neutral-800 mb-3 animate-fade-in" key={messageIndex}>
           {LOADING_MESSAGES[messageIndex]}
@@ -121,11 +151,12 @@ function AnalysisLoading() {
   );
 }
 
-function ScoreGauge({ score, showScore }) {
-  const animatedScore = useAnimatedCount(score, 1000, showScore);
+function ScoreGauge({ score, showScore, skipAnimation = false }) {
+  const animatedScore = useAnimatedCount(score, 1000, showScore && !skipAnimation);
+  const displayScore = skipAnimation ? score : animatedScore;
   const radius = 90;
   const circumference = 2 * Math.PI * radius;
-  const progress = (animatedScore / 100) * circumference;
+  const progress = (displayScore / 100) * circumference;
   const offset = circumference - progress;
 
   const getScoreColor = (s) => {
@@ -134,7 +165,7 @@ function ScoreGauge({ score, showScore }) {
     return 'rose';
   };
 
-  const colorClass = getScoreColor(animatedScore);
+  const colorClass = getScoreColor(displayScore);
 
   return (
     <div className="relative w-[200px] h-[200px] mx-auto">
@@ -147,14 +178,14 @@ function ScoreGauge({ score, showScore }) {
           className={`score-ring-progress ${colorClass}`}
           strokeDasharray={circumference}
           strokeDashoffset={showScore ? offset : circumference}
-          style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+          style={{ transition: skipAnimation ? 'none' : 'stroke-dashoffset 1s ease-out' }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-[48px] font-bold tabular-nums text-neutral-800 ${showScore ? 'animate-score-reveal' : 'opacity-0'}`}>
-          {animatedScore}
+        <span className={`text-[48px] font-bold tabular-nums text-neutral-800 ${showScore || skipAnimation ? '' : 'opacity-0'}`}>
+          {displayScore}
         </span>
-        <span className={`text-neutral-500 text-[13px] mt-1 ${showScore ? 'animate-fade-in' : 'opacity-0'}`}>
+        <span className={`text-neutral-500 text-[13px] mt-1 ${showScore || skipAnimation ? '' : 'opacity-0'}`}>
           / 100점
         </span>
       </div>
@@ -162,7 +193,7 @@ function ScoreGauge({ score, showScore }) {
   );
 }
 
-function IndependenceIndex({ categoryScores, showScore }) {
+function IndependenceIndex({ categoryScores, showScore, skipAnimation = false }) {
   const indices = [
     { label: '재정 안정성', key: ['housing', 'savings'] },
     { label: '지출 통제력', key: ['food', 'leisure', 'misc'] },
@@ -187,18 +218,25 @@ function IndependenceIndex({ categoryScores, showScore }) {
         const score = calculateIndexScore(index.key);
         const colorClass = getBarColor(score);
         return (
-          <div key={index.label} className="animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+          <div
+            key={index.label}
+            className={skipAnimation ? '' : 'animate-fade-in'}
+            style={skipAnimation ? {} : { animationDelay: `${i * 0.1}s` }}
+          >
             <div className="flex justify-between items-center mb-2">
               <span className="text-[14px] font-medium text-neutral-600">{index.label}</span>
               <span className={`text-[14px] font-semibold tabular-nums ${
-                colorClass === 'emerald' ? 'text-emerald-600' :
+                colorClass === 'emerald' ? 'text-[#0F3D2E]' :
                 colorClass === 'amber' ? 'text-amber-500' : 'text-red-500'
               }`}>{score}</span>
             </div>
             <div className="index-bar">
               <div
                 className={`index-bar-fill ${colorClass}`}
-                style={{ width: showScore ? `${score}%` : '0%' }}
+                style={{
+                  width: (showScore || skipAnimation) ? `${score}%` : '0%',
+                  transition: skipAnimation ? 'none' : undefined,
+                }}
               />
             </div>
           </div>
@@ -209,41 +247,239 @@ function IndependenceIndex({ categoryScores, showScore }) {
 }
 
 function ShareCard({ result, cardRef }) {
-  const gradeStyle = GRADE_STYLES[result?.grade] || {};
+  const gradeStyle = SHARE_GRADE_STYLES[result?.grade] || { bg: '#F3F4F6', border: '#9CA3AF', text: '#6B7280' };
+  const verdict = GRADE_VERDICT[result?.grade] || '';
+
+  const riskCategories = result?.categoryScores
+    ? Object.entries(result.categoryScores)
+        .filter(([, score]) => score < 50)
+        .map(([key]) => CATEGORY_RISK_LABELS[key])
+        .slice(0, 3)
+    : [];
 
   return (
     <div
       ref={cardRef}
-      className="fixed -left-[9999px] top-0 w-[400px] bg-white p-10"
-      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+      style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        width: '1080px',
+        height: '1080px',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #F7FAF8 50%, #F2F7F4 100%)',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '80px',
+        boxSizing: 'border-box',
+        visibility: 'hidden',
+        pointerEvents: 'none',
+      }}
     >
-      <div className="text-center">
-        <p className="text-xs text-gray-400 mb-1">Financial Independence Score</p>
-        <h1 className="text-xl font-bold text-gray-900 mb-10">독립점수</h1>
-        <p className="text-sm text-gray-500 mb-2">독립 가능성 점수</p>
-        <p className="text-7xl font-bold text-gray-900 mb-2">{result?.score ?? 0}</p>
-        <p className="text-gray-400 mb-6">/ 100점</p>
-        <div className={`inline-block px-6 py-2 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold mb-8`}>
+      {/* 상단 라벨 */}
+      <div style={{
+        fontSize: '26px',
+        color: '#6B7280',
+        letterSpacing: '0.12em',
+        marginBottom: '16px',
+        textTransform: 'uppercase',
+      }}>
+        Financial Independence Score
+      </div>
+
+      {/* 타이틀 */}
+      <div style={{
+        fontSize: '52px',
+        fontWeight: '700',
+        color: '#0F3D2E',
+        marginBottom: '20px',
+      }}>
+        독립점수
+      </div>
+
+      {/* 타이틀 아래 강조선 */}
+      <div style={{
+        width: '60px',
+        height: '3px',
+        backgroundColor: '#0F3D2E',
+        marginBottom: '72px',
+      }} />
+
+      {/* 점수 라벨 */}
+      <div style={{
+        fontSize: '28px',
+        color: '#6B7280',
+        marginBottom: '20px',
+      }}>
+        독립 가능성 점수
+      </div>
+
+      {/* 점수 */}
+      <div style={{
+        fontSize: '200px',
+        fontWeight: '700',
+        color: '#0F3D2E',
+        lineHeight: '1',
+        letterSpacing: '-2px',
+        marginBottom: '8px',
+      }}>
+        {result?.score ?? 0}
+      </div>
+
+      {/* /100점 위 구분선 */}
+      <div style={{
+        width: '120px',
+        height: '1px',
+        backgroundColor: '#D1D5DB',
+        marginBottom: '12px',
+      }} />
+
+      {/* /100점 */}
+      <div style={{
+        fontSize: '32px',
+        color: '#9CA3AF',
+        marginBottom: '48px',
+      }}>
+        / 100점
+      </div>
+
+      {/* 등급 배지 */}
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px 48px',
+        borderRadius: '100px',
+        backgroundColor: gradeStyle.bg,
+        border: `3px solid ${gradeStyle.border}`,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+        marginBottom: '24px',
+      }}>
+        <span style={{
+          fontSize: '36px',
+          fontWeight: '700',
+          color: gradeStyle.text,
+        }}>
           {result?.grade}
+        </span>
+      </div>
+
+      {/* 판정 문구 */}
+      <div style={{
+        fontSize: '26px',
+        color: '#4B5563',
+        marginBottom: '56px',
+      }}>
+        {verdict}
+      </div>
+
+      {/* 위험 카테고리 */}
+      {riskCategories.length > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '56px',
+        }}>
+          <span style={{ fontSize: '22px', color: '#6B7280' }}>주의 필요:</span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {riskCategories.map((cat, i) => (
+              <span key={i} style={{
+                padding: '8px 16px',
+                borderRadius: '6px',
+                backgroundColor: '#FEF2F2',
+                color: '#DC2626',
+                fontSize: '20px',
+                fontWeight: '600',
+              }}>
+                {cat}
+              </span>
+            ))}
+          </div>
         </div>
-        <div className="border-t border-gray-100 pt-6">
-          <p className="text-xs text-gray-400">독립점수 | 독립 가능성 진단</p>
-        </div>
+      )}
+
+      {/* 하단 구분선 */}
+      <div style={{
+        width: '200px',
+        height: '1px',
+        backgroundColor: '#D1D5DB',
+        marginBottom: '28px',
+      }} />
+
+      {/* 브랜딩 */}
+      <div style={{
+        fontSize: '24px',
+        fontWeight: '600',
+        color: '#0F3D2E',
+        letterSpacing: '0.05em',
+        marginTop: '32px',
+      }}>
+        canilivealone.com
       </div>
     </div>
   );
 }
 
 export function ResultStep() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { income, expenses, answers, result, setResult, reset, setCurrentStep } = useSurvey();
   const { toast, showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [showScore, setShowScore] = useState(false);
   const [showGrade, setShowGrade] = useState(false);
   const [isImageSaving, setIsImageSaving] = useState(false);
+  const [totalCount, setTotalCount] = useState(null);
+  const [resultId, setResultId] = useState(null);
+  const [isSharedResult, setIsSharedResult] = useState(false);
   const shareCardRef = useRef(null);
 
+  const sharedId = searchParams.get('id');
+
+  // 총 진단 수 조회 (1회)
   useEffect(() => {
+    async function fetchCount() {
+      try {
+        const { count } = await supabase
+          .from('results')
+          .select('*', { count: 'exact', head: true });
+        if (count !== null) setTotalCount(count);
+      } catch {
+        // 실패해도 무시
+      }
+    }
+    fetchCount();
+  }, []);
+
+  // 공유된 결과 조회 (id가 URL에 있는 경우)
+  useEffect(() => {
+    if (!sharedId) return;
+
+    async function loadSharedResult() {
+      setIsSharedResult(true);
+
+      const sharedResult = await fetchResultById(sharedId);
+
+      if (sharedResult) {
+        setResult(sharedResult);
+        setResultId(sharedId);
+      }
+
+      // 공유 링크: 로딩/애니메이션 스킵
+      setIsLoading(false);
+      setShowScore(true);
+      setShowGrade(true);
+    }
+
+    loadSharedResult();
+  }, [sharedId, setResult]);
+
+  // 새 결과 계산 (id가 URL에 없는 경우)
+  useEffect(() => {
+    if (sharedId) return; // 공유 링크인 경우 스킵
+
     setIsLoading(true);
 
     const safeIncome = income || '0';
@@ -256,26 +492,41 @@ export function ResultStep() {
     const calculatedResult = calculateResult(expensesWithIncome, answers || {});
     setResult(calculatedResult);
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       setIsLoading(false);
       setTimeout(() => setShowScore(true), 300);
       setTimeout(() => setShowGrade(true), 1500);
+
       if (calculatedResult) {
         AnalyticsEvents.reachResult(calculatedResult.score, calculatedResult.grade);
+
+        // Supabase에 저장하고 ID 받아오기
+        const savedId = await saveResultToServer(calculatedResult);
+        if (savedId) {
+          setResultId(savedId);
+          // URL에 id 추가 (히스토리 교체)
+          setSearchParams({ id: savedId }, { replace: true });
+        }
       }
     }, LOADING_DURATION);
 
     return () => clearTimeout(timer);
-  }, [income, expenses, answers, setResult]);
+  }, [income, expenses, answers, setResult, sharedId, setSearchParams]);
 
   const handleRestart = () => {
+    localStorage.removeItem('result_saved_id');
     reset();
     setCurrentStep(0);
+    // URL에서 id 제거하고 홈으로
+    window.location.href = '/';
   };
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      const shareUrl = resultId
+        ? `${window.location.origin}/result?id=${resultId}`
+        : window.location.href;
+      await navigator.clipboard.writeText(shareUrl);
       showToast('링크가 복사되었습니다');
       AnalyticsEvents.copyLink();
     } catch (err) {
@@ -289,22 +540,32 @@ export function ResultStep() {
     setIsImageSaving(true);
     showToast('이미지를 생성하고 있습니다...');
 
+    const el = shareCardRef.current;
+
     try {
-      const canvas = await html2canvas(shareCardRef.current, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        logging: false,
+      el.style.visibility = 'visible';
+
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const dataUrl = await domToPng(el, {
+        width: 1080,
+        height: 1080,
+        scale: 1,
+        quality: 1,
       });
+
+      el.style.visibility = 'hidden';
 
       const link = document.createElement('a');
       link.download = 'independent-score.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
 
       showToast('이미지가 저장되었습니다');
       AnalyticsEvents.saveImage();
     } catch (err) {
       console.error('Image save error:', err);
+      el.style.visibility = 'hidden';
       showToast('이미지 저장에 실패했습니다');
     } finally {
       setIsImageSaving(false);
@@ -345,33 +606,36 @@ export function ResultStep() {
 
       {/* 헤더 */}
       <header className="text-center pb-4">
-        <p className="text-[13px] text-neutral-500 tracking-wide mb-3 font-medium">Analysis Report</p>
-        <h1 className="text-[22px] font-bold text-neutral-800">진단 결과</h1>
+        <p className="text-[11px] text-neutral-400 tracking-[0.12em] mb-2 font-medium uppercase">Analysis Report</p>
+        <h1 className="text-[20px] font-bold text-neutral-800 tracking-tight">진단 결과</h1>
       </header>
 
       {/* 점수 카드 */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-8 text-center mx-2">
-        <p className="text-[15px] text-neutral-500 font-medium mb-6">독립 가능성 점수</p>
-        <ScoreGauge score={result.score} showScore={showScore} />
-        <div className={`inline-block px-5 py-2 mt-6 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[15px] ${showGrade ? 'animate-grade-reveal' : 'opacity-0'}`}>
+      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-8 text-center mx-2">
+        <p className="text-[13px] text-neutral-400 font-medium mb-5 tracking-wide">독립 가능성 점수</p>
+        <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
+        <div className={`inline-block px-5 py-2 mt-6 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[15px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
           {result.grade}
         </div>
+        <p className="text-[12px] text-neutral-400 mt-6 tracking-wide">
+          현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
+        </p>
       </div>
 
       {/* 신뢰 안내 */}
-      <p className="text-[14px] text-neutral-500 text-center leading-relaxed mx-4">
+      <p className="text-[13px] text-neutral-400 text-center leading-relaxed mx-4">
         이 결과는 입력한 정보를 기반으로 계산된 재정 안정성 진단입니다.
       </p>
 
       {/* 독립 준비도 인덱스 */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 mx-2">
+      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
         <h3 className="text-[17px] font-bold text-neutral-800 mb-4">독립 준비도 인덱스</h3>
-        <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} />
+        <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
       </div>
 
       {/* 등급별 설명 */}
       {gradeDetail && (
-        <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 mx-2">
+        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
           <p className="text-[17px] text-neutral-800 font-bold mb-3 leading-relaxed">{gradeDetail.summary}</p>
           <p className="text-[15px] text-neutral-500 leading-relaxed">{gradeDetail.details}</p>
         </div>
@@ -379,7 +643,7 @@ export function ResultStep() {
 
       {/* 주거 유형별 맞춤 분석 */}
       {result.housingAnalysis && (
-        <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 mx-2 space-y-5">
+        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2 space-y-5">
           <div>
             <h3 className="text-[17px] font-bold text-neutral-800 mb-3">{result.housingAnalysis.title}</h3>
             <p className="text-[15px] text-neutral-600 leading-relaxed">
@@ -393,9 +657,9 @@ export function ResultStep() {
             <h4 className="text-[15px] font-semibold text-neutral-700 mb-3">전략 제안</h4>
             <ul className="space-y-2">
               {result.housingAnalysis.strategies.map((strategy, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="text-emerald-600 mt-0.5">•</span>
-                  <span className="text-[14px] text-neutral-600">{strategy}</span>
+                <li key={index} className="flex items-baseline gap-2">
+                  <span className="text-[#0F3D2E] text-[10px]">●</span>
+                  <span className="text-[14px] text-neutral-600 leading-relaxed">{strategy}</span>
                 </li>
               ))}
             </ul>
@@ -422,7 +686,7 @@ export function ResultStep() {
       )}
 
       {/* 재정 요약 */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 mx-2">
+      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
         <h3 className="text-[17px] font-bold text-neutral-800 mb-4">재정 요약</h3>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
@@ -446,7 +710,7 @@ export function ResultStep() {
           <div className="divider my-3"></div>
           <div className="flex justify-between items-center">
             <span className="text-[14px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
-            <span className="text-[20px] font-bold text-emerald-600 tabular-nums">
+            <span className="text-[20px] font-bold text-[#0F3D2E] tabular-nums">
               {(result.safetyAssets || 0).toLocaleString()}만원
             </span>
           </div>
@@ -454,7 +718,7 @@ export function ResultStep() {
       </div>
 
       {/* 카테고리별 점수 */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 mx-2">
+      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
         <h3 className="text-[17px] font-bold text-neutral-800 mb-4">카테고리별 점수</h3>
         <div className="space-y-4">
           {result.categoryScores && Object.entries(result.categoryScores).map(([key, score]) => (
@@ -465,14 +729,14 @@ export function ResultStep() {
               <div className="flex-1 h-2 bg-neutral-200 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    score >= 70 ? 'bg-emerald-600' :
+                    score >= 70 ? 'bg-[#0F3D2E]' :
                     score >= 50 ? 'bg-amber-500' : 'bg-red-500'
                   }`}
                   style={{ width: `${score}%` }}
                 />
               </div>
               <span className={`text-[14px] font-semibold w-8 text-right tabular-nums ${
-                score >= 70 ? 'text-emerald-600' :
+                score >= 70 ? 'text-[#0F3D2E]' :
                 score >= 50 ? 'text-amber-500' : 'text-red-500'
               }`}>
                 {score}
@@ -483,7 +747,7 @@ export function ResultStep() {
       </div>
 
       {/* 공유 영역 */}
-      <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-6 mx-2">
+      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
         <p className="text-center text-[14px] text-neutral-500 mb-3">
           주변 사람의 독립 준비도는 어떨까요?
         </p>

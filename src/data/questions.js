@@ -7,12 +7,13 @@ export const HOUSING_TYPES = {
   JEONSE_LOAN: 'jeonse_loan',
 };
 
-// 월세 유형 (보증금 있는 월세)
-const RENT_TYPES = [HOUSING_TYPES.RENT_STABLE, HOUSING_TYPES.RENT_LOW];
+// 월세/반전세 유형 (임대료 인상 대비 질문 대상)
+const RENT_TYPES = [HOUSING_TYPES.RENT_STABLE, HOUSING_TYPES.RENT_LOW, HOUSING_TYPES.JEONSE_SAFE];
 
 export const questions = [
   // ===== 주거비 (housing) =====
-  // 주거 형태 선택 (모든 사용자 공통)
+
+  // 1. 주거 형태 선택 (모든 사용자 공통) - 형태 자체는 감점 없음
   {
     id: 'housing_q1',
     category: 'housing',
@@ -21,39 +22,98 @@ export const questions = [
     question: '독립 후 예상하는 주거 형태는 무엇인가요?',
     options: [
       { label: '월세 (보증금 1,000만원 이상)', value: 'rent_stable', scoreImpact: 0 },
-      { label: '월세 (보증금 500만원 미만)', value: 'rent_low', scoreImpact: -10 },
-      { label: '고시원 / 쉐어하우스 (보증금 없음 또는 소액)', value: 'gosiwon_share', scoreImpact: -20 },
-      { label: '반전세/전세 (대출 없음)', value: 'jeonse_safe', scoreImpact: 0 },
-      { label: '전세 (대출 있음)', value: 'jeonse_loan', scoreImpact: -15 },
+      { label: '월세 (보증금 500만원 미만)', value: 'rent_low', scoreImpact: 0 },
+      { label: '고시원 / 쉐어하우스', value: 'gosiwon_share', scoreImpact: 0 },
+      { label: '반전세 / 전세 (대출 없음)', value: 'jeonse_safe', scoreImpact: 0 },
+      { label: '전세 (대출 있음)', value: 'jeonse_loan', scoreImpact: 0 },
     ],
   },
 
-  // === 월세 조건부 질문 ===
+  // 2. 공통 질문: 주거비 비상자금 (모든 사용자)
+  {
+    id: 'housing_emergency',
+    category: 'housing',
+    categoryLabel: '주거비',
+    title: '주거비 비상자금',
+    question: '소득이 중단될 경우 주거 계약을 유지하기 위한 별도 대비 자금은 몇 개월치입니까?',
+    options: [
+      { label: '6개월 이상', value: 'over_6months', scoreImpact: 0 },
+      { label: '3~5개월', value: '3_5months', scoreImpact: -15 },
+      { label: '1~2개월', value: '1_2months', scoreImpact: -25 },
+      { label: '거의 없음', value: 'none', scoreImpact: -35 },
+    ],
+  },
+
+  // 3. 공통 질문: 소득 감소 대응 (모든 사용자)
+  {
+    id: 'housing_income_reduction',
+    category: 'housing',
+    categoryLabel: '주거비',
+    title: '소득 감소 대응',
+    question: '소득이 30% 감소해도 현재 주거를 유지할 수 있나요?',
+    options: [
+      { label: '충분히 가능', value: 'comfortable', scoreImpact: 0 },
+      { label: '지출 조정 시 가능', value: 'adjust_spending', scoreImpact: -10 },
+      { label: '유지 어려움', value: 'difficult', scoreImpact: -25 },
+    ],
+  },
+
+  // 4. 공통 질문: 계약 안전성 (모든 사용자)
+  {
+    id: 'housing_contract_safety',
+    category: 'housing',
+    categoryLabel: '주거비',
+    title: '계약 안전성',
+    question: '전입신고, 확정일자, 보증보험에 대해 이해하고 있나요?',
+    options: [
+      { label: '잘 이해하고 준비 예정', value: 'well_prepared', scoreImpact: 0 },
+      { label: '일부만 이해', value: 'partial', scoreImpact: -5 },
+      { label: '잘 모름', value: 'unknown', scoreImpact: -15 },
+    ],
+  },
+
+  // 5. 공통 질문: 보유 현금 자산 (보정 계산용 - 감점 없음)
+  {
+    id: 'housing_asset_q1',
+    category: 'housing',
+    categoryLabel: '주거비',
+    title: '보유 현금 자산',
+    question: '현재 즉시 사용 가능한 현금성 자산은 총 생활비 기준 몇 개월치입니까?',
+    options: [
+      { label: '12개월 이상', value: 'over_12months', scoreImpact: 0 },
+      { label: '6~11개월', value: '6_11months', scoreImpact: 0 },
+      { label: '3~5개월', value: '3_5months', scoreImpact: 0 },
+      { label: '3개월 미만', value: 'under_3months', scoreImpact: 0 },
+    ],
+  },
+
+  // 6. 공통 질문: 소득 안정성 (프리랜서/변동소득 대응)
+  {
+    id: 'income_stability_q1',
+    category: 'housing',
+    categoryLabel: '주거비',
+    title: '소득 안정성',
+    question: '최근 6개월 소득 변동폭은 어느 정도입니까?',
+    options: [
+      { label: '거의 동일', value: 'stable', scoreImpact: 0 },
+      { label: '±20% 이내 변동', value: 'slight_variation', scoreImpact: -5 },
+      { label: '±40% 변동', value: 'moderate_variation', scoreImpact: -10 },
+      { label: '월별 큰 차이 있음', value: 'high_variation', scoreImpact: -20 },
+    ],
+  },
+
+  // === 월세/반전세 조건부 질문 ===
   {
     id: 'housing_rent_q1',
     category: 'housing',
     categoryLabel: '주거비',
     title: '임대료 인상 대비',
-    question: '임대료 인상 시 3개월 이상 버틸 자금이 있습니까?',
+    question: '임대료 인상 시 몇 개월을 버틸 수 있는 자금이 있나요?',
     showWhen: { questionId: 'housing_q1', values: RENT_TYPES },
     options: [
-      { label: '3개월 이상 충분히 가능', value: 'over_3months', scoreImpact: 0 },
-      { label: '1~2개월 정도 가능', value: '1_2months', scoreImpact: -10 },
+      { label: '6개월 이상 가능', value: 'over_6months', scoreImpact: 0 },
+      { label: '3~5개월 가능', value: '3_5months', scoreImpact: -10 },
       { label: '대비 자금 없음', value: 'none', scoreImpact: -20 },
-    ],
-  },
-  {
-    id: 'housing_rent_q2',
-    category: 'housing',
-    categoryLabel: '주거비',
-    title: '월세 비율',
-    question: '월세가 세후 소득의 30%를 초과합니까?',
-    showWhen: { questionId: 'housing_q1', values: RENT_TYPES },
-    options: [
-      { label: '20% 이하', value: 'under_20', scoreImpact: 0 },
-      { label: '21~30%', value: '21_30', scoreImpact: -5 },
-      { label: '30% 초과', value: 'over_30', scoreImpact: -15 },
-      { label: '40% 초과', value: 'over_40', scoreImpact: -25 },
     ],
   },
 
@@ -63,7 +123,7 @@ export const questions = [
     category: 'housing',
     categoryLabel: '주거비',
     title: '전환 계획',
-    question: '2년 이내 일반 월세로 전환 계획이 있습니까?',
+    question: '일반 월세로 전환할 계획이 있나요?',
     showWhen: { questionId: 'housing_q1', values: [HOUSING_TYPES.GOSIWON] },
     options: [
       { label: '1년 이내 전환 예정', value: 'within_1year', scoreImpact: 0 },
@@ -77,27 +137,13 @@ export const questions = [
     category: 'housing',
     categoryLabel: '주거비',
     title: '보증금 저축',
-    question: '보증금 마련을 위한 저축 계획이 있습니까?',
+    question: '보증금 마련을 위한 저축을 하고 있나요?',
     showWhen: { questionId: 'housing_q1', values: [HOUSING_TYPES.GOSIWON] },
     options: [
       { label: '매월 정기 저축 중', value: 'saving_monthly', scoreImpact: 0 },
       { label: '저축 계획 수립 중', value: 'planning', scoreImpact: -5 },
-      { label: '저축 여력이 부족함', value: 'no_余裕', scoreImpact: -15 },
+      { label: '저축 여력이 부족함', value: 'insufficient', scoreImpact: -15 },
       { label: '저축 계획 없음', value: 'no_plan', scoreImpact: -20 },
-    ],
-  },
-  {
-    id: 'housing_gosiwon_q3',
-    category: 'housing',
-    categoryLabel: '주거비',
-    title: '전환 시점',
-    question: '전환 예상 시점은 언제입니까?',
-    showWhen: { questionId: 'housing_q1', values: [HOUSING_TYPES.GOSIWON] },
-    options: [
-      { label: '6개월 이내', value: 'within_6months', scoreImpact: 0 },
-      { label: '1년 이내', value: 'within_1year', scoreImpact: -5 },
-      { label: '2년 이내', value: 'within_2years', scoreImpact: -10 },
-      { label: '미정 / 알 수 없음', value: 'unknown', scoreImpact: -15 },
     ],
   },
 
@@ -107,7 +153,7 @@ export const questions = [
     category: 'housing',
     categoryLabel: '주거비',
     title: '전세금 인상 대비',
-    question: '전세금 상승 시 추가 자금 마련이 가능합니까?',
+    question: '전세금 상승 시 추가 자금 마련이 가능한가요?',
     showWhen: { questionId: 'housing_q1', values: [HOUSING_TYPES.JEONSE_SAFE] },
     options: [
       { label: '여유 자금으로 충분히 가능', value: 'enough', scoreImpact: 0 },
@@ -121,13 +167,13 @@ export const questions = [
     category: 'housing',
     categoryLabel: '주거비',
     title: '자산 집중도',
-    question: '전세금이 전체 자산의 70% 이상입니까?',
+    question: '전세금이 전체 자산에서 차지하는 비율은?',
     showWhen: { questionId: 'housing_q1', values: [HOUSING_TYPES.JEONSE_SAFE] },
     options: [
       { label: '50% 미만', value: 'under_50', scoreImpact: 0 },
       { label: '50~70%', value: '50_70', scoreImpact: -5 },
-      { label: '70% 이상', value: 'over_70', scoreImpact: -15 },
-      { label: '거의 전부 (90% 이상)', value: 'over_90', scoreImpact: -25 },
+      { label: '70~90%', value: '70_90', scoreImpact: -15 },
+      { label: '90% 이상', value: 'over_90', scoreImpact: -25 },
     ],
   },
 
@@ -137,12 +183,12 @@ export const questions = [
     category: 'housing',
     categoryLabel: '주거비',
     title: '금리 상승 대비',
-    question: '금리 2% 상승 시 상환 가능합니까?',
+    question: '금리가 2% 상승해도 상환 가능한가요?',
     showWhen: { questionId: 'housing_q1', values: [HOUSING_TYPES.JEONSE_LOAN] },
     options: [
       { label: '충분히 감당 가능', value: 'comfortable', scoreImpact: 0 },
-      { label: '다른 지출 줄이면 가능', value: 'cut_others', scoreImpact: -10 },
-      { label: '상당히 부담됨', value: 'burdensome', scoreImpact: -15 },
+      { label: '지출 줄이면 가능', value: 'cut_others', scoreImpact: -10 },
+      { label: '상당히 부담됨', value: 'burdensome', scoreImpact: -20 },
       { label: '상환 어려움', value: 'difficult', scoreImpact: -25 },
     ],
   },
@@ -151,30 +197,20 @@ export const questions = [
     category: 'housing',
     categoryLabel: '주거비',
     title: '상환 비상금',
-    question: '6개월 이상 상환 가능한 비상금이 있습니까?',
+    question: '대출 상환을 위한 비상금이 몇 개월치 있나요?',
     showWhen: { questionId: 'housing_q1', values: [HOUSING_TYPES.JEONSE_LOAN] },
     options: [
       { label: '6개월 이상 보유', value: 'over_6months', scoreImpact: 0 },
-      { label: '3~6개월 보유', value: '3_6months', scoreImpact: -10 },
-      { label: '3개월 미만', value: 'under_3months', scoreImpact: -15 },
+      { label: '3~5개월 보유', value: '3_5months', scoreImpact: -10 },
+      { label: '3개월 미만', value: 'under_3months', scoreImpact: -20 },
       { label: '비상금 없음', value: 'none', scoreImpact: -25 },
     ],
   },
 
   // ===== 식비 (food) =====
-  {
-    id: 'food_q1',
-    category: 'food',
-    categoryLabel: '식비',
-    title: '식사 해결 방식',
-    question: '평소 식사를 주로 어떻게 해결하나요?',
-    options: [
-      { label: '대부분 직접 요리', value: 'cook_mostly', scoreImpact: 0 },
-      { label: '요리 반, 외식/배달 반', value: 'half_half', scoreImpact: -5 },
-      { label: '외식/배달이 더 많음', value: 'eat_out_more', scoreImpact: -10 },
-      { label: '거의 외식/배달', value: 'eat_out_always', scoreImpact: -15 },
-    ],
-  },
+  // food_q1 삭제됨 (food_q2와 중복)
+  // 식비율(food_ratio)은 자동 계산됨: 월 식비 / 월 수입
+
   {
     id: 'food_q2',
     category: 'food',
@@ -183,9 +219,9 @@ export const questions = [
     question: '일주일에 배달/외식을 몇 번 하나요?',
     options: [
       { label: '주 1~2회 이하', value: 'rarely', scoreImpact: 0 },
-      { label: '주 3~4회', value: 'sometimes', scoreImpact: -5 },
-      { label: '주 5~7회', value: 'often', scoreImpact: -10 },
-      { label: '거의 매일 2회 이상', value: 'always', scoreImpact: -15 },
+      { label: '주 3~4회', value: 'sometimes', scoreImpact: -3 },
+      { label: '주 5~7회', value: 'often', scoreImpact: -7 },
+      { label: '거의 매일 2회 이상', value: 'always', scoreImpact: -10 },
     ],
   },
   {
@@ -206,11 +242,11 @@ export const questions = [
     category: 'food',
     categoryLabel: '식비',
     title: '식비 현실 인식',
-    question: '입력한 식비로 실제 한 달을 버틸 수 있나요?',
+    question: '현재 입력한 식비가 실제 지출과 차이가 있습니까?',
     options: [
-      { label: '충분히 가능 (여유 있음)', value: 'enough', scoreImpact: 0 },
-      { label: '딱 맞거나 약간 빠듯', value: 'tight', scoreImpact: -5 },
-      { label: '솔직히 부족할 것 같음', value: 'not_enough', scoreImpact: -10 },
+      { label: '거의 일치함', value: 'enough', scoreImpact: 0 },
+      { label: '약간 차이 있음', value: 'tight', scoreImpact: -5 },
+      { label: '실제가 더 많을 것 같음', value: 'not_enough', scoreImpact: -10 },
       { label: '잘 모르겠음', value: 'unknown', scoreImpact: -15 },
     ],
   },
@@ -270,32 +306,10 @@ export const questions = [
   },
 
   // ===== 교통비 (transport) =====
-  {
-    id: 'transport_q1',
-    category: 'transport',
-    categoryLabel: '교통비',
-    title: '주요 이동 수단',
-    question: '주로 어떤 이동 수단을 사용하나요?',
-    options: [
-      { label: '대중교통 위주', value: 'public', scoreImpact: 0 },
-      { label: '자전거/도보 위주', value: 'bike_walk', scoreImpact: 0 },
-      { label: '자가용 위주', value: 'car', scoreImpact: -10 },
-      { label: '택시/카셰어링 자주 이용', value: 'taxi_share', scoreImpact: -10 },
-    ],
-  },
-  {
-    id: 'transport_q2',
-    category: 'transport',
-    categoryLabel: '교통비',
-    title: '출퇴근 비용',
-    question: '출퇴근/통학에 드는 월 교통비는?',
-    options: [
-      { label: '5만원 이하', value: 'under_5', scoreImpact: 0 },
-      { label: '5~10만원', value: '5_10', scoreImpact: -5 },
-      { label: '10~20만원', value: '10_20', scoreImpact: -10 },
-      { label: '20만원 초과', value: 'over_20', scoreImpact: -15 },
-    ],
-  },
+  // transport_q1 삭제됨 (생활방식 감점 제거)
+  // transport_q2 삭제됨 (절대금액 기준 → 비율 기반으로 대체)
+  // 교통비율(transport_ratio)은 자동 계산됨: 월 교통비 / 월 수입
+
   {
     id: 'transport_q3',
     category: 'transport',
@@ -324,19 +338,9 @@ export const questions = [
   },
 
   // ===== 여가비 (leisure) =====
-  {
-    id: 'leisure_q1',
-    category: 'leisure',
-    categoryLabel: '여가비',
-    title: '여가 소비 패턴',
-    question: '주로 어떤 여가 활동에 돈을 쓰나요?',
-    options: [
-      { label: '무료/저비용 활동 위주', value: 'free_low', scoreImpact: 0 },
-      { label: '적당한 취미 (월 5만원 이하)', value: 'moderate', scoreImpact: -5 },
-      { label: '비용이 드는 취미 (월 10만원 이상)', value: 'expensive', scoreImpact: -10 },
-      { label: '고비용 취미 (월 20만원 이상)', value: 'very_expensive', scoreImpact: -15 },
-    ],
-  },
+  // leisure_q1 삭제됨 (생활방식/절대금액 기준 감점 제거)
+  // 여가비율(leisure_ratio)은 자동 계산됨: 월 여가비 / 월 수입
+
   {
     id: 'leisure_q2',
     category: 'leisure',
@@ -378,19 +382,9 @@ export const questions = [
   },
 
   // ===== 생활 잡비 (misc) =====
-  {
-    id: 'misc_q1',
-    category: 'misc',
-    categoryLabel: '생활 잡비',
-    title: '생필품 구매 습관',
-    question: '생필품을 어떻게 구매하나요?',
-    options: [
-      { label: '필요할 때만 최소한으로', value: 'minimal', scoreImpact: 0 },
-      { label: '할인할 때 미리 구매', value: 'bulk_discount', scoreImpact: 0 },
-      { label: '필요 이상으로 사는 편', value: 'over_buy', scoreImpact: -10 },
-      { label: '충동적으로 자주 구매', value: 'impulsive', scoreImpact: -15 },
-    ],
-  },
+  // misc_q1 삭제됨 (생활방식 감점 제거)
+  // 잡비율(misc_ratio)은 자동 계산됨: 월 생활잡비 / 월 수입
+
   {
     id: 'misc_q2',
     category: 'misc',
@@ -432,12 +426,15 @@ export const questions = [
   },
 
   // ===== 저축/비상금 (savings) =====
+  // savings_q4 삭제됨 (savings_q1과 중복)
+  // 저축률(savings_ratio)은 자동 계산됨: 월 저축액 / 월 수입
+
   {
     id: 'savings_q1',
     category: 'savings',
     categoryLabel: '저축·비상금',
     title: '현재 비상금 수준',
-    question: '지금 당장 쓸 수 있는 비상금이 얼마나 있나요?',
+    question: '예상치 못한 상황에서 전체 생활비(주거·식비·기타 포함)를 감당할 수 있는 총 비상자금은 몇 개월치입니까?',
     options: [
       { label: '6개월 이상 생활비', value: 'over_6months', scoreImpact: 0 },
       { label: '3~6개월 생활비', value: '3_6months', scoreImpact: -5 },
@@ -469,19 +466,6 @@ export const questions = [
       { label: '저축 깨서 해결', value: 'break_savings', scoreImpact: -5 },
       { label: '가족/지인에게 빌림', value: 'borrow_family', scoreImpact: -10 },
       { label: '대출/카드론 이용', value: 'loan', scoreImpact: -20 },
-    ],
-  },
-  {
-    id: 'savings_q4',
-    category: 'savings',
-    categoryLabel: '저축·비상금',
-    title: '재정 안전망 인식',
-    question: '실직/질병 시 몇 개월을 버틸 수 있나요?',
-    options: [
-      { label: '6개월 이상', value: 'over_6months', scoreImpact: 0 },
-      { label: '3~6개월', value: '3_6months', scoreImpact: -5 },
-      { label: '1~3개월', value: '1_3months', scoreImpact: -10 },
-      { label: '1개월도 어려움', value: 'under_1month', scoreImpact: -20 },
     ],
   },
 ];

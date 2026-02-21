@@ -28,7 +28,7 @@ export function StepLayout({
   return (
     <div className="min-h-dvh flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white border-b border-neutral-200 py-4 px-5">
+      <header className="sticky top-0 z-30 bg-white border-b border-neutral-100 py-4 px-5">
         {showProgress && (
           isQuestionStep ? (
             <ProgressBar
@@ -48,12 +48,12 @@ export function StepLayout({
         {(title || subtitle) && (
           <div className="mb-4">
             {title && (
-              <h1 className="text-lg font-semibold text-neutral-800">
+              <h1 className="text-[17px] font-semibold text-neutral-800 tracking-tight leading-snug">
                 {title}
               </h1>
             )}
             {subtitle && (
-              <p className="text-sm text-neutral-500 mt-1">
+              <p className="text-[13px] text-neutral-400 mt-1.5 leading-relaxed">
                 {subtitle}
               </p>
             )}
@@ -67,7 +67,7 @@ export function StepLayout({
       </main>
 
       {/* Footer */}
-      <footer className="sticky bottom-0 z-20 bg-white border-t border-neutral-200 py-3 px-5">
+      <footer className="sticky bottom-0 z-20 bg-white border-t border-neutral-100 py-3 px-5">
         <div className="flex gap-3">
           {showBackButton && currentStep > 0 && (
             <Button

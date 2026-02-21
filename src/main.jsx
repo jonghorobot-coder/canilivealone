@@ -1,7 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { SurveyProvider } from './context/SurveyContext';
 import { initGA } from './utils/analytics';
+import ErrorBoundary from './components/ErrorBoundary';
 import App from './App';
 import './index.css';
 
@@ -10,8 +12,12 @@ initGA();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <SurveyProvider>
-      <App />
-    </SurveyProvider>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <SurveyProvider>
+          <App />
+        </SurveyProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>
 );
