@@ -6,6 +6,7 @@ import { IntroStep } from './components/steps/IntroStep';
 import { ExpenseStep } from './components/steps/ExpenseStep';
 import { QuestionStep } from './components/steps/QuestionStep';
 import { ResultStep } from './components/steps/ResultStep';
+import { NotFound } from './pages/NotFound';
 
 function PageLayout({ children }) {
   return (
@@ -64,6 +65,7 @@ function App() {
     <Routes>
       <Route path="/" element={<SurveyPage />} />
       <Route path="/result" element={<ResultPage />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

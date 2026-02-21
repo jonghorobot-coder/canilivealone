@@ -36,6 +36,12 @@ export function QuestionStep({ question }) {
   const showModal = pendingCategoryModal === currentCategory && categoryInfo;
 
   useEffect(() => {
+    if (question?.id) {
+      AnalyticsEvents.viewQuestionStep(question.id);
+    }
+  }, [question?.id]);
+
+  useEffect(() => {
     if (isHalfwayPoint) {
       setShowHalfwayToast(true);
       const timer = setTimeout(() => setShowHalfwayToast(false), 3000);

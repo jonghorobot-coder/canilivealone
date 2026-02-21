@@ -471,6 +471,8 @@ export function ResultStep() {
       setIsLoading(false);
       setShowScore(true);
       setShowGrade(true);
+
+      AnalyticsEvents.viewResultPage();
     }
 
     loadSharedResult();
@@ -497,6 +499,8 @@ export function ResultStep() {
       setTimeout(() => setShowScore(true), 300);
       setTimeout(() => setShowGrade(true), 1500);
 
+      AnalyticsEvents.viewResultPage();
+
       if (calculatedResult) {
         AnalyticsEvents.reachResult(calculatedResult.score, calculatedResult.grade);
 
@@ -506,6 +510,9 @@ export function ResultStep() {
           setResultId(savedId);
           // URL에 id 추가 (히스토리 교체)
           setSearchParams({ id: savedId }, { replace: true });
+        } else {
+          // 저장 실패 시 사용자에게 알림 (앱 동작은 유지)
+          showToast('결과 저장에 실패했습니다. 링크 공유가 제한됩니다.');
         }
       }
     }, LOADING_DURATION);
@@ -514,6 +521,7 @@ export function ResultStep() {
   }, [income, expenses, answers, setResult, sharedId, setSearchParams]);
 
   const handleRestart = () => {
+    AnalyticsEvents.restartDiagnosis();
     localStorage.removeItem('result_saved_id');
     reset();
     setCurrentStep(0);
@@ -582,6 +590,7 @@ export function ResultStep() {
           <button
             onClick={handleRestart}
             className="btn-secondary w-full py-4"
+            aria-label="진단을 처음부터 다시 시작"
           >
             처음부터 다시하기
           </button>
@@ -759,12 +768,14 @@ export function ResultStep() {
             onClick={handleSaveImage}
             disabled={isImageSaving}
             className="btn-secondary flex-1 h-12 text-[14px] disabled:opacity-50"
+            aria-label="진단 결과를 이미지로 저장"
           >
             {isImageSaving ? '저장 중...' : '이미지로 저장'}
           </button>
           <button
             onClick={handleCopyLink}
             className="btn-secondary flex-1 h-12 text-[14px]"
+            aria-label="결과 공유 링크 복사"
           >
             링크 복사
           </button>
@@ -776,6 +787,7 @@ export function ResultStep() {
         <button
           onClick={handleRestart}
           className="btn-primary w-full h-14 text-[15px]"
+          aria-label="진단을 처음부터 다시 시작"
         >
           처음부터 다시하기
         </button>

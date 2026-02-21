@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { StepLayout } from '../layout/StepLayout';
 import { NumberInput } from '../common/NumberInput';
 import { useSurvey } from '../../hooks/useSurvey';
@@ -11,6 +12,10 @@ const fixedExpenses = ['fixed', 'savings'];
 
 export function ExpenseStep() {
   const { income, expenses, setIncome, setExpense, nextStep } = useSurvey();
+
+  useEffect(() => {
+    AnalyticsEvents.viewExpenseStep();
+  }, []);
 
   const incomeValue = toNumber(income);
   const isIncomeZero = income !== '' && incomeValue === 0;

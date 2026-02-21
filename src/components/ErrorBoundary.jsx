@@ -10,6 +10,23 @@ class ErrorBoundary extends Component {
     return { hasError: true };
   }
 
+  componentDidCatch(error, errorInfo) {
+    // 에러 로깅
+    console.error('[ErrorBoundary] Error:', error);
+    console.error('[ErrorBoundary] Component Stack:', errorInfo.componentStack);
+
+    // 향후 Sentry 등 외부 서비스 연동 시 여기에 추가
+    // Example: Sentry.captureException(error, { extra: errorInfo });
+    if (typeof window !== 'undefined' && window.reportError) {
+      window.reportError({
+        error: error.toString(),
+        componentStack: errorInfo.componentStack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+      });
+    }
+  }
+
   handleRefresh = () => {
     window.location.reload();
   };
@@ -27,6 +44,7 @@ class ErrorBoundary extends Component {
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -50,12 +68,22 @@ class ErrorBoundary extends Component {
               </p>
 
               {/* 버튼 */}
-              <button
-                onClick={this.handleRefresh}
-                className="w-full h-[52px] rounded-[10px] bg-[#0F3D2E] hover:bg-[#0a2e22] text-white text-[15px] font-semibold shadow-sm transition-colors tracking-tight"
-              >
-                새로고침
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={this.handleRefresh}
+                  className="w-full h-[52px] rounded-[10px] bg-[#0F3D2E] hover:bg-[#0a2e22] text-white text-[15px] font-semibold shadow-sm transition-colors tracking-tight"
+                  aria-label="현재 페이지 새로고침"
+                >
+                  새로고침
+                </button>
+                <a
+                  href="/"
+                  className="block w-full h-[52px] rounded-[10px] bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[15px] font-semibold transition-colors tracking-tight leading-[52px] text-center"
+                  aria-label="홈으로 이동"
+                >
+                  홈으로 이동
+                </a>
+              </div>
 
               {/* 서브 텍스트 */}
               <p className="mt-4 text-[13px] text-neutral-400">

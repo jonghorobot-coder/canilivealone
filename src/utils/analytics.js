@@ -12,13 +12,20 @@ export function initGA() {
     return;
   }
 
+  // dataLayer 및 gtag 함수 초기화 (스크립트 로드 전에 필요)
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function() {
+    window.dataLayer.push(arguments);
+  };
+  window.gtag('js', new Date());
+
   // gtag.js 스크립트 동적 로드
   const script = document.createElement('script');
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
   document.head.appendChild(script);
 
-  // gtag 설정
+  // gtag 설정 (이제 안전하게 호출 가능)
   window.gtag('config', GA_ID, {
     send_page_view: true,
   });
@@ -68,5 +75,36 @@ export const AnalyticsEvents = {
     event_category: 'engagement',
     event_label: `Step ${step}`,
     value: step,
+  }),
+
+  // 인트로 화면 조회
+  viewIntro: () => trackEvent('view_intro', {
+    event_category: 'pageview',
+    event_label: 'Intro Page',
+  }),
+
+  // 지출 입력 단계 조회
+  viewExpenseStep: () => trackEvent('view_expense_step', {
+    event_category: 'pageview',
+    event_label: 'Expense Step',
+  }),
+
+  // 설문 단계 조회
+  viewQuestionStep: (questionId) => trackEvent('view_question_step', {
+    event_category: 'pageview',
+    event_label: `Question ${questionId}`,
+    value: questionId,
+  }),
+
+  // 결과 페이지 조회
+  viewResultPage: () => trackEvent('view_result_page', {
+    event_category: 'pageview',
+    event_label: 'Result Page',
+  }),
+
+  // 진단 재시작
+  restartDiagnosis: () => trackEvent('restart_diagnosis', {
+    event_category: 'engagement',
+    event_label: 'Restart Button Click',
   }),
 };

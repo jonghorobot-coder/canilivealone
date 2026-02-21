@@ -1,8 +1,13 @@
+import { useEffect } from 'react';
 import { useSurvey } from '../../hooks/useSurvey';
 import { AnalyticsEvents } from '../../utils/analytics';
 
 export function IntroStep() {
   const { nextStep } = useSurvey();
+
+  useEffect(() => {
+    AnalyticsEvents.viewIntro();
+  }, []);
 
   const handleStart = () => {
     AnalyticsEvents.startDiagnosis();
@@ -36,6 +41,7 @@ export function IntroStep() {
         <button
           onClick={handleStart}
           className="w-full h-[52px] rounded-[10px] bg-[#0F3D2E] hover:bg-[#0a2e22] text-white text-[15px] font-semibold shadow-sm transition-colors tracking-tight"
+          aria-label="독립점수 진단 시작하기"
         >
           진단 시작
         </button>
