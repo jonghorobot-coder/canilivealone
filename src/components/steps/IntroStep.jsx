@@ -210,7 +210,7 @@ export function IntroStep() {
           </button>
 
           <p className="mt-4 text-[13px] text-neutral-400 text-center">
-            재무 자립도 분석 리포트 제공
+            모든 정보는 익명으로 안전하게 저장됩니다
           </p>
         </section>
 
