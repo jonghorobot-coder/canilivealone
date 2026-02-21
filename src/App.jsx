@@ -7,6 +7,8 @@ import { ExpenseStep } from './components/steps/ExpenseStep';
 import { QuestionStep } from './components/steps/QuestionStep';
 import { ResultStep } from './components/steps/ResultStep';
 import { NotFound } from './pages/NotFound';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsOfService } from './pages/TermsOfService';
 
 function PageLayout({ children }) {
   return (
@@ -65,6 +67,8 @@ function App() {
     <Routes>
       <Route path="/" element={<SurveyPage />} />
       <Route path="/result" element={<ResultPage />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
