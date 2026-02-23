@@ -1,5 +1,5 @@
 import { createContext, useCallback, useMemo } from 'react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useSurveyState } from '../hooks/useSurveyState';
 import { questions, getFilteredQuestions, getQuestionCategories } from '../data/questions';
 
 // 질문 ID 기반으로 answers 초기값 동적 생성
@@ -31,7 +31,7 @@ const initialState = {
 export const SurveyContext = createContext(null);
 
 export function SurveyProvider({ children }) {
-  const [state, setState, clearStorage] = useLocalStorage(initialState);
+  const [state, setState, resetState] = useSurveyState(initialState);
 
   // 현재 답변 상태에 따라 필터링된 질문 목록
   const filteredQuestions = useMemo(() => {
@@ -169,8 +169,8 @@ export function SurveyProvider({ children }) {
   }, [setState]);
 
   const reset = useCallback(() => {
-    clearStorage();
-  }, [clearStorage]);
+    resetState();
+  }, [resetState]);
 
   // 현재 스텝이 어떤 단계인지 판별하는 헬퍼
   const stepInfo = useMemo(() => {
