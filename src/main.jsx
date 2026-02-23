@@ -18,9 +18,9 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     hiddenTime = Date.now();
   } else if (document.visibilityState === 'visible') {
-    // 0.5초 이상 숨겨져 있었으면 새로고침 (짧은 앱 전환은 무시)
+    // 30초 이상 숨겨져 있었으면 새로고침 (짧은 앱 전환은 무시)
     const wasHiddenFor = Date.now() - hiddenTime;
-    if (hiddenTime > 0 && wasHiddenFor > 500 && window.location.pathname === '/') {
+    if (hiddenTime > 0 && wasHiddenFor > 30000 && window.location.pathname === '/') {
       window.location.reload();
     }
   }
