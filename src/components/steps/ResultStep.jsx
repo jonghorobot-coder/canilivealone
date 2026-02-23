@@ -588,7 +588,7 @@ export function ResultStep() {
 
     const shareData = {
       title: '독립점수 진단 결과',
-      text: '나의 독립 준비 상태를 확인해보세요!',
+      text: '나의 독립 진단 분석 리포트입니다.',
       url: shareUrl,
     };
 
