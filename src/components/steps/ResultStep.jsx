@@ -263,14 +263,16 @@ function ShareCard({ result, cardRef }) {
 
   const scoreColor = getScoreColor(score);
 
-  // 카테고리별 점수 (입력 순서대로 앞 4개)
+  // 카테고리별 점수 (낮은 점수 우선 4개 - 개선 필요 영역 강조)
   const categoryData = result?.categoryScores
-    ? [
-        { key: 'housing', label: '주거', score: result.categoryScores.housing },
-        { key: 'food', label: '식비', score: result.categoryScores.food },
-        { key: 'fixed', label: '고정', score: result.categoryScores.fixed },
-        { key: 'transport', label: '교통', score: result.categoryScores.transport },
-      ]
+    ? CATEGORY_ORDER
+        .map((key) => ({
+          key,
+          label: CATEGORY_RISK_LABELS[key],
+          score: result.categoryScores[key],
+        }))
+        .sort((a, b) => a.score - b.score)
+        .slice(0, 4)
     : [];
 
   // SVG 원형 게이지 계산
