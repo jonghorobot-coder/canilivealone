@@ -19,6 +19,8 @@ export function IntroStep() {
 
   const handleCloseModal = () => {
     setShowConsentModal(false);
+    setAgreedPrivacy(false);
+    setAgreedTerms(false);
   };
 
   const handleConfirm = () => {
