@@ -180,11 +180,11 @@ export function IntroStep() {
 
       <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 40%, #1a5c45 70%, #0F3D2E 100%)' }}>
 
-        {/* Hero 영역 - 수직 중앙 정렬 */}
-        <div className="flex-1 flex items-center justify-center px-6">
+        {/* Hero 영역 - 수직 중앙 + 위로 소폭 이동 (footer 높이 보정) */}
+        <div className="flex-1 flex items-center justify-center px-6 pb-20">
           <div className="w-full max-w-md text-center">
             {/* 로고 */}
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-5">
               <div className="w-[52px] h-[52px] bg-white/12 rounded-[14px] flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 100 100">
                   <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
@@ -201,12 +201,12 @@ export function IntroStep() {
             <h1 className="text-[28px] font-bold text-white leading-tight tracking-tight mb-3">
               독립 점수 진단
             </h1>
-            <p className="text-[14px] text-white/60 leading-relaxed mb-10">
+            <p className="text-[14px] text-white/60 leading-relaxed mb-7">
               월 수입·지출 구조 기반<br />
               재무 자립 가능성 분석
             </p>
 
-            {/* CTA 버튼 - 강한 대비와 시각적 무게감 */}
+            {/* CTA 버튼 */}
             <button
               onClick={handleStartClick}
               className="w-full h-[54px] rounded-[12px] bg-white text-[#0F3D2E] text-[16px] font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] hover:shadow-[0_6px_28px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 tracking-tight"
@@ -215,16 +215,16 @@ export function IntroStep() {
               진단 시작
             </button>
 
-            {/* 신뢰 문구 - 가독성 확보 */}
-            <p className="mt-4 text-[12px] text-white/60 text-center">
+            {/* 신뢰 문구 - 버튼의 보조 요소로 명확히 인식 */}
+            <p className="mt-3 text-[11px] text-white/80 text-center tracking-wide">
               모든 정보는 익명으로 안전하게 저장됩니다
             </p>
           </div>
         </div>
 
-        {/* 하단 통계 - safe-area 확보, 명확한 분리 */}
-        <div className="w-full max-w-md mx-auto px-6 pb-10">
-          <div className="pt-5 border-t border-white/15">
+        {/* 하단 통계 */}
+        <div className="w-full max-w-md mx-auto px-6 pb-8">
+          <div className="pt-4 border-t border-white/15">
             <div className="flex items-center">
               <div className="text-center flex-1 pr-4 border-r border-white/15">
                 <span className="text-[18px] font-semibold text-white block tabular-nums tracking-tight">2분</span>
