@@ -655,7 +655,7 @@ export function ResultStep() {
   const gradeDetail = GRADE_DETAILS[result.grade];
 
   return (
-    <div className="min-h-dvh bg-[#FAFAFA]">
+    <div className="min-h-dvh bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2]">
       <ShareCard result={result} cardRef={shareCardRef} />
 
       {/* 토스트 */}
@@ -665,12 +665,29 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 그린 헤더 영역 */}
+      {/* 데스크톱: 상단 네비게이션 */}
+      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-white border-b border-neutral-100">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#0F3D2E] rounded-[8px] flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 100 100">
+              <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+              <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+              <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
+            </svg>
+          </div>
+          <span className="text-[#0F3D2E] font-bold text-[17px] tracking-tight">독립점수</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[13px] text-neutral-500">분석 완료</span>
+          <span className="w-2 h-2 bg-[#0F3D2E] rounded-full" />
+        </div>
+      </nav>
+
+      {/* 모바일: 그린 헤더 영역 */}
       <div
-        className="text-center pt-5 pb-14 px-4"
+        className="lg:hidden text-center pt-5 pb-14 px-4"
         style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 60%, #1a5c45 100%)' }}
       >
-        {/* 미니 로고 */}
         <div className="w-7 h-7 bg-white/15 rounded-[7px] flex items-center justify-center mx-auto mb-2">
           <svg width="14" height="14" viewBox="0 0 100 100">
             <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
@@ -681,8 +698,47 @@ export function ResultStep() {
         <p className="text-[10px] text-white/50 tracking-[0.1em] uppercase">Analysis Complete</p>
       </div>
 
-      {/* 플로팅 점수 카드 */}
-      <div className="px-4 -mt-10 space-y-4 pb-6">
+      {/* 메인 콘텐츠 */}
+      <div className="px-4 -mt-10 lg:mt-0 lg:px-8 xl:px-16 lg:py-8 pb-6">
+        <div className="lg:max-w-5xl lg:mx-auto lg:grid lg:grid-cols-3 lg:gap-8">
+
+          {/* 왼쪽: 점수 카드 (데스크톱에서 사이드바) */}
+          <div className="lg:col-span-1 space-y-4 lg:space-y-6">
+            <div className="bg-white rounded-xl shadow-sm p-6 text-center lg:sticky lg:top-8">
+              <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
+              <div className={`inline-block px-4 py-1.5 mt-4 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[14px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
+                {result.grade}
+              </div>
+              <p className="text-[12px] text-neutral-500 mt-3">
+                {GRADE_VERDICT[result.grade]}
+              </p>
+              <p className="text-[11px] text-neutral-400 mt-4 tracking-wide">
+                현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
+              </p>
+
+              {/* 데스크톱: 공유 버튼을 점수 카드에 포함 */}
+              <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100">
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveImage}
+                    disabled={isImageSaving}
+                    className="flex-1 h-10 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50 transition-colors hover:bg-[#0a2e22]"
+                  >
+                    {isImageSaving ? '저장 중...' : '이미지 저장'}
+                  </button>
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex-1 h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
+                  >
+                    링크 복사
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 오른쪽: 상세 분석 */}
+          <div className="lg:col-span-2 space-y-4 mt-4 lg:mt-0">
         <div className="bg-white rounded-xl shadow-sm p-6 text-center">
           <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
           <div className={`inline-block px-4 py-1.5 mt-4 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[14px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
@@ -885,8 +941,8 @@ export function ResultStep() {
         </div>
       </div>
 
-      {/* 9. 공유 영역 */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
+      {/* 9. 공유 영역 - 모바일 전용 */}
+      <div className="lg:hidden bg-white rounded-xl shadow-sm p-4">
         <h3 className="text-[14px] font-bold text-neutral-800 mb-1 text-center">
           결과 저장 및 공유
         </h3>
@@ -913,7 +969,7 @@ export function ResultStep() {
       </div>
 
       {/* 다시하기 버튼 */}
-      <div className="pt-2 pb-6">
+      <div className="pt-2 pb-6 lg:pb-0">
         <button
           onClick={handleRestart}
           className="w-full h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
@@ -922,7 +978,21 @@ export function ResultStep() {
           처음부터 다시하기
         </button>
       </div>
-      </div>
+
+          </div>{/* 오른쪽 컬럼 끝 */}
+        </div>{/* 그리드 끝 */}
+      </div>{/* 메인 콘텐츠 끝 */}
+
+      {/* 데스크톱: 하단 푸터 */}
+      <footer className="hidden lg:block px-8 xl:px-16 py-6 border-t border-neutral-200 bg-white mt-8">
+        <div className="max-w-5xl mx-auto flex items-center justify-between text-neutral-400 text-[13px]">
+          <p>© 2024 독립점수. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <a href="/privacy" className="hover:text-neutral-600 transition-colors">개인정보처리방침</a>
+            <a href="/terms" className="hover:text-neutral-600 transition-colors">이용약관</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

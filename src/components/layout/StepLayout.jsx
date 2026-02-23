@@ -34,12 +34,37 @@ export function StepLayout({
     : `${currentStep}/${totalSteps}`;
 
   return (
-    <div className="min-h-dvh flex flex-col bg-[#FAFAFA]">
-      {/* Header - 그린 배경 */}
-      <header className="sticky top-0 z-30 bg-[#0F3D2E] py-3 px-4">
+    <div className="min-h-dvh flex flex-col bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2]">
+      {/* 데스크톱: 상단 네비게이션 */}
+      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-white border-b border-neutral-100">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#0F3D2E] rounded-[8px] flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 100 100">
+              <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+              <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+              <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
+            </svg>
+          </div>
+          <span className="text-[#0F3D2E] font-bold text-[17px] tracking-tight">독립점수</span>
+        </div>
+        {showProgress && (
+          <div className="flex items-center gap-4">
+            <span className="text-[13px] text-neutral-500">진행률</span>
+            <div className="w-48 h-2 bg-neutral-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#0F3D2E] rounded-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <span className="text-[13px] font-medium text-[#0F3D2E] tabular-nums">{progressLabel}</span>
+          </div>
+        )}
+      </nav>
+
+      {/* 모바일: Header - 그린 배경 */}
+      <header className="lg:hidden sticky top-0 z-30 bg-[#0F3D2E] py-3 px-4">
         {showProgress && (
           <div className="flex items-center gap-3">
-            {/* 미니 로고 */}
             <div className="w-7 h-7 bg-white/12 rounded-[7px] flex items-center justify-center flex-shrink-0">
               <svg width="14" height="14" viewBox="0 0 100 100">
                 <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
@@ -47,14 +72,12 @@ export function StepLayout({
                 <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
               </svg>
             </div>
-            {/* 프로그레스 바 */}
             <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            {/* 진행률 텍스트 */}
             <span className="text-[11px] text-white/60 flex-shrink-0 tabular-nums">
               {progressLabel}
             </span>
@@ -63,31 +86,58 @@ export function StepLayout({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 py-4 px-4 pb-24 space-y-4">
-        {/* 타이틀 영역 */}
-        {(title || subtitle) && (
-          <div className="mb-3">
-            {title && (
-              <h1 className="text-[16px] font-semibold text-neutral-800 tracking-tight leading-snug">
-                {title}
-              </h1>
+      <main className="flex-1 py-4 px-4 pb-24 space-y-4 lg:py-8 lg:px-8 lg:pb-8 lg:flex lg:justify-center">
+        <div className="lg:w-full lg:max-w-2xl lg:bg-white lg:rounded-2xl lg:shadow-sm lg:border lg:border-neutral-100 lg:p-8">
+          {/* 타이틀 영역 */}
+          {(title || subtitle) && (
+            <div className="mb-3 lg:mb-6">
+              {title && (
+                <h1 className="text-[16px] lg:text-[20px] font-semibold text-neutral-800 tracking-tight leading-snug">
+                  {title}
+                </h1>
+              )}
+              {subtitle && (
+                <p className="text-[12px] lg:text-[14px] text-neutral-400 mt-1 lg:mt-2 leading-relaxed">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* 컨텐츠 */}
+          <div className="space-y-4">
+            {children}
+          </div>
+
+          {/* 데스크톱: 인라인 버튼 */}
+          <div className="hidden lg:flex gap-3 mt-8 pt-6 border-t border-neutral-100">
+            {showBackButton && currentStep > 0 && (
+              <button
+                onClick={handleBack}
+                className="flex-shrink-0 px-6 h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
+              >
+                이전
+              </button>
             )}
-            {subtitle && (
-              <p className="text-[12px] text-neutral-400 mt-1 leading-relaxed">
-                {subtitle}
-              </p>
+            {showNextButton && (
+              <button
+                onClick={onNext}
+                disabled={nextDisabled}
+                className={`flex-1 h-12 rounded-[10px] text-[15px] font-semibold transition-colors ${
+                  nextDisabled
+                    ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                    : 'bg-[#0F3D2E] text-white hover:bg-[#0a2e22]'
+                }`}
+              >
+                {nextLabel}
+              </button>
             )}
           </div>
-        )}
-
-        {/* 컨텐츠 */}
-        <div className="space-y-4">
-          {children}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="sticky bottom-0 z-20 bg-white border-t border-neutral-100 py-2.5 px-4" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
+      {/* 모바일: Footer */}
+      <footer className="lg:hidden sticky bottom-0 z-20 bg-white border-t border-neutral-100 py-2.5 px-4" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
         <div className="flex gap-2">
           {showBackButton && currentStep > 0 && (
             <button

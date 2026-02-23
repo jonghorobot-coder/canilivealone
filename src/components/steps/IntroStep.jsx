@@ -182,50 +182,153 @@ export function IntroStep() {
 
       <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 40%, #1a5c45 70%, #0F3D2E 100%)' }}>
 
-        {/* Hero 영역 - 수직 중앙, 응집된 블록 */}
-        <div className="flex-1 flex items-center justify-center px-6">
-          <div className="w-full max-w-md text-center -translate-y-10">
-            {/* 로고 */}
-            <div className="flex justify-center mb-5">
-              <div className="w-[52px] h-[52px] bg-white/12 rounded-[14px] flex items-center justify-center">
-                <svg width="28" height="28" viewBox="0 0 100 100">
-                  <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
-                  <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
-                  <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
-                </svg>
+        {/* 데스크톱: 상단 네비게이션 */}
+        <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/12 rounded-[10px] flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 100 100">
+                <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+                <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+                <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
+              </svg>
+            </div>
+            <span className="text-white font-bold text-[18px] tracking-tight">독립점수</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <span className="text-white/60 text-[14px]">재무 자립 가능성 분석 서비스</span>
+          </div>
+        </nav>
+
+        {/* Hero 영역 */}
+        <div className="flex-1 flex items-center justify-center px-6 lg:px-16">
+          <div className="w-full max-w-6xl flex flex-col lg:flex-row lg:items-center lg:gap-16 xl:gap-24">
+
+            {/* 왼쪽: 메인 콘텐츠 */}
+            <div className="w-full lg:w-1/2 text-center lg:text-left -translate-y-10 lg:translate-y-0">
+              {/* 모바일 로고 */}
+              <div className="flex justify-center lg:hidden mb-5">
+                <div className="w-[52px] h-[52px] bg-white/12 rounded-[14px] flex items-center justify-center">
+                  <svg width="28" height="28" viewBox="0 0 100 100">
+                    <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+                    <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+                    <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
+                  </svg>
+                </div>
+              </div>
+
+              {/* 타이틀 */}
+              <p className="text-[10px] lg:text-[11px] tracking-[0.14em] text-white/50 uppercase font-medium mb-2 lg:mb-3">
+                Financial Independence Score
+              </p>
+              <h1 className="text-[28px] lg:text-[42px] xl:text-[48px] font-bold text-white leading-tight tracking-tight mb-3 lg:mb-4">
+                독립 점수 진단
+              </h1>
+              <p className="text-[14px] lg:text-[17px] text-white/60 leading-relaxed mb-7 lg:mb-8">
+                <span className="lg:hidden">월 수입·지출 구조 기반<br />재무 자립 가능성 분석</span>
+                <span className="hidden lg:inline">월 수입과 지출 구조를 분석하여<br />재무적 독립 가능성을 진단합니다</span>
+              </p>
+
+              {/* CTA 버튼 */}
+              <button
+                onClick={handleStartClick}
+                className="w-full lg:w-auto lg:px-12 h-[54px] lg:h-[56px] rounded-[12px] bg-white text-[#0F3D2E] text-[16px] lg:text-[17px] font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] hover:shadow-[0_6px_28px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 tracking-tight"
+                aria-label="독립점수 진단 시작하기"
+              >
+                무료 진단 시작하기
+              </button>
+
+              {/* 신뢰 문구 */}
+              <p className="mt-3 text-[11px] lg:text-[13px] text-white/70 tracking-wide">
+                모든 정보는 익명으로 안전하게 저장됩니다
+              </p>
+
+              {/* 데스크톱: 통계 인라인 */}
+              <div className="hidden lg:flex items-center gap-8 mt-10 pt-8 border-t border-white/15">
+                <div>
+                  <span className="text-[28px] font-bold text-white block tabular-nums">2분</span>
+                  <span className="text-[12px] text-white/50">소요 시간</span>
+                </div>
+                <div className="h-10 border-l border-white/20" />
+                <div>
+                  <span className="text-[28px] font-bold text-white block tabular-nums">25개</span>
+                  <span className="text-[12px] text-white/50">분석 항목</span>
+                </div>
+                <div className="h-10 border-l border-white/20" />
+                <div>
+                  <span className="text-[28px] font-bold text-white block tabular-nums">7개</span>
+                  <span className="text-[12px] text-white/50">카테고리</span>
+                </div>
               </div>
             </div>
 
-            {/* 타이틀 */}
-            <p className="text-[10px] tracking-[0.14em] text-white/50 uppercase font-medium mb-2">
-              Financial Independence Score
-            </p>
-            <h1 className="text-[28px] font-bold text-white leading-tight tracking-tight mb-3">
-              독립 점수 진단
-            </h1>
-            <p className="text-[14px] text-white/60 leading-relaxed mb-7">
-              월 수입·지출 구조 기반<br />
-              재무 자립 가능성 분석
-            </p>
+            {/* 오른쪽: 데스크톱 일러스트/카드 */}
+            <div className="hidden lg:flex lg:w-1/2 justify-center">
+              <div className="relative w-full max-w-[400px]">
+                {/* 메인 프리뷰 카드 */}
+                <div className="bg-white rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-[#E8F3EF] rounded-full flex items-center justify-center">
+                      <svg width="24" height="24" viewBox="0 0 100 100">
+                        <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="#0F3D2E" opacity="0.9"/>
+                        <path d="M20 50L50 65L80 50" stroke="#0F3D2E" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+                        <path d="M20 65L50 80L80 65" stroke="#0F3D2E" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-[14px] font-semibold text-neutral-800">독립 점수</p>
+                      <p className="text-[12px] text-neutral-400">재무 자립도 분석</p>
+                    </div>
+                  </div>
 
-            {/* CTA 버튼 */}
-            <button
-              onClick={handleStartClick}
-              className="w-full h-[54px] rounded-[12px] bg-white text-[#0F3D2E] text-[16px] font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] hover:shadow-[0_6px_28px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 tracking-tight"
-              aria-label="독립점수 진단 시작하기"
-            >
-              진단 시작
-            </button>
+                  {/* 점수 미리보기 */}
+                  <div className="text-center py-6">
+                    <div className="relative w-32 h-32 mx-auto mb-4">
+                      <svg className="w-full h-full" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="#E5E7EB" strokeWidth="8"/>
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="#0F3D2E" strokeWidth="8"
+                          strokeDasharray="327" strokeDashoffset="82" strokeLinecap="round"
+                          style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}/>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[36px] font-bold text-neutral-800">75</span>
+                      </div>
+                    </div>
+                    <span className="inline-block px-4 py-1.5 bg-[#E8F3EF] text-[#0F3D2E] rounded-full text-[13px] font-semibold">
+                      안정
+                    </span>
+                  </div>
 
-            {/* 신뢰 문구 */}
-            <p className="mt-2 text-[11px] text-white/80 text-center tracking-wide">
-              모든 정보는 익명으로 안전하게 저장됩니다
-            </p>
+                  {/* 카테고리 미리보기 */}
+                  <div className="space-y-3 pt-4 border-t border-neutral-100">
+                    {[
+                      { label: '주거비', value: 82 },
+                      { label: '식비', value: 68 },
+                      { label: '저축', value: 75 },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-3">
+                        <span className="text-[12px] text-neutral-500 w-12">{item.label}</span>
+                        <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#0F3D2E] rounded-full"
+                            style={{ width: `${item.value}%` }}
+                          />
+                        </div>
+                        <span className="text-[12px] font-semibold text-neutral-700 w-8">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 장식 요소 */}
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-2xl -z-10" />
+                <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-white/5 rounded-3xl -z-10" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* 하단 통계 */}
-        <div className="w-full max-w-md mx-auto px-6 pb-8" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
+        {/* 모바일: 하단 통계 */}
+        <div className="lg:hidden w-full max-w-md mx-auto px-6 pb-8" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
           <div className="pt-4 border-t border-white/15">
             <div className="flex items-center">
               <div className="text-center flex-1 pr-4 border-r border-white/15">
@@ -243,6 +346,17 @@ export function IntroStep() {
             </div>
           </div>
         </div>
+
+        {/* 데스크톱: 하단 푸터 */}
+        <footer className="hidden lg:block px-8 xl:px-16 py-6 border-t border-white/10">
+          <div className="flex items-center justify-between text-white/40 text-[13px]">
+            <p>© 2024 독립점수. All rights reserved.</p>
+            <div className="flex items-center gap-6">
+              <Link to="/privacy" className="hover:text-white/70 transition-colors">개인정보처리방침</Link>
+              <Link to="/terms" className="hover:text-white/70 transition-colors">이용약관</Link>
+            </div>
+          </div>
+        </footer>
 
       </div>
     </>
