@@ -180,9 +180,9 @@ export function IntroStep() {
 
       <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 40%, #1a5c45 70%, #0F3D2E 100%)' }}>
 
-        {/* Hero 영역 - 수직 중앙 + 위로 소폭 이동 (footer 높이 보정) */}
-        <div className="flex-1 flex items-center justify-center px-6 pb-20">
-          <div className="w-full max-w-md text-center">
+        {/* Hero 영역 - 수직 중앙, 응집된 블록 */}
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="w-full max-w-md text-center -translate-y-10">
             {/* 로고 */}
             <div className="flex justify-center mb-5">
               <div className="w-[52px] h-[52px] bg-white/12 rounded-[14px] flex items-center justify-center">
@@ -215,8 +215,8 @@ export function IntroStep() {
               진단 시작
             </button>
 
-            {/* 신뢰 문구 - 버튼의 보조 요소로 명확히 인식 */}
-            <p className="mt-3 text-[11px] text-white/80 text-center tracking-wide">
+            {/* 신뢰 문구 */}
+            <p className="mt-2 text-[11px] text-white/80 text-center tracking-wide">
               모든 정보는 익명으로 안전하게 저장됩니다
             </p>
           </div>
