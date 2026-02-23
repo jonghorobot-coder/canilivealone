@@ -350,8 +350,9 @@ export function IntroStep() {
         {/* 데스크톱: 하단 푸터 */}
         <footer className="hidden lg:block px-8 xl:px-16 py-6 border-t border-white/10">
           <div className="flex items-center justify-between text-white/40 text-[13px]">
-            <p>© 2024 독립점수. All rights reserved.</p>
+            <p>© 2026 독립점수 ver1. All rights reserved.</p>
             <div className="flex items-center gap-6">
+              <a href="mailto:canilivealone.help@gmail.com" className="hover:text-white/70 transition-colors">canilivealone.help@gmail.com</a>
               <Link to="/privacy" className="hover:text-white/70 transition-colors">개인정보처리방침</Link>
               <Link to="/terms" className="hover:text-white/70 transition-colors">이용약관</Link>
             </div>
