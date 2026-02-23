@@ -12,14 +12,10 @@ import { TermsOfService } from './pages/TermsOfService';
 
 function PageLayout({ children }) {
   return (
-    <div className="min-h-dvh bg-neutral-100">
-      <div className="w-full px-5">
-        <div className="max-w-md mx-auto">
-          <CoreLayout>
-            {children}
-          </CoreLayout>
-        </div>
-      </div>
+    <div className="min-h-dvh">
+      <CoreLayout>
+        {children}
+      </CoreLayout>
     </div>
   );
 }
