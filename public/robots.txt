@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /result?id=
+Disallow: /result
 
 Sitemap: https://canilivealone.com/sitemap.xml
