@@ -48,6 +48,9 @@ const GRADE_DETAILS = {
   },
 };
 
+// 카테고리 순서 (입력 순서와 동일하게 통일)
+const CATEGORY_ORDER = ['housing', 'food', 'fixed', 'transport', 'leisure', 'misc', 'savings'];
+
 const CATEGORY_LABELS = {
   housing: '주거비',
   food: '식비',
@@ -260,13 +263,13 @@ function ShareCard({ result, cardRef }) {
 
   const scoreColor = getScoreColor(score);
 
-  // 카테고리별 점수 (상위 4개만)
+  // 카테고리별 점수 (입력 순서대로 앞 4개)
   const categoryData = result?.categoryScores
     ? [
         { key: 'housing', label: '주거', score: result.categoryScores.housing },
-        { key: 'savings', label: '저축', score: result.categoryScores.savings },
         { key: 'food', label: '식비', score: result.categoryScores.food },
         { key: 'fixed', label: '고정', score: result.categoryScores.fixed },
+        { key: 'transport', label: '교통', score: result.categoryScores.transport },
       ]
     : [];
 
@@ -798,28 +801,31 @@ export function ResultStep() {
       <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
         <h3 className="text-[17px] font-bold text-neutral-800 mb-4">카테고리별 점수</h3>
         <div className="space-y-4">
-          {result.categoryScores && Object.entries(result.categoryScores).map(([key, score]) => (
-            <div key={key} className="flex items-center gap-4">
-              <span className="text-[14px] text-neutral-600 w-20 flex-shrink-0 font-medium">
-                {CATEGORY_LABELS[key]}
-              </span>
-              <div className="flex-1 h-2 bg-neutral-200 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    score >= 70 ? 'bg-[#0F3D2E]' :
-                    score >= 50 ? 'bg-amber-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${score}%` }}
-                />
+          {result.categoryScores && CATEGORY_ORDER.map((key) => {
+            const score = result.categoryScores[key];
+            return (
+              <div key={key} className="flex items-center gap-4">
+                <span className="text-[14px] text-neutral-600 w-20 flex-shrink-0 font-medium">
+                  {CATEGORY_LABELS[key]}
+                </span>
+                <div className="flex-1 h-2 bg-neutral-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      score >= 70 ? 'bg-[#0F3D2E]' :
+                      score >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                    }`}
+                    style={{ width: `${score}%` }}
+                  />
+                </div>
+                <span className={`text-[14px] font-semibold w-8 text-right tabular-nums ${
+                  score >= 70 ? 'text-[#0F3D2E]' :
+                  score >= 50 ? 'text-amber-500' : 'text-red-500'
+                }`}>
+                  {score}
+                </span>
               </div>
-              <span className={`text-[14px] font-semibold w-8 text-right tabular-nums ${
-                score >= 70 ? 'text-[#0F3D2E]' :
-                score >= 50 ? 'text-amber-500' : 'text-red-500'
-              }`}>
-                {score}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
