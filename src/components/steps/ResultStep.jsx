@@ -6,6 +6,7 @@ import { calculateResult } from '../../utils/calculate';
 import { AnalyticsEvents } from '../../utils/analytics';
 import { saveResultToServer, fetchResultById } from '../../utils/saveResult';
 import { supabase } from '../../lib/supabase';
+import { getAllCategoryAdvice } from '../../data/categoryAdvice';
 
 const LOADING_DURATION = 2500;
 
@@ -754,6 +755,73 @@ export function ResultStep() {
           ))}
         </div>
       </div>
+
+      {/* 구조 개선 조언 */}
+      {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
+        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
+          <h3 className="text-[17px] font-bold text-neutral-800 mb-4">구조 개선 분석</h3>
+          <div className="space-y-6">
+            {getAllCategoryAdvice(result.categoryScores).map((advice) => (
+              <div key={advice.categoryId} className="space-y-3">
+                {/* 카테고리 헤더 */}
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded text-[11px] font-bold ${
+                    advice.level === 'critical'
+                      ? 'bg-red-100 text-red-600'
+                      : 'bg-amber-100 text-amber-600'
+                  }`}>
+                    {advice.level === 'critical' ? '!' : '△'}
+                  </span>
+                  <span className="text-[15px] font-semibold text-neutral-800">
+                    {advice.label}
+                  </span>
+                  <span className={`text-[13px] font-medium tabular-nums ${
+                    advice.level === 'critical' ? 'text-red-500' : 'text-amber-500'
+                  }`}>
+                    {advice.score}점
+                  </span>
+                </div>
+
+                {/* 진단 */}
+                <p className="text-[14px] text-neutral-700 leading-relaxed">
+                  {advice.diagnosis}
+                </p>
+
+                {/* 기준 지표 */}
+                <div className="bg-neutral-50 rounded-lg p-3">
+                  <p className="text-[12px] font-medium text-neutral-500 mb-2">기준 지표</p>
+                  <ul className="space-y-1">
+                    {advice.metrics.map((metric, idx) => (
+                      <li key={idx} className="text-[13px] text-neutral-600 flex items-start gap-2">
+                        <span className="text-neutral-400 mt-0.5">•</span>
+                        <span>{metric}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 개선 조치 */}
+                <div>
+                  <p className="text-[12px] font-medium text-neutral-500 mb-2">개선 조치</p>
+                  <ul className="space-y-1.5">
+                    {advice.actions.map((action, idx) => (
+                      <li key={idx} className="text-[13px] text-neutral-700 flex items-start gap-2">
+                        <span className="text-[#0F3D2E] font-medium mt-0.5">{idx + 1}.</span>
+                        <span>{action}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 구분선 (마지막 항목 제외) */}
+                {advice !== getAllCategoryAdvice(result.categoryScores).slice(-1)[0] && (
+                  <div className="border-t border-neutral-100 pt-2" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 공유 영역 */}
       <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
