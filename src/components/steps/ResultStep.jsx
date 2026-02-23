@@ -581,20 +581,37 @@ export function ResultStep() {
     window.location.href = '/';
   };
 
-  const handleCopyLink = async () => {
-    try {
-      const shareUrl = resultId
-        ? `${window.location.origin}/result?id=${resultId}`
-        : window.location.href;
-      const shareText = `📊 독립점수 진단 결과
+  const handleShare = async () => {
+    const shareUrl = resultId
+      ? `${window.location.origin}/result?id=${resultId}`
+      : window.location.href;
 
-나의 독립 준비 상태를 확인해보세요!
-👉 ${shareUrl}`;
-      await navigator.clipboard.writeText(shareText);
-      showToast('링크가 복사되었습니다');
-      AnalyticsEvents.copyLink();
-    } catch (err) {
-      showToast('링크 복사에 실패했습니다');
+    const shareData = {
+      title: '독립점수 진단 결과',
+      text: '나의 독립 준비 상태를 확인해보세요!',
+      url: shareUrl,
+    };
+
+    // Web Share API 지원 시 네이티브 공유
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+        AnalyticsEvents.copyLink();
+      } catch (err) {
+        // 사용자가 공유 취소한 경우 무시
+        if (err.name !== 'AbortError') {
+          console.warn('Share failed:', err);
+        }
+      }
+    } else {
+      // 미지원 시 URL만 복사
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('링크가 복사되었습니다');
+        AnalyticsEvents.copyLink();
+      } catch (err) {
+        showToast('공유하기에 실패했습니다');
+      }
     }
   };
 
@@ -731,10 +748,10 @@ export function ResultStep() {
                     {isImageSaving ? '저장 중...' : '이미지 저장'}
                   </button>
                   <button
-                    onClick={handleCopyLink}
+                    onClick={handleShare}
                     className="flex-1 h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
                   >
-                    링크 복사
+                    공유하기
                   </button>
                 </div>
               </div>
@@ -964,11 +981,11 @@ export function ResultStep() {
             {isImageSaving ? '저장 중...' : '이미지 저장'}
           </button>
           <button
-            onClick={handleCopyLink}
+            onClick={handleShare}
             className="flex-1 h-11 rounded-[10px] bg-[#0F3D2E] text-white text-[13px] font-semibold transition-colors hover:bg-[#0a2e22]"
-            aria-label="결과 공유 링크 복사"
+            aria-label="결과 공유 공유하기"
           >
-            링크 복사
+            공유하기
           </button>
         </div>
       </div>
