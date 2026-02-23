@@ -254,14 +254,12 @@ function ShareCard({ result, cardRef }) {
   const gradeStyle = SHARE_GRADE_STYLES[result?.grade] || { bg: '#F3F4F6', border: '#9CA3AF', text: '#6B7280' };
   const score = result?.score ?? 0;
 
-  // 점수에 따른 게이지 색상
+  // 점수에 따른 색상
   const getScoreColor = (s) => {
     if (s >= 70) return '#0F3D2E';
-    if (s >= 50) return '#D97706';
-    return '#DC2626';
+    if (s >= 50) return '#F59E0B';
+    return '#EF4444';
   };
-
-  const scoreColor = getScoreColor(score);
 
   // 카테고리별 점수 (낮은 점수 우선 4개 - 개선 필요 영역 강조)
   const categoryData = result?.categoryScores
@@ -275,12 +273,6 @@ function ShareCard({ result, cardRef }) {
         .slice(0, 4)
     : [];
 
-  // SVG 원형 게이지 계산
-  const radius = 140;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (score / 100) * circumference;
-  const offset = circumference - progress;
-
   return (
     <div
       ref={cardRef}
@@ -290,207 +282,192 @@ function ShareCard({ result, cardRef }) {
         top: 0,
         width: '1080px',
         height: '1080px',
-        background: 'linear-gradient(145deg, #0F3D2E 0%, #1a5c45 50%, #0F3D2E 100%)',
+        background: 'linear-gradient(145deg, #0a2e1f 0%, #0F3D2E 30%, #1a5c45 60%, #0F3D2E 100%)',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        padding: '70px 80px',
+        padding: '55px 65px',
         boxSizing: 'border-box',
         visibility: 'hidden',
         pointerEvents: 'none',
       }}
     >
-      {/* 상단 로고 + 브랜드 */}
+      {/* 상단 로고 */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
-        marginBottom: '50px',
+        gap: '14px',
+        marginBottom: '35px',
       }}>
-        {/* 파비콘 로고 */}
         <div style={{
-          width: '56px',
-          height: '56px',
-          backgroundColor: 'rgba(255,255,255,0.15)',
-          borderRadius: '14px',
+          width: '50px',
+          height: '50px',
+          backgroundColor: 'rgba(255,255,255,0.1)',
+          borderRadius: '12px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <svg width="32" height="32" viewBox="0 0 100 100">
-            <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.95"/>
-            <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.75"/>
-            <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.55"/>
+          <svg width="28" height="28" viewBox="0 0 100 100">
+            <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+            <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+            <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
           </svg>
         </div>
-        <div style={{
-          fontSize: '28px',
+        <span style={{
+          fontSize: '26px',
           fontWeight: '700',
           color: 'white',
-          letterSpacing: '-0.02em',
         }}>
           독립점수
-        </div>
+        </span>
       </div>
 
-      {/* 메인 점수 카드 */}
+      {/* 메인 흰색 카드 */}
       <div style={{
         backgroundColor: 'white',
-        borderRadius: '32px',
-        padding: '50px 60px',
-        width: '100%',
-        maxWidth: '920px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        borderRadius: '36px',
+        flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        textAlign: 'center',
+        boxShadow: '0 30px 80px rgba(0,0,0,0.4)',
+        padding: '50px 60px',
       }}>
-        {/* 원형 게이지 + 점수 */}
+        {/* 점수 영역 */}
         <div style={{
-          position: 'relative',
-          width: '320px',
-          height: '320px',
-          marginBottom: '32px',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingTop: '90px',
         }}>
-          <svg width="320" height="320" style={{ transform: 'rotate(-90deg)' }}>
-            {/* 배경 원 */}
-            <circle
-              cx="160"
-              cy="160"
-              r={radius}
-              fill="none"
-              stroke="#E5E7EB"
-              strokeWidth="20"
-            />
-            {/* 진행 원 */}
-            <circle
-              cx="160"
-              cy="160"
-              r={radius}
-              fill="none"
-              stroke={scoreColor}
-              strokeWidth="20"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              strokeLinecap="round"
-            />
-          </svg>
-          {/* 중앙 점수 */}
+          {/* 점수 */}
           <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'center',
+            gap: '8px',
+            marginBottom: '24px',
           }}>
-            <div style={{
-              fontSize: '96px',
+            <span style={{
+              fontSize: '200px',
               fontWeight: '800',
-              color: '#111827',
-              lineHeight: '1',
-              letterSpacing: '-3px',
+              color: '#0F3D2E',
+              lineHeight: 1,
+              letterSpacing: '-10px',
             }}>
               {score}
-            </div>
-            <div style={{
-              fontSize: '24px',
+            </span>
+            <span style={{
+              fontSize: '54px',
               color: '#9CA3AF',
-              marginTop: '8px',
             }}>
-              / 100
-            </div>
+              /100
+            </span>
+          </div>
+
+          {/* 등급 배지 */}
+          <div style={{
+            display: 'inline-block',
+            backgroundColor: gradeStyle.bg,
+            border: `2px solid ${gradeStyle.border}`,
+            padding: '20px 28px',
+            borderRadius: '9999px',
+            marginBottom: '20px',
+          }}>
+            <span style={{
+              fontSize: '28px',
+              fontWeight: '700',
+              color: gradeStyle.text,
+            }}>
+              {result?.grade}
+            </span>
+          </div>
+
+          {/* 결과 문구 */}
+          <div style={{
+            fontSize: '28px',
+            color: '#374151',
+          }}>
+            {GRADE_VERDICT[result?.grade] || ''}
           </div>
         </div>
 
-        {/* 등급 배지 */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px 40px',
-          borderRadius: '100px',
-          backgroundColor: gradeStyle.bg,
-          border: `2px solid ${gradeStyle.border}`,
-          marginBottom: '40px',
-        }}>
-          <span style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: gradeStyle.text,
-          }}>
-            {result?.grade}
-          </span>
-        </div>
+        {/* 하단 카테고리 영역 */}
+        <div style={{ flexShrink: 0 }}>
+          {/* 구분선 */}
+          <div style={{
+            height: '1px',
+            backgroundColor: '#9CA3AF',
+            marginBottom: '24px',
+          }} />
 
-        {/* 카테고리별 점수 바 */}
-        <div style={{
-          width: '100%',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '20px',
-        }}>
-          {categoryData.map((cat) => (
-            <div key={cat.key} style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '12px',
-            }}>
-              <div style={{
-                fontSize: '18px',
-                color: '#6B7280',
-                fontWeight: '500',
-              }}>
-                {cat.label}
-              </div>
-              <div style={{
-                width: '100%',
-                height: '12px',
-                backgroundColor: '#E5E7EB',
-                borderRadius: '6px',
-                overflow: 'hidden',
+          {/* FOCUS AREAS 타이틀 */}
+          <div style={{
+            fontSize: '13px',
+            color: '#9CA3AF',
+            letterSpacing: '2px',
+            marginBottom: '18px',
+          }}>
+            FOCUS AREAS
+          </div>
+
+          {/* 카테고리 그리드 */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '14px',
+          }}>
+            {categoryData.map((cat) => (
+              <div key={cat.key} style={{
+                backgroundColor: '#F3F4F6',
+                borderRadius: '16px',
+                padding: '24px 16px',
+                textAlign: 'center',
               }}>
                 <div style={{
-                  width: `${cat.score}%`,
-                  height: '100%',
-                  backgroundColor: getScoreColor(cat.score),
-                  borderRadius: '6px',
-                }} />
+                  fontSize: '36px',
+                  fontWeight: '700',
+                  color: getScoreColor(cat.score),
+                  marginBottom: '8px',
+                }}>
+                  {cat.score}
+                </div>
+                <div style={{
+                  fontSize: '20px',
+                  color: '#6B7280',
+                }}>
+                  {cat.label}
+                </div>
               </div>
-              <div style={{
-                fontSize: '20px',
-                fontWeight: '700',
-                color: getScoreColor(cat.score),
-              }}>
-                {cat.score}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       {/* 하단 URL */}
       <div style={{
-        marginTop: 'auto',
-        paddingTop: '40px',
+        marginTop: '50px',
         display: 'flex',
         alignItems: 'center',
-        gap: '8px',
+        justifyContent: 'center',
+        gap: '10px',
       }}>
-        <div style={{
+        <span style={{
           fontSize: '22px',
-          color: 'rgba(255,255,255,0.7)',
+          color: 'rgba(255,255,255,0.5)',
         }}>
           나도 진단받기
-        </div>
-        <div style={{
+        </span>
+        <strong style={{
           fontSize: '22px',
+          color: 'rgba(255,255,255,0.8)',
           fontWeight: '600',
-          color: 'white',
         }}>
           canilivealone.com
-        </div>
+        </strong>
       </div>
     </div>
   );
