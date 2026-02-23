@@ -461,7 +461,7 @@ function ShareCard({ result, cardRef }) {
           fontSize: '22px',
           color: 'rgba(255,255,255,0.5)',
         }}>
-          나도 진단받기
+          무료로 진단받기
         </span>
         <strong style={{
           fontSize: '22px',
@@ -633,7 +633,7 @@ export function ResultStep() {
 
     const shareData = {
       title: '독립점수 진단 결과',
-      text: '나의 독립 진단 분석 리포트입니다.',
+      text: '독립 준비 상태를 분석해보세요.',
       url: shareUrl,
     };
 
@@ -667,45 +667,58 @@ export function ResultStep() {
 
     // Kakao SDK 로드 확인
     if (!window.Kakao) {
-      // Kakao SDK 미로드 시 일반 공유로 fallback
+      console.error('Kakao SDK not loaded');
       handleShare();
       return;
     }
 
-    if (!window.Kakao.isInitialized()) {
-      window.Kakao.init(import.meta.env.VITE_KAKAO_KEY);
-    }
+    try {
+      if (!window.Kakao.isInitialized()) {
+        const kakaoKey = import.meta.env.VITE_KAKAO_KEY;
+        console.log('Kakao init with key:', kakaoKey ? 'exists' : 'missing');
+        if (!kakaoKey) {
+          console.error('VITE_KAKAO_KEY is missing');
+          handleShare();
+          return;
+        }
+        window.Kakao.init(kakaoKey);
+      }
 
-    window.Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: '독립점수 진단 결과',
-        description: `${result?.score}점 · ${result?.grade} 등급 - 재무 자립 가능성 분석 리포트`,
-        imageUrl: 'https://canilivealone.com/og-image.png',
-        link: {
-          mobileWebUrl: shareUrl,
-          webUrl: shareUrl,
-        },
-      },
-      buttons: [
-        {
-          title: '결과 확인하기',
+      window.Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: '독립점수 진단 결과',
+          description: `${result?.score}점 · ${result?.grade} 등급 - 재무 자립 가능성 분석 리포트`,
+          imageUrl: 'https://canilivealone.com/og-image.png',
           link: {
             mobileWebUrl: shareUrl,
             webUrl: shareUrl,
           },
         },
-        {
-          title: '나도 진단받기',
-          link: {
-            mobileWebUrl: window.location.origin,
-            webUrl: window.location.origin,
+        buttons: [
+          {
+            title: '결과 확인하기',
+            link: {
+              mobileWebUrl: shareUrl,
+              webUrl: shareUrl,
+            },
           },
-        },
-      ],
-    });
+          {
+            title: '무료 진단받기',
+            link: {
+              mobileWebUrl: window.location.origin,
+              webUrl: window.location.origin,
+            },
+          },
+        ],
+      });
 
-    AnalyticsEvents.copyLink();
+      AnalyticsEvents.copyLink();
+    } catch (error) {
+      console.error('Kakao share error:', error);
+      showToast('카카오톡 공유에 실패했습니다');
+      handleShare();
+    }
   };
 
   const handleSaveImage = async () => {
@@ -864,12 +877,19 @@ export function ResultStep() {
                   </svg>
                   카카오톡 공유
                 </button>
-                {isSharedResult && (
+                {isSharedResult ? (
                   <button
                     onClick={() => window.location.href = '/'}
                     className="w-full h-10 mt-3 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold transition-colors hover:bg-[#0a2e22]"
                   >
-                    나도 진단받기
+                    무료로 진단받기
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleRestartClick}
+                    className="w-full h-10 mt-3 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
+                  >
+                    처음부터 다시하기
                   </button>
                 )}
               </div>
@@ -1087,7 +1107,7 @@ export function ResultStep() {
           결과 저장 및 공유
         </h3>
         <p className="text-center text-[12px] text-neutral-500 mb-4">
-          나의 독립 준비 상태를 기록해두세요
+          진단 결과를 저장하고 공유하세요
         </p>
         <div className="flex gap-2 mb-2">
           <button
@@ -1118,29 +1138,31 @@ export function ResultStep() {
         </button>
       </div>
 
-      {/* 10. 나도 진단받기 CTA - 공유 링크로 들어온 경우만 표시 */}
+      {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우만 표시 */}
       {isSharedResult && (
         <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 text-center print:hidden">
-          <p className="text-white/80 text-[13px] mb-2">나의 독립 준비 상태가 궁금하다면</p>
+          <p className="text-white/80 text-[13px] mb-2">독립 준비 상태가 궁금하다면</p>
           <button
             onClick={() => window.location.href = '/'}
             className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors"
           >
-            나도 무료로 진단받기
+            무료로 진단받기
           </button>
         </div>
       )}
 
-      {/* 다시하기 버튼 */}
-      <div className="pt-2 pb-6 lg:pb-0 print:hidden">
-        <button
-          onClick={handleRestartClick}
-          className="w-full h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
-          aria-label="진단을 처음부터 다시 시작"
-        >
-          {isSharedResult ? '나도 진단받기' : '처음부터 다시하기'}
-        </button>
-      </div>
+      {/* 다시하기 버튼 - 본인 결과일 때만 표시 */}
+      {!isSharedResult && (
+        <div className="pt-2 pb-6 lg:pb-0 print:hidden">
+          <button
+            onClick={handleRestartClick}
+            className="w-full h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
+            aria-label="진단을 처음부터 다시 시작"
+          >
+            처음부터 다시하기
+          </button>
+        </div>
+      )}
 
           </div>{/* 오른쪽 컬럼 끝 */}
         </div>{/* 그리드 끝 */}
