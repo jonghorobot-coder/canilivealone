@@ -7,6 +7,14 @@ import { AnalyticsEvents } from '../../utils/analytics';
 import { saveResultToServer, fetchResultById } from '../../utils/saveResult';
 import { supabase } from '../../lib/supabase';
 import { getAllCategoryAdvice } from '../../data/categoryAdvice';
+import {
+  addToHistory,
+  getHistory,
+  compareWithPrevious,
+  saveFriendScore,
+  getFriendScore,
+  clearFriendScore,
+} from '../../utils/historyStorage';
 
 const LOADING_DURATION = 2500;
 
@@ -524,6 +532,9 @@ export function ResultStep() {
   const [resultId, setResultId] = useState(null);
   const [isSharedResult, setIsSharedResult] = useState(false);
   const [showRestartModal, setShowRestartModal] = useState(false);
+  const [previousComparison, setPreviousComparison] = useState(null);
+  const [friendComparison, setFriendComparison] = useState(null);
+  const [history, setHistory] = useState([]);
   const shareCardRef = useRef(null);
 
   const sharedId = searchParams.get('id');
@@ -555,6 +566,9 @@ export function ResultStep() {
       if (sharedResult) {
         setResult(sharedResult);
         setResultId(sharedId);
+
+        // 친구 점수 저장 (나중에 비교용)
+        saveFriendScore(sharedResult.score, sharedResult.grade);
       }
 
       // 공유 링크: 로딩/애니메이션 스킵
@@ -593,6 +607,24 @@ export function ResultStep() {
 
       if (calculatedResult) {
         AnalyticsEvents.reachResult(calculatedResult.score, calculatedResult.grade);
+
+        // 히스토리에 저장
+        addToHistory(calculatedResult);
+        setHistory(getHistory());
+
+        // 이전 결과와 비교
+        const comparison = compareWithPrevious(calculatedResult.score);
+        setPreviousComparison(comparison);
+
+        // 친구 점수와 비교 (공유 링크로 들어온 적 있으면)
+        const friendScore = getFriendScore();
+        if (friendScore) {
+          setFriendComparison({
+            ...friendScore,
+            diff: calculatedResult.score - friendScore.score,
+          });
+          clearFriendScore(); // 비교 후 삭제
+        }
 
         // Supabase에 저장하고 ID 받아오기
         const savedId = await saveResultToServer(calculatedResult);
@@ -912,6 +944,53 @@ export function ResultStep() {
           </p>
         </div>
 
+      {/* 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
+      {friendComparison && !isSharedResult && (
+        <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 text-white">
+          <p className="text-[12px] text-white/70 mb-2">친구와 점수 비교</p>
+          <div className="flex items-center justify-between">
+            <div className="text-center">
+              <p className="text-[11px] text-white/60">친구</p>
+              <p className="text-[28px] font-bold tabular-nums">{friendComparison.score}</p>
+              <p className="text-[11px] text-white/60">{friendComparison.grade}</p>
+            </div>
+            <div className="text-center px-4">
+              <div className={`text-[18px] font-bold ${friendComparison.diff > 0 ? 'text-green-300' : friendComparison.diff < 0 ? 'text-red-300' : 'text-white/80'}`}>
+                {friendComparison.diff > 0 ? '+' : ''}{friendComparison.diff}점
+              </div>
+              <p className="text-[11px] text-white/60">
+                {friendComparison.diff > 0 ? '더 높아요' : friendComparison.diff < 0 ? '더 낮아요' : '동점이에요'}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-[11px] text-white/60">나</p>
+              <p className="text-[28px] font-bold tabular-nums">{result.score}</p>
+              <p className="text-[11px] text-white/60">{result.grade}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 이전 진단 대비 변화 (2회 이상 진단한 경우) */}
+      {previousComparison && !isSharedResult && (
+        <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[12px] text-neutral-500 mb-1">이전 진단 대비</p>
+            <p className="text-[13px] text-neutral-700">
+              {new Date(previousComparison.previousDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} 진단 ({previousComparison.previousScore}점)
+            </p>
+          </div>
+          <div className={`text-right ${previousComparison.improved ? 'text-[#0F3D2E]' : previousComparison.diff < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
+            <p className="text-[20px] font-bold tabular-nums">
+              {previousComparison.diff > 0 ? '+' : ''}{previousComparison.diff}점
+            </p>
+            <p className="text-[11px]">
+              {previousComparison.improved ? '상승' : previousComparison.diff < 0 ? '하락' : '유지'}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 2. 등급별 설명 */}
       {gradeDetail && (
         <div className="bg-white rounded-xl shadow-sm p-4">
@@ -1100,6 +1179,65 @@ export function ResultStep() {
           </div>
         </div>
       </div>
+
+      {/* 진단 히스토리 (2회 이상 진단 기록이 있을 때만) */}
+      {history.length > 1 && !isSharedResult && (
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h3 className="text-[14px] font-bold text-neutral-800 mb-3">진단 기록</h3>
+          <div className="space-y-2">
+            {history.slice(0, 5).map((entry, index) => {
+              const isLatest = index === 0;
+              const prevEntry = history[index + 1];
+              const diff = prevEntry ? entry.score - prevEntry.score : null;
+
+              return (
+                <div
+                  key={entry.id}
+                  className={`flex items-center justify-between py-2 ${!isLatest ? 'border-t border-neutral-100' : ''}`}
+                >
+                  <div className="flex items-center gap-3">
+                    {isLatest && (
+                      <span className="px-2 py-0.5 bg-[#0F3D2E] text-white text-[10px] font-semibold rounded">
+                        NOW
+                      </span>
+                    )}
+                    <span className="text-[12px] text-neutral-500">
+                      {new Date(entry.date).toLocaleDateString('ko-KR', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {diff !== null && (
+                      <span className={`text-[11px] ${diff > 0 ? 'text-[#0F3D2E]' : diff < 0 ? 'text-red-500' : 'text-neutral-400'}`}>
+                        {diff > 0 ? '+' : ''}{diff}
+                      </span>
+                    )}
+                    <span className={`text-[14px] font-bold tabular-nums ${isLatest ? 'text-[#0F3D2E]' : 'text-neutral-600'}`}>
+                      {entry.score}점
+                    </span>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${
+                      entry.grade === '매우 안정' || entry.grade === '안정'
+                        ? 'bg-[#E8F3EF] text-[#0F3D2E]'
+                        : entry.grade === '주의'
+                        ? 'bg-[#FFF7E5] text-[#9A6B00]'
+                        : 'bg-[#FDECEC] text-[#912018]'
+                    }`}>
+                      {entry.grade}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {history.length > 5 && (
+            <p className="text-[11px] text-neutral-400 text-center mt-3">
+              최근 5회 기록만 표시됩니다
+            </p>
+          )}
+        </div>
+      )}
 
       {/* 9. 공유 영역 - 모바일 전용 */}
       <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
