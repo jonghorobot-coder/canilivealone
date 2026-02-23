@@ -583,9 +583,8 @@ export function ResultStep() {
 
   const handleCopyLink = async () => {
     try {
-      // /s/[id] 형식의 공유 URL 사용 (동적 OG 태그 지원)
       const shareUrl = resultId
-        ? `${window.location.origin}/s/${resultId}`
+        ? `${window.location.origin}/result?id=${resultId}`
         : window.location.href;
       await navigator.clipboard.writeText(shareUrl);
       showToast('링크가 복사되었습니다');
