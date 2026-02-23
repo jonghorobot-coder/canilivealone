@@ -87,7 +87,7 @@ export function StepLayout({
       </main>
 
       {/* Footer */}
-      <footer className="sticky bottom-0 z-20 bg-white border-t border-neutral-100 py-2.5 px-4">
+      <footer className="sticky bottom-0 z-20 bg-white border-t border-neutral-100 py-2.5 px-4" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
         <div className="flex gap-2">
           {showBackButton && currentStep > 0 && (
             <button

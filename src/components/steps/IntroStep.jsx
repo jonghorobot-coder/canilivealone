@@ -223,7 +223,7 @@ export function IntroStep() {
         </div>
 
         {/* 하단 통계 */}
-        <div className="w-full max-w-md mx-auto px-6 pb-8">
+        <div className="w-full max-w-md mx-auto px-6 pb-8" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
           <div className="pt-4 border-t border-white/15">
             <div className="flex items-center">
               <div className="text-center flex-1 pr-4 border-r border-white/15">

@@ -54,14 +54,14 @@ export function ExpenseStep() {
             <div>
               <span className="text-[10px] text-neutral-400 block mb-0.5 tracking-wide">수입</span>
               <span className="text-[16px] font-semibold text-neutral-800 tabular-nums tracking-tight">
-                {incomeNum.toLocaleString()}
+                {incomeNum.toLocaleString()}<span className="text-[11px] text-neutral-400 ml-0.5">만원</span>
               </span>
             </div>
             <div className="h-9 border-l border-neutral-100" />
             <div>
               <span className="text-[10px] text-neutral-400 block mb-0.5 tracking-wide">지출</span>
               <span className="text-[16px] font-semibold text-neutral-800 tabular-nums tracking-tight">
-                {totalExpenses.toLocaleString()}
+                {totalExpenses.toLocaleString()}<span className="text-[11px] text-neutral-400 ml-0.5">만원</span>
               </span>
             </div>
           </div>
