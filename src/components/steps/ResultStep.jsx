@@ -825,12 +825,12 @@ export function ResultStep() {
 
       {/* 공유 영역 */}
       <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-        <p className="text-center text-[14px] text-neutral-500 mb-3">
-          주변 사람의 독립 준비도는 어떨까요?
-        </p>
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-6 text-center">
-          결과 공유하기
+        <h3 className="text-[17px] font-bold text-neutral-800 mb-2 text-center">
+          결과 저장 및 공유
         </h3>
+        <p className="text-center text-[14px] text-neutral-500 mb-5">
+          나의 독립 준비 상태를 기록해두세요
+        </p>
         <div className="flex gap-3">
           <button
             onClick={handleSaveImage}
