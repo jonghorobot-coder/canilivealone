@@ -25,6 +25,27 @@ function SurveyPage() {
   const { stepInfo } = useSurvey();
   const { isIntroStep, isExpenseStep, isQuestionStep, isResultStep, currentQuestion } = stepInfo;
 
+  // 진단 중 이탈 방지
+  useEffect(() => {
+    const isInProgress = isExpenseStep || isQuestionStep;
+
+    const handleBeforeUnload = (e) => {
+      if (isInProgress) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    if (isInProgress) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isExpenseStep, isQuestionStep]);
+
   useEffect(() => {
     if (isResultStep) {
       navigate('/result', { replace: true });

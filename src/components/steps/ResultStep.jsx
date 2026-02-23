@@ -475,6 +475,43 @@ function ShareCard({ result, cardRef }) {
   );
 }
 
+// 다시하기 확인 모달
+function RestartConfirmModal({ isOpen, onConfirm, onCancel }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 animate-overlay-bg"
+        onClick={onCancel}
+      />
+      <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content">
+        <h3 className="text-[17px] font-bold text-neutral-800 mb-2">
+          진단을 다시 시작하시겠습니까?
+        </h3>
+        <p className="text-[14px] text-neutral-500 mb-6 leading-relaxed">
+          현재 결과는 링크로 저장되어 있습니다.<br />
+          새로운 진단을 시작하면 처음부터 입력하게 됩니다.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 h-12 rounded-[10px] border border-neutral-200 text-neutral-600 text-[14px] font-semibold hover:bg-neutral-50 transition-colors"
+          >
+            취소
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors"
+          >
+            다시 시작
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ResultStep() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { income, expenses, answers, result, setResult, reset, setCurrentStep } = useSurvey();
@@ -486,6 +523,7 @@ export function ResultStep() {
   const [totalCount, setTotalCount] = useState(null);
   const [resultId, setResultId] = useState(null);
   const [isSharedResult, setIsSharedResult] = useState(false);
+  const [showRestartModal, setShowRestartModal] = useState(false);
   const shareCardRef = useRef(null);
 
   const sharedId = searchParams.get('id');
@@ -563,8 +601,8 @@ export function ResultStep() {
           // URL에 id 추가 (히스토리 교체)
           setSearchParams({ id: savedId }, { replace: true });
         } else {
-          // 저장 실패 시 사용자에게 알림 (앱 동작은 유지)
-          showToast('결과 저장에 실패했습니다. 링크 공유가 제한됩니다.');
+          // 저장 실패 시 명확한 안내
+          showToast('일시적인 오류로 링크 공유가 제한됩니다. 이미지 저장은 가능합니다.');
         }
       }
     }, LOADING_DURATION);
@@ -572,13 +610,20 @@ export function ResultStep() {
     return () => clearTimeout(timer);
   }, [income, expenses, answers, setResult, sharedId, setSearchParams]);
 
-  const handleRestart = () => {
+  const handleRestartClick = () => {
+    setShowRestartModal(true);
+  };
+
+  const handleRestartConfirm = () => {
     AnalyticsEvents.restartDiagnosis();
     localStorage.removeItem('result_saved_id');
     reset();
     setCurrentStep(0);
-    // URL에서 id 제거하고 홈으로
     window.location.href = '/';
+  };
+
+  const handleRestartCancel = () => {
+    setShowRestartModal(false);
   };
 
   const handleShare = async () => {
@@ -613,6 +658,54 @@ export function ResultStep() {
         showToast('공유하기에 실패했습니다');
       }
     }
+  };
+
+  const handleKakaoShare = () => {
+    const shareUrl = resultId
+      ? `${window.location.origin}/result?id=${resultId}`
+      : window.location.href;
+
+    // Kakao SDK 로드 확인
+    if (!window.Kakao) {
+      // Kakao SDK 미로드 시 일반 공유로 fallback
+      handleShare();
+      return;
+    }
+
+    if (!window.Kakao.isInitialized()) {
+      window.Kakao.init(import.meta.env.VITE_KAKAO_KEY);
+    }
+
+    window.Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '독립점수 진단 결과',
+        description: `${result?.score}점 · ${result?.grade} 등급 - 재무 자립 가능성 분석 리포트`,
+        imageUrl: 'https://canilivealone.com/og-image.png',
+        link: {
+          mobileWebUrl: shareUrl,
+          webUrl: shareUrl,
+        },
+      },
+      buttons: [
+        {
+          title: '결과 확인하기',
+          link: {
+            mobileWebUrl: shareUrl,
+            webUrl: shareUrl,
+          },
+        },
+        {
+          title: '나도 진단받기',
+          link: {
+            mobileWebUrl: window.location.origin,
+            webUrl: window.location.origin,
+          },
+        },
+      ],
+    });
+
+    AnalyticsEvents.copyLink();
   };
 
   const handleSaveImage = async () => {
@@ -658,14 +751,15 @@ export function ResultStep() {
   if (!result) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-6">결과를 불러올 수 없습니다.</p>
+        <div className="text-center px-6">
+          <p className="text-neutral-500 mb-2 text-[15px]">결과를 불러올 수 없습니다.</p>
+          <p className="text-neutral-400 mb-6 text-[13px]">링크가 만료되었거나 일시적인 오류입니다.</p>
           <button
-            onClick={handleRestart}
-            className="btn-secondary w-full py-4"
-            aria-label="진단을 처음부터 다시 시작"
+            onClick={() => window.location.href = '/'}
+            className="btn-primary w-full py-4"
+            aria-label="새로운 진단 시작하기"
           >
-            처음부터 다시하기
+            새로운 진단 시작하기
           </button>
         </div>
       </div>
@@ -676,12 +770,19 @@ export function ResultStep() {
   const gradeDetail = GRADE_DETAILS[result.grade];
 
   return (
-    <div className="min-h-dvh bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2]">
+    <div className="min-h-dvh bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2] print:bg-white">
       <ShareCard result={result} cardRef={shareCardRef} />
+
+      {/* 다시하기 확인 모달 */}
+      <RestartConfirmModal
+        isOpen={showRestartModal}
+        onConfirm={handleRestartConfirm}
+        onCancel={handleRestartCancel}
+      />
 
       {/* 토스트 */}
       {toast.show && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gray-900 text-white text-[13px] rounded-full shadow-lg animate-fade-in">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gray-900 text-white text-[13px] rounded-full shadow-lg animate-fade-in print:hidden" role="alert">
           {toast.message}
         </div>
       )}
@@ -738,8 +839,8 @@ export function ResultStep() {
               </p>
 
               {/* 데스크톱: 공유 버튼을 점수 카드에 포함 */}
-              <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100">
-                <div className="flex gap-2">
+              <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100 print:hidden">
+                <div className="flex gap-2 mb-2">
                   <button
                     onClick={handleSaveImage}
                     disabled={isImageSaving}
@@ -751,9 +852,26 @@ export function ResultStep() {
                     onClick={handleShare}
                     className="flex-1 h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
                   >
-                    공유하기
+                    링크 복사
                   </button>
                 </div>
+                <button
+                  onClick={handleKakaoShare}
+                  className="w-full h-10 rounded-[8px] bg-[#FEE500] text-[#191919] text-[12px] font-semibold transition-colors hover:bg-[#F5DC00] flex items-center justify-center gap-2"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#191919">
+                    <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                  </svg>
+                  카카오톡 공유
+                </button>
+                {isSharedResult && (
+                  <button
+                    onClick={() => window.location.href = '/'}
+                    className="w-full h-10 mt-3 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold transition-colors hover:bg-[#0a2e22]"
+                  >
+                    나도 진단받기
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -964,14 +1082,14 @@ export function ResultStep() {
       </div>
 
       {/* 9. 공유 영역 - 모바일 전용 */}
-      <div className="lg:hidden bg-white rounded-xl shadow-sm p-4">
+      <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
         <h3 className="text-[14px] font-bold text-neutral-800 mb-1 text-center">
           결과 저장 및 공유
         </h3>
         <p className="text-center text-[12px] text-neutral-500 mb-4">
           나의 독립 준비 상태를 기록해두세요
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-2">
           <button
             onClick={handleSaveImage}
             disabled={isImageSaving}
@@ -982,22 +1100,45 @@ export function ResultStep() {
           </button>
           <button
             onClick={handleShare}
-            className="flex-1 h-11 rounded-[10px] bg-[#0F3D2E] text-white text-[13px] font-semibold transition-colors hover:bg-[#0a2e22]"
-            aria-label="결과 공유 공유하기"
+            className="flex-1 h-11 rounded-[10px] border border-neutral-200 text-neutral-700 text-[13px] font-semibold transition-colors hover:bg-neutral-50"
+            aria-label="링크 공유하기"
           >
-            공유하기
+            링크 복사
           </button>
         </div>
+        <button
+          onClick={handleKakaoShare}
+          className="w-full h-11 rounded-[10px] bg-[#FEE500] text-[#191919] text-[13px] font-semibold transition-colors hover:bg-[#F5DC00] flex items-center justify-center gap-2"
+          aria-label="카카오톡으로 공유하기"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#191919">
+            <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+          </svg>
+          카카오톡 공유
+        </button>
       </div>
 
+      {/* 10. 나도 진단받기 CTA - 공유 링크로 들어온 경우만 표시 */}
+      {isSharedResult && (
+        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 text-center print:hidden">
+          <p className="text-white/80 text-[13px] mb-2">나의 독립 준비 상태가 궁금하다면</p>
+          <button
+            onClick={() => window.location.href = '/'}
+            className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors"
+          >
+            나도 무료로 진단받기
+          </button>
+        </div>
+      )}
+
       {/* 다시하기 버튼 */}
-      <div className="pt-2 pb-6 lg:pb-0">
+      <div className="pt-2 pb-6 lg:pb-0 print:hidden">
         <button
-          onClick={handleRestart}
+          onClick={handleRestartClick}
           className="w-full h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
           aria-label="진단을 처음부터 다시 시작"
         >
-          처음부터 다시하기
+          {isSharedResult ? '나도 진단받기' : '처음부터 다시하기'}
         </button>
       </div>
 
