@@ -157,7 +157,7 @@ export function PrivacyPolicy() {
               <p className="font-semibold text-[#0F3D2E] mb-2">개인정보 보호책임자</p>
               <ul className="text-[14px] space-y-1">
                 <li>서비스명: 독립점수</li>
-                <li>이메일: privacy@canilivealone.com</li>
+                <li>이메일: canilivealone.help@gmail.com</li>
               </ul>
             </div>
           </section>

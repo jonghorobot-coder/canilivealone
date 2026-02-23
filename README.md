@@ -149,4 +149,4 @@ Vercel에 연결하면 `main` 브랜치 push 시 자동 배포됩니다.
 ## 문의
 
 - 서비스: [canilivealone.com](https://canilivealone.com)
-- 이메일: privacy@canilivealone.com
+- 이메일: canilivealone.help@gmail.com
