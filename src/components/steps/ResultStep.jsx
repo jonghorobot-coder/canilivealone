@@ -341,7 +341,7 @@ function ShareCard({ result, cardRef }) {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          paddingTop: '90px',
+          paddingTop: '60px',
         }}>
           {/* 점수 */}
           <div style={{
@@ -350,6 +350,7 @@ function ShareCard({ result, cardRef }) {
             justifyContent: 'center',
             gap: '8px',
             marginBottom: '24px',
+            paddingLeft: '80px',
           }}>
             <span style={{
               fontSize: '200px',
@@ -390,6 +391,7 @@ function ShareCard({ result, cardRef }) {
           <div style={{
             fontSize: '28px',
             color: '#374151',
+            marginBottom: '30px',
           }}>
             {GRADE_VERDICT[result?.grade] || ''}
           </div>
@@ -449,7 +451,7 @@ function ShareCard({ result, cardRef }) {
 
       {/* 하단 URL */}
       <div style={{
-        marginTop: '50px',
+        marginTop: '40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
