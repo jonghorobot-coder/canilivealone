@@ -655,53 +655,66 @@ export function ResultStep() {
   const gradeDetail = GRADE_DETAILS[result.grade];
 
   return (
-    <div className="py-8 space-y-6">
+    <div className="min-h-dvh bg-[#FAFAFA]">
       <ShareCard result={result} cardRef={shareCardRef} />
 
       {/* 토스트 */}
       {toast.show && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gray-900 text-white text-[14px] rounded-full shadow-lg animate-fade-in">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gray-900 text-white text-[13px] rounded-full shadow-lg animate-fade-in">
           {toast.message}
         </div>
       )}
 
-      {/* 헤더 */}
-      <header className="text-center pb-4">
-        <p className="text-[11px] text-neutral-400 tracking-[0.12em] mb-2 font-medium uppercase">Analysis Report</p>
-        <h1 className="text-[20px] font-bold text-neutral-800 tracking-tight">진단 결과</h1>
-      </header>
-
-      {/* 1. 점수 카드 */}
-      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-8 text-center mx-2">
-        <p className="text-[13px] text-neutral-400 font-medium mb-5 tracking-wide">독립 가능성 점수</p>
-        <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
-        <div className={`inline-block px-5 py-2 mt-6 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[15px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
-          {result.grade}
+      {/* 그린 헤더 영역 */}
+      <div
+        className="text-center pt-5 pb-14 px-4"
+        style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 60%, #1a5c45 100%)' }}
+      >
+        {/* 미니 로고 */}
+        <div className="w-7 h-7 bg-white/15 rounded-[7px] flex items-center justify-center mx-auto mb-2">
+          <svg width="14" height="14" viewBox="0 0 100 100">
+            <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+            <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+            <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
+          </svg>
         </div>
-        <p className="text-[12px] text-neutral-400 mt-6 tracking-wide">
-          현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
-        </p>
+        <p className="text-[10px] text-white/50 tracking-[0.1em] uppercase">Analysis Complete</p>
       </div>
+
+      {/* 플로팅 점수 카드 */}
+      <div className="px-4 -mt-10 space-y-4 pb-6">
+        <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+          <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
+          <div className={`inline-block px-4 py-1.5 mt-4 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[14px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
+            {result.grade}
+          </div>
+          <p className="text-[12px] text-neutral-500 mt-3">
+            {GRADE_VERDICT[result.grade]}
+          </p>
+          <p className="text-[11px] text-neutral-400 mt-4 tracking-wide">
+            현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
+          </p>
+        </div>
 
       {/* 2. 등급별 설명 */}
       {gradeDetail && (
-        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-          <p className="text-[17px] text-neutral-800 font-bold mb-3 leading-relaxed">{gradeDetail.summary}</p>
-          <p className="text-[15px] text-neutral-500 leading-relaxed">{gradeDetail.details}</p>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <p className="text-[15px] text-neutral-800 font-bold mb-2 leading-relaxed">{gradeDetail.summary}</p>
+          <p className="text-[13px] text-neutral-500 leading-relaxed">{gradeDetail.details}</p>
         </div>
       )}
 
       {/* 3. 리스크 플래그 */}
       {result.details?.riskFlags?.length > 0 && (
-        <div className="space-y-2 mx-2">
+        <div className="space-y-2">
           {result.details.riskFlags.map((flag, index) => (
             <div
               key={index}
-              className={`p-4 rounded-xl ${
+              className={`p-3.5 rounded-xl ${
                 flag.severity === 'critical' ? 'bg-red-50' : 'bg-amber-50'
               }`}
             >
-              <p className={`text-[14px] font-medium leading-relaxed ${
+              <p className={`text-[13px] font-medium leading-relaxed ${
                 flag.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
               }`}>{flag.message}</p>
             </div>
@@ -710,17 +723,17 @@ export function ResultStep() {
       )}
 
       {/* 4. 카테고리별 점수 */}
-      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-4">카테고리별 점수</h3>
-        <div className="space-y-4">
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">카테고리별 점수</h3>
+        <div className="space-y-3">
           {result.categoryScores && CATEGORY_ORDER.map((key) => {
             const score = result.categoryScores[key];
             return (
-              <div key={key} className="flex items-center gap-4">
-                <span className="text-[14px] text-neutral-600 w-20 flex-shrink-0 font-medium">
+              <div key={key} className="flex items-center gap-3">
+                <span className="text-[12px] text-neutral-500 w-16 flex-shrink-0 font-medium">
                   {CATEGORY_LABELS[key]}
                 </span>
-                <div className="flex-1 h-2 bg-neutral-200 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       score >= 70 ? 'bg-[#0F3D2E]' :
@@ -729,7 +742,7 @@ export function ResultStep() {
                     style={{ width: `${score}%` }}
                   />
                 </div>
-                <span className={`text-[14px] font-semibold w-8 text-right tabular-nums ${
+                <span className={`text-[12px] font-semibold w-7 text-right tabular-nums ${
                   score >= 70 ? 'text-[#0F3D2E]' :
                   score >= 50 ? 'text-amber-500' : 'text-red-500'
                 }`}>
@@ -743,8 +756,8 @@ export function ResultStep() {
 
       {/* 5. 구조 개선 조언 */}
       {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
-        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-          <h3 className="text-[17px] font-bold text-neutral-800 mb-4">구조 개선 분석</h3>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h3 className="text-[14px] font-bold text-neutral-800 mb-3">구조 개선 분석</h3>
           <div className="space-y-6">
             {getAllCategoryAdvice(result.categoryScores).map((advice) => (
               <div key={advice.categoryId} className="space-y-3">
@@ -810,7 +823,7 @@ export function ResultStep() {
 
       {/* 6. 주거 유형별 맞춤 분석 */}
       {result.housingAnalysis && (
-        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2 space-y-5">
+        <div className="bg-white rounded-xl shadow-sm p-4 space-y-4">
           <div>
             <h3 className="text-[17px] font-bold text-neutral-800 mb-3">{result.housingAnalysis.title}</h3>
             <p className="text-[15px] text-neutral-600 leading-relaxed">
@@ -835,37 +848,37 @@ export function ResultStep() {
       )}
 
       {/* 7. 독립 준비도 인덱스 */}
-      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-4">독립 준비도 인덱스</h3>
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">독립 준비도 인덱스</h3>
         <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
       </div>
 
       {/* 8. 재정 요약 */}
-      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-4">재정 요약</h3>
-        <div className="space-y-4">
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">재정 요약</h3>
+        <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-500">월 수입</span>
-            <span className="text-[17px] font-bold text-neutral-800 tabular-nums">
+            <span className="text-[12px] text-neutral-500">월 수입</span>
+            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
               {(result.income || 0).toLocaleString()}만원
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-500">입력 지출</span>
-            <span className="text-[17px] font-bold text-neutral-800 tabular-nums">
+            <span className="text-[12px] text-neutral-500">입력 지출</span>
+            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
               {(result.originalExpenses || 0).toLocaleString()}만원
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-500">보정 지출 (예상)</span>
-            <span className="text-[17px] font-semibold text-neutral-600 tabular-nums">
+            <span className="text-[12px] text-neutral-500">보정 지출 (예상)</span>
+            <span className="text-[14px] font-semibold text-neutral-600 tabular-nums">
               {(result.monthlyRequired || 0).toLocaleString()}만원
             </span>
           </div>
-          <div className="divider my-3"></div>
+          <div className="divider my-2"></div>
           <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
-            <span className="text-[20px] font-bold text-[#0F3D2E] tabular-nums">
+            <span className="text-[12px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
+            <span className="text-[16px] font-bold text-[#0F3D2E] tabular-nums">
               {(result.safetyAssets || 0).toLocaleString()}만원
             </span>
           </div>
@@ -873,25 +886,25 @@ export function ResultStep() {
       </div>
 
       {/* 9. 공유 영역 */}
-      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-2 text-center">
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-1 text-center">
           결과 저장 및 공유
         </h3>
-        <p className="text-center text-[14px] text-neutral-500 mb-5">
+        <p className="text-center text-[12px] text-neutral-500 mb-4">
           나의 독립 준비 상태를 기록해두세요
         </p>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
             onClick={handleSaveImage}
             disabled={isImageSaving}
-            className="btn-secondary flex-1 h-12 text-[14px] disabled:opacity-50"
+            className="flex-1 h-11 rounded-[10px] bg-[#0F3D2E] text-white text-[13px] font-semibold disabled:opacity-50 transition-colors hover:bg-[#0a2e22]"
             aria-label="진단 결과를 이미지로 저장"
           >
-            {isImageSaving ? '저장 중...' : '이미지로 저장'}
+            {isImageSaving ? '저장 중...' : '이미지 저장'}
           </button>
           <button
             onClick={handleCopyLink}
-            className="btn-secondary flex-1 h-12 text-[14px]"
+            className="flex-1 h-11 rounded-[10px] bg-[#0F3D2E] text-white text-[13px] font-semibold transition-colors hover:bg-[#0a2e22]"
             aria-label="결과 공유 링크 복사"
           >
             링크 복사
@@ -900,14 +913,15 @@ export function ResultStep() {
       </div>
 
       {/* 다시하기 버튼 */}
-      <div className="px-1.5 mt-8">
+      <div className="pt-2 pb-6">
         <button
           onClick={handleRestart}
-          className="btn-primary w-full h-14 text-[15px]"
+          className="w-full h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
           aria-label="진단을 처음부터 다시 시작"
         >
           처음부터 다시하기
         </button>
+      </div>
       </div>
     </div>
   );

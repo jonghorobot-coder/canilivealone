@@ -142,18 +142,18 @@ export function QuestionStep({ question }) {
               onClick={() => handleSelect(option.value)}
               style={{ animationDelay: `${index * 0.04}s` }}
               className={`
-                w-full p-4 rounded-[10px] text-left transition-colors duration-150
+                w-full p-3.5 rounded-[10px] text-left transition-colors duration-150
                 focus:outline-none animate-option-in
                 ${
                   selectedValue === option.value
-                    ? 'bg-white border-2 border-[#0F3D2E]'
-                    : 'bg-white border border-neutral-100 hover:border-neutral-200'
+                    ? 'bg-[#F0FDF4] border-2 border-[#0F3D2E]'
+                    : 'bg-white border border-neutral-200 hover:border-neutral-300'
                 }
               `}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2.5">
                 <div className={`
-                  w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                  w-[18px] h-[18px] mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0
                   transition-colors duration-150
                   ${
                     selectedValue === option.value
@@ -162,13 +162,13 @@ export function QuestionStep({ question }) {
                   }
                 `}>
                   {selectedValue === option.value && (
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}
                 </div>
                 <div className="flex-1">
-                  <span className={`text-[14px] font-medium block tracking-tight ${
+                  <span className={`text-[13px] font-medium block tracking-tight ${
                     selectedValue === option.value
                       ? 'text-[#0F3D2E]'
                       : 'text-neutral-700'
@@ -176,7 +176,7 @@ export function QuestionStep({ question }) {
                     {option.label}
                   </span>
                   {option.description && (
-                    <span className="text-[12px] text-neutral-400 mt-0.5 block">
+                    <span className="text-[11px] text-neutral-400 mt-0.5 block">
                       {option.description}
                     </span>
                   )}
