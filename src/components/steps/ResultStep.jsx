@@ -1103,12 +1103,6 @@ export function ResultStep() {
 
       {/* 9. 공유 영역 - 모바일 전용 */}
       <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-1 text-center">
-          결과 저장 및 공유
-        </h3>
-        <p className="text-center text-[12px] text-neutral-500 mb-4">
-          진단 결과를 저장하고 공유하세요
-        </p>
         <div className="flex gap-2 mb-2">
           <button
             onClick={handleSaveImage}
@@ -1138,9 +1132,9 @@ export function ResultStep() {
         </button>
       </div>
 
-      {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우만 표시 */}
+      {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우, 모바일에서만 표시 (데스크톱은 사이드바에 있음) */}
       {isSharedResult && (
-        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 text-center print:hidden">
+        <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 text-center print:hidden">
           <p className="text-white/80 text-[13px] mb-2">독립 준비 상태가 궁금하다면</p>
           <button
             onClick={() => window.location.href = '/'}
@@ -1151,9 +1145,9 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 다시하기 버튼 - 본인 결과일 때만 표시 */}
+      {/* 다시하기 버튼 - 본인 결과일 때, 모바일에서만 표시 (데스크톱은 사이드바에 있음) */}
       {!isSharedResult && (
-        <div className="pt-2 pb-6 lg:pb-0 print:hidden">
+        <div className="lg:hidden pt-2 pb-6 print:hidden">
           <button
             onClick={handleRestartClick}
             className="w-full h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
