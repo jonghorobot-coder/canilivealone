@@ -1,22 +1,27 @@
 import { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'canilivealone-data';
-const SESSION_KEY = 'canilivealone-session';
+
+// 페이지 로드 시 한 번만 실행되는 초기화 플래그
+// SPA 내부 네비게이션에서는 이미 true이므로 초기화되지 않음
+let isAppInitialized = false;
 
 export function useLocalStorage(initialState) {
   const [state, setState] = useState(() => {
     try {
-      // 새 세션인지 확인 (탭/창을 닫았다가 다시 열면 sessionStorage가 초기화됨)
-      const isNewSession = !sessionStorage.getItem(SESSION_KEY);
+      // 페이지가 처음 로드될 때 (링크 클릭, URL 직접 입력, 새로고침 등)
+      // 루트 경로('/')면 항상 초기 상태로 시작
+      if (!isAppInitialized) {
+        isAppInitialized = true;
 
-      if (isNewSession) {
-        // 새 세션이면 localStorage 데이터 무시하고 초기 상태로 시작
-        sessionStorage.setItem(SESSION_KEY, 'active');
-        localStorage.removeItem(STORAGE_KEY);
-        return initialState;
+        const isRootPath = window.location.pathname === '/';
+        if (isRootPath) {
+          localStorage.removeItem(STORAGE_KEY);
+          return initialState;
+        }
       }
 
-      // 기존 세션이면 localStorage에서 복원
+      // 루트가 아니거나 SPA 내비게이션이면 localStorage에서 복원
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         return JSON.parse(saved);
