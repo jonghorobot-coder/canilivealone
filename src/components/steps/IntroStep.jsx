@@ -179,73 +179,68 @@ export function IntroStep() {
       )}
 
       <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 40%, #1a5c45 70%, #0F3D2E 100%)' }}>
-        <div className="w-full max-w-md mx-auto px-6 flex-1 flex flex-col py-10">
+        <div className="w-full max-w-md mx-auto px-6 flex-1 flex flex-col pt-14 pb-8">
 
-        {/* 콘텐츠 영역 - 황금비율 상단 40% 지점에 배치 */}
-        <div className="flex-[3] flex flex-col justify-end pb-10">
-          {/* 로고 아이콘 */}
-          <div className="flex justify-center mb-6">
-            <div className="w-[48px] h-[48px] bg-white/10 rounded-[12px] flex items-center justify-center">
-              <svg width="26" height="26" viewBox="0 0 100 100">
-                <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
-                <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
-                <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
-              </svg>
+          {/* 콘텐츠 - 상단에서 자연스럽게 시작 */}
+          <div className="text-center">
+            {/* 로고 */}
+            <div className="flex justify-center mb-5">
+              <div className="w-[44px] h-[44px] bg-white/10 rounded-[10px] flex items-center justify-center">
+                <svg width="24" height="24" viewBox="0 0 100 100">
+                  <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+                  <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
+                  <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
+                </svg>
+              </div>
             </div>
-          </div>
 
-          {/* MAIN */}
-          <main className="text-center space-y-3">
-            <p className="text-[10px] tracking-[0.14em] text-white/45 uppercase font-medium">
+            {/* 타이틀 */}
+            <p className="text-[10px] tracking-[0.12em] text-white/40 uppercase font-medium mb-2">
               Financial Independence Score
             </p>
-
-            <h1 className="text-[26px] font-bold text-white leading-tight tracking-tight">
+            <h1 className="text-[24px] font-bold text-white leading-tight tracking-tight mb-3">
               독립 점수 진단
             </h1>
-
-            <p className="text-[14px] text-white/55 leading-relaxed">
+            <p className="text-[13px] text-white/50 leading-relaxed">
               월 수입·지출 구조 기반<br />
               재무 자립 가능성 분석
             </p>
-          </main>
-        </div>
+          </div>
 
-        {/* 액션 영역 - 하단 40% */}
-        <div className="flex-[2] flex flex-col justify-end">
-          {/* CTA */}
-          <section className="mb-5">
+          {/* 여백 - 남은 공간 차지 */}
+          <div className="flex-1 min-h-[60px]" />
+
+          {/* 하단 액션 */}
+          <div>
             <button
               onClick={handleStartClick}
-              className="w-full h-[50px] rounded-[12px] bg-white hover:bg-neutral-100 text-[#0F3D2E] text-[15px] font-semibold shadow-sm transition-colors tracking-tight"
+              className="w-full h-[48px] rounded-[10px] bg-white hover:bg-neutral-100 text-[#0F3D2E] text-[14px] font-semibold shadow-sm transition-colors tracking-tight"
               aria-label="독립점수 진단 시작하기"
             >
               진단 시작
             </button>
-
-            <p className="mt-2.5 text-[11px] text-white/30 text-center">
+            <p className="mt-2 text-[10px] text-white/25 text-center">
               모든 정보는 익명으로 안전하게 저장됩니다
             </p>
-          </section>
 
-          {/* 하단 통계 */}
-          <footer className="pt-4 border-t border-white/10">
-            <div className="flex items-center">
-              <div className="text-center flex-1 pr-4 border-r border-white/10">
-                <span className="text-[17px] font-semibold text-white block tabular-nums tracking-tight">2분</span>
-                <span className="text-[9px] text-white/40 mt-0.5 block tracking-wide">소요 시간</span>
-              </div>
-              <div className="text-center flex-1 px-4 border-r border-white/10">
-                <span className="text-[17px] font-semibold text-white block tabular-nums tracking-tight">25개</span>
-                <span className="text-[9px] text-white/40 mt-0.5 block tracking-wide">분석 항목</span>
-              </div>
-              <div className="text-center flex-1 pl-4">
-                <span className="text-[17px] font-semibold text-white block tabular-nums tracking-tight">7개</span>
-                <span className="text-[9px] text-white/40 mt-0.5 block tracking-wide">카테고리</span>
+            {/* 통계 */}
+            <div className="mt-6 pt-4 border-t border-white/8">
+              <div className="flex items-center">
+                <div className="text-center flex-1 pr-3 border-r border-white/8">
+                  <span className="text-[15px] font-semibold text-white block tabular-nums">2분</span>
+                  <span className="text-[9px] text-white/35 block">소요 시간</span>
+                </div>
+                <div className="text-center flex-1 px-3 border-r border-white/8">
+                  <span className="text-[15px] font-semibold text-white block tabular-nums">25개</span>
+                  <span className="text-[9px] text-white/35 block">분석 항목</span>
+                </div>
+                <div className="text-center flex-1 pl-3">
+                  <span className="text-[15px] font-semibold text-white block tabular-nums">7개</span>
+                  <span className="text-[9px] text-white/35 block">카테고리</span>
+                </div>
               </div>
             </div>
-          </footer>
-        </div>
+          </div>
 
         </div>
       </div>
