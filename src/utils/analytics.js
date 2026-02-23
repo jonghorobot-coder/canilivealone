@@ -45,17 +45,17 @@ export function trackEvent(eventName, params = {}) {
 
 // 사전 정의된 이벤트
 export const AnalyticsEvents = {
-  // 진단 시작
-  startDiagnosis: () => trackEvent('start_diagnosis', {
+  // 테스트 시작 (start_test)
+  startDiagnosis: () => trackEvent('start_test', {
     event_category: 'engagement',
     event_label: 'Start Button Click',
   }),
 
-  // 결과 도달
-  reachResult: (score, grade) => trackEvent('reach_result', {
+  // 테스트 완료 (complete_test) - 점수 포함
+  reachResult: (score, grade) => trackEvent('complete_test', {
     event_category: 'conversion',
     event_label: grade,
-    value: score,
+    score: score,
   }),
 
   // 링크 복사
@@ -96,8 +96,8 @@ export const AnalyticsEvents = {
     value: questionId,
   }),
 
-  // 결과 페이지 조회
-  viewResultPage: () => trackEvent('view_result_page', {
+  // 결과 페이지 조회 (view_result)
+  viewResultPage: () => trackEvent('view_result', {
     event_category: 'pageview',
     event_label: 'Result Page',
   }),
