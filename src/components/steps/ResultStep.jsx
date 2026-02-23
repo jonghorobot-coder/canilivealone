@@ -249,14 +249,32 @@ function IndependenceIndex({ categoryScores, showScore, skipAnimation = false })
 
 function ShareCard({ result, cardRef }) {
   const gradeStyle = SHARE_GRADE_STYLES[result?.grade] || { bg: '#F3F4F6', border: '#9CA3AF', text: '#6B7280' };
-  const verdict = GRADE_VERDICT[result?.grade] || '';
+  const score = result?.score ?? 0;
 
-  const riskCategories = result?.categoryScores
-    ? Object.entries(result.categoryScores)
-        .filter(([, score]) => score < 50)
-        .map(([key]) => CATEGORY_RISK_LABELS[key])
-        .slice(0, 3)
+  // 점수에 따른 게이지 색상
+  const getScoreColor = (s) => {
+    if (s >= 70) return '#0F3D2E';
+    if (s >= 50) return '#D97706';
+    return '#DC2626';
+  };
+
+  const scoreColor = getScoreColor(score);
+
+  // 카테고리별 점수 (상위 4개만)
+  const categoryData = result?.categoryScores
+    ? [
+        { key: 'housing', label: '주거', score: result.categoryScores.housing },
+        { key: 'savings', label: '저축', score: result.categoryScores.savings },
+        { key: 'food', label: '식비', score: result.categoryScores.food },
+        { key: 'fixed', label: '고정', score: result.categoryScores.fixed },
+      ]
     : [];
+
+  // SVG 원형 게이지 계산
+  const radius = 140;
+  const circumference = 2 * Math.PI * radius;
+  const progress = (score / 100) * circumference;
+  const offset = circumference - progress;
 
   return (
     <div
@@ -267,158 +285,207 @@ function ShareCard({ result, cardRef }) {
         top: 0,
         width: '1080px',
         height: '1080px',
-        background: 'linear-gradient(180deg, #FFFFFF 0%, #F7FAF8 50%, #F2F7F4 100%)',
+        background: 'linear-gradient(145deg, #0F3D2E 0%, #1a5c45 50%, #0F3D2E 100%)',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '80px',
+        padding: '70px 80px',
         boxSizing: 'border-box',
         visibility: 'hidden',
         pointerEvents: 'none',
       }}
     >
-      {/* 상단 라벨 */}
+      {/* 상단 로고 + 브랜드 */}
       <div style={{
-        fontSize: '26px',
-        color: '#6B7280',
-        letterSpacing: '0.12em',
-        marginBottom: '16px',
-        textTransform: 'uppercase',
-      }}>
-        Financial Independence Score
-      </div>
-
-      {/* 타이틀 */}
-      <div style={{
-        fontSize: '52px',
-        fontWeight: '700',
-        color: '#0F3D2E',
-        marginBottom: '20px',
-      }}>
-        독립점수
-      </div>
-
-      {/* 타이틀 아래 강조선 */}
-      <div style={{
-        width: '60px',
-        height: '3px',
-        backgroundColor: '#0F3D2E',
-        marginBottom: '72px',
-      }} />
-
-      {/* 점수 라벨 */}
-      <div style={{
-        fontSize: '28px',
-        color: '#6B7280',
-        marginBottom: '20px',
-      }}>
-        독립 가능성 점수
-      </div>
-
-      {/* 점수 */}
-      <div style={{
-        fontSize: '200px',
-        fontWeight: '700',
-        color: '#0F3D2E',
-        lineHeight: '1',
-        letterSpacing: '-2px',
-        marginBottom: '8px',
-      }}>
-        {result?.score ?? 0}
-      </div>
-
-      {/* /100점 위 구분선 */}
-      <div style={{
-        width: '120px',
-        height: '1px',
-        backgroundColor: '#D1D5DB',
-        marginBottom: '12px',
-      }} />
-
-      {/* /100점 */}
-      <div style={{
-        fontSize: '32px',
-        color: '#9CA3AF',
-        marginBottom: '48px',
-      }}>
-        / 100점
-      </div>
-
-      {/* 등급 배지 */}
-      <div style={{
-        display: 'inline-flex',
+        display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px 48px',
-        borderRadius: '100px',
-        backgroundColor: gradeStyle.bg,
-        border: `3px solid ${gradeStyle.border}`,
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-        marginBottom: '24px',
+        gap: '16px',
+        marginBottom: '50px',
       }}>
-        <span style={{
-          fontSize: '36px',
-          fontWeight: '700',
-          color: gradeStyle.text,
-        }}>
-          {result?.grade}
-        </span>
-      </div>
-
-      {/* 판정 문구 */}
-      <div style={{
-        fontSize: '26px',
-        color: '#4B5563',
-        marginBottom: '56px',
-      }}>
-        {verdict}
-      </div>
-
-      {/* 위험 카테고리 */}
-      {riskCategories.length > 0 && (
+        {/* 파비콘 로고 */}
         <div style={{
+          width: '56px',
+          height: '56px',
+          backgroundColor: 'rgba(255,255,255,0.15)',
+          borderRadius: '14px',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
-          marginBottom: '56px',
+          justifyContent: 'center',
         }}>
-          <span style={{ fontSize: '22px', color: '#6B7280' }}>주의 필요:</span>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {riskCategories.map((cat, i) => (
-              <span key={i} style={{
-                padding: '8px 16px',
-                borderRadius: '6px',
-                backgroundColor: '#FEF2F2',
-                color: '#DC2626',
-                fontSize: '20px',
-                fontWeight: '600',
-              }}>
-                {cat}
-              </span>
-            ))}
+          <svg width="32" height="32" viewBox="0 0 100 100">
+            <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.95"/>
+            <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.75"/>
+            <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.55"/>
+          </svg>
+        </div>
+        <div style={{
+          fontSize: '28px',
+          fontWeight: '700',
+          color: 'white',
+          letterSpacing: '-0.02em',
+        }}>
+          독립점수
+        </div>
+      </div>
+
+      {/* 메인 점수 카드 */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '32px',
+        padding: '50px 60px',
+        width: '100%',
+        maxWidth: '920px',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}>
+        {/* 원형 게이지 + 점수 */}
+        <div style={{
+          position: 'relative',
+          width: '320px',
+          height: '320px',
+          marginBottom: '32px',
+        }}>
+          <svg width="320" height="320" style={{ transform: 'rotate(-90deg)' }}>
+            {/* 배경 원 */}
+            <circle
+              cx="160"
+              cy="160"
+              r={radius}
+              fill="none"
+              stroke="#E5E7EB"
+              strokeWidth="20"
+            />
+            {/* 진행 원 */}
+            <circle
+              cx="160"
+              cy="160"
+              r={radius}
+              fill="none"
+              stroke={scoreColor}
+              strokeWidth="20"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+            />
+          </svg>
+          {/* 중앙 점수 */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+          }}>
+            <div style={{
+              fontSize: '96px',
+              fontWeight: '800',
+              color: '#111827',
+              lineHeight: '1',
+              letterSpacing: '-3px',
+            }}>
+              {score}
+            </div>
+            <div style={{
+              fontSize: '24px',
+              color: '#9CA3AF',
+              marginTop: '8px',
+            }}>
+              / 100
+            </div>
           </div>
         </div>
-      )}
 
-      {/* 하단 구분선 */}
-      <div style={{
-        width: '200px',
-        height: '1px',
-        backgroundColor: '#D1D5DB',
-        marginBottom: '28px',
-      }} />
+        {/* 등급 배지 */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px 40px',
+          borderRadius: '100px',
+          backgroundColor: gradeStyle.bg,
+          border: `2px solid ${gradeStyle.border}`,
+          marginBottom: '40px',
+        }}>
+          <span style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: gradeStyle.text,
+          }}>
+            {result?.grade}
+          </span>
+        </div>
 
-      {/* 브랜딩 */}
+        {/* 카테고리별 점수 바 */}
+        <div style={{
+          width: '100%',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '20px',
+        }}>
+          {categoryData.map((cat) => (
+            <div key={cat.key} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '12px',
+            }}>
+              <div style={{
+                fontSize: '18px',
+                color: '#6B7280',
+                fontWeight: '500',
+              }}>
+                {cat.label}
+              </div>
+              <div style={{
+                width: '100%',
+                height: '12px',
+                backgroundColor: '#E5E7EB',
+                borderRadius: '6px',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  width: `${cat.score}%`,
+                  height: '100%',
+                  backgroundColor: getScoreColor(cat.score),
+                  borderRadius: '6px',
+                }} />
+              </div>
+              <div style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                color: getScoreColor(cat.score),
+              }}>
+                {cat.score}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 하단 URL */}
       <div style={{
-        fontSize: '24px',
-        fontWeight: '600',
-        color: '#0F3D2E',
-        letterSpacing: '0.05em',
-        marginTop: '32px',
+        marginTop: 'auto',
+        paddingTop: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
       }}>
-        canilivealone.com
+        <div style={{
+          fontSize: '22px',
+          color: 'rgba(255,255,255,0.7)',
+        }}>
+          나도 진단받기
+        </div>
+        <div style={{
+          fontSize: '22px',
+          fontWeight: '600',
+          color: 'white',
+        }}>
+          canilivealone.com
+        </div>
       </div>
     </div>
   );
