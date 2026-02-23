@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>OG 결과 이미지</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #333;
+      padding: 20px;
+    }
+    .og-card {
+      width: 1200px;
+      height: 630px;
+      background: linear-gradient(145deg, #0a2e1f 0%, #0F3D2E 35%, #165c42 65%, #0F3D2E 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 배경 장식 */
+    .bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+    .bg-circle-1 {
+      width: 400px;
+      height: 400px;
+      top: -100px;
+      right: -100px;
+    }
+    .bg-circle-2 {
+      width: 300px;
+      height: 300px;
+      bottom: -80px;
+      left: -80px;
+    }
+
+    /* 왼쪽 영역 */
+    .left-section {
+      width: 480px;
+      padding: 55px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 로고 */
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-box {
+      width: 46px;
+      height: 46px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-box svg {
+      width: 24px;
+      height: 24px;
+    }
+    .logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* 결과 공유 배지 */
+    .share-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      padding: 8px 14px;
+      border-radius: 20px;
+      margin-top: 50px;
+      width: fit-content;
+    }
+    .share-badge-icon {
+      font-size: 14px;
+    }
+    .share-badge-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.5px;
+    }
+
+    /* 메인 텍스트 */
+    .main-text {
+      margin-top: 20px;
+    }
+    .main-title {
+      font-size: 34px;
+      font-weight: 700;
+      color: white;
+      line-height: 1.35;
+      letter-spacing: -0.5px;
+    }
+    .main-subtitle {
+      font-size: 17px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    /* 하단 CTA */
+    .bottom-cta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.7);
+      font-size: 15px;
+    }
+    .bottom-cta-highlight {
+      color: white;
+      font-weight: 600;
+    }
+
+    /* 오른쪽 영역 - 결과 카드 */
+    .right-section {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: 28px;
+      padding: 45px 55px;
+      text-align: center;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+      position: relative;
+    }
+
+    .result-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0F3D2E;
+      background: #E8F3EF;
+      padding: 6px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 24px;
+      letter-spacing: 0.3px;
+    }
+
+    .result-score {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .score-number {
+      font-size: 110px;
+      font-weight: 800;
+      color: #0F3D2E;
+      line-height: 1;
+      letter-spacing: -3px;
+    }
+    .score-unit {
+      font-size: 32px;
+      font-weight: 500;
+      color: #9CA3AF;
+    }
+
+    .result-grade {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #E8F3EF;
+      border: 2px solid #0F3D2E;
+      padding: 10px 24px;
+      border-radius: 30px;
+      margin-bottom: 16px;
+    }
+    .grade-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0F3D2E;
+    }
+
+    .result-message {
+      font-size: 15px;
+      color: #6B7280;
+    }
+
+    /* 물음표 오버레이 */
+    .mystery-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.97);
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .mystery-icon {
+      font-size: 80px;
+      margin-bottom: 16px;
+    }
+    .mystery-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .mystery-subtext {
+      font-size: 14px;
+      color: #9CA3AF;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="og-card">
+    <!-- 배경 장식 -->
+    <div class="bg-circle bg-circle-1"></div>
+    <div class="bg-circle bg-circle-2"></div>
+
+    <!-- 왼쪽 영역 -->
+    <div class="left-section">
+      <div>
+        <!-- 로고 -->
+        <div class="logo-area">
+          <div class="logo-box">
+            <svg viewBox="0 0 100 100">
+              <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
+              <path d="M20 50L50 65L80 50" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.7"/>
+              <path d="M20 65L50 80L80 65" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.5"/>
+            </svg>
+          </div>
+          <span class="logo-text">독립점수</span>
+        </div>
+
+        <!-- 결과 공유 배지 -->
+        <div class="share-badge">
+          <span class="share-badge-icon">📊</span>
+          <span class="share-badge-text">진단 결과 공유</span>
+        </div>
+
+        <!-- 메인 텍스트 -->
+        <div class="main-text">
+          <h1 class="main-title">누군가의 독립 준비도<br/>진단 결과입니다</h1>
+          <p class="main-subtitle">나도 2분 만에 무료로 진단받고<br/>독립 준비 상태를 확인해보세요</p>
+        </div>
+      </div>
+
+      <!-- 하단 CTA -->
+      <div class="bottom-cta">
+        <span class="bottom-cta-highlight">canilivealone.com</span>
+        <span>에서 진단받기 →</span>
+      </div>
+    </div>
+
+    <!-- 오른쪽 영역 - 결과 카드 -->
+    <div class="right-section">
+      <div class="result-card">
+        <!-- 실제 결과 (숨겨짐) -->
+        <div class="result-label">독립 준비도 점수</div>
+        <div class="result-score">
+          <span class="score-number">78</span>
+          <span class="score-unit">점</span>
+        </div>
+        <div class="result-grade">
+          <span class="grade-text">안정</span>
+        </div>
+        <p class="result-message">안정적인 독립이 가능합니다</p>
+
+        <!-- 물음표 오버레이 -->
+        <div class="mystery-overlay">
+          <span class="mystery-icon">🔒</span>
+          <span class="mystery-text">결과가 궁금하다면?</span>
+          <span class="mystery-subtext">링크를 눌러 직접 확인하세요</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

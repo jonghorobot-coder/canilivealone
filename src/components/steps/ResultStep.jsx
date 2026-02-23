@@ -586,7 +586,11 @@ export function ResultStep() {
       const shareUrl = resultId
         ? `${window.location.origin}/result?id=${resultId}`
         : window.location.href;
-      await navigator.clipboard.writeText(shareUrl);
+      const shareText = `📊 독립점수 진단 결과
+
+나의 독립 준비 상태를 확인해보세요!
+👉 ${shareUrl}`;
+      await navigator.clipboard.writeText(shareText);
       showToast('링크가 복사되었습니다');
       AnalyticsEvents.copyLink();
     } catch (err) {
