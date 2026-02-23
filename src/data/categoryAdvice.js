@@ -243,22 +243,26 @@ export function getCategoryAdvice(categoryId, score) {
   };
 }
 
+// 카테고리 순서 (입력 순서와 동일)
+const CATEGORY_ORDER = ['housing', 'food', 'fixed', 'transport', 'leisure', 'misc', 'savings'];
+
 /**
- * 모든 카테고리의 개선 조언 반환 (점수 낮은 순)
+ * 모든 카테고리의 개선 조언 반환 (입력 순서대로)
  * @param {Object} categoryScores - 카테고리별 점수 객체
- * @returns {Array} 조언 배열 (stable 제외, 점수 낮은 순 정렬)
+ * @returns {Array} 조언 배열 (stable 제외, 입력 순서대로 정렬)
  */
 export function getAllCategoryAdvice(categoryScores) {
   if (!categoryScores) return [];
 
-  const adviceList = Object.entries(categoryScores)
-    .map(([categoryId, score]) => {
+  const adviceList = CATEGORY_ORDER
+    .map((categoryId) => {
+      const score = categoryScores[categoryId];
+      if (score === undefined) return null;
       const advice = getCategoryAdvice(categoryId, score);
       if (!advice) return null;
       return { ...advice, score };
     })
-    .filter(Boolean)
-    .sort((a, b) => a.score - b.score); // 점수 낮은 순
+    .filter(Boolean);
 
   return adviceList;
 }
