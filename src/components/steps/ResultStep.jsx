@@ -702,8 +702,8 @@ export function ResultStep() {
       <div className="px-4 -mt-10 lg:mt-0 lg:px-8 xl:px-16 lg:py-8 pb-6">
         <div className="lg:max-w-5xl lg:mx-auto lg:grid lg:grid-cols-3 lg:gap-8">
 
-          {/* 왼쪽: 점수 카드 (데스크톱에서 사이드바) */}
-          <div className="lg:col-span-1 space-y-4 lg:space-y-6">
+          {/* 왼쪽: 점수 카드 (데스크톱 전용 사이드바) */}
+          <div className="hidden lg:block lg:col-span-1 space-y-4 lg:space-y-6">
             <div className="bg-white rounded-xl shadow-sm p-6 text-center lg:sticky lg:top-8">
               <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
               <div className={`inline-block px-4 py-1.5 mt-4 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[14px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
@@ -739,7 +739,8 @@ export function ResultStep() {
 
           {/* 오른쪽: 상세 분석 */}
           <div className="lg:col-span-2 space-y-4 mt-4 lg:mt-0">
-        <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+        {/* 모바일 전용 점수 카드 */}
+        <div className="lg:hidden bg-white rounded-xl shadow-sm p-6 text-center">
           <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
           <div className={`inline-block px-4 py-1.5 mt-4 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[14px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
             {result.grade}
