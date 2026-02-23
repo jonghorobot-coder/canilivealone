@@ -179,14 +179,14 @@ export function IntroStep() {
       )}
 
       <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 40%, #1a5c45 70%, #0F3D2E 100%)' }}>
-        <div className="w-full max-w-md mx-auto px-6 flex-1 flex flex-col pt-14 pb-8">
 
-          {/* 콘텐츠 - 상단에서 자연스럽게 시작 */}
-          <div className="text-center">
+        {/* Hero 영역 - 수직 중앙 정렬 */}
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="w-full max-w-md text-center">
             {/* 로고 */}
-            <div className="flex justify-center mb-5">
-              <div className="w-[44px] h-[44px] bg-white/10 rounded-[10px] flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 100 100">
+            <div className="flex justify-center mb-6">
+              <div className="w-[52px] h-[52px] bg-white/12 rounded-[14px] flex items-center justify-center">
+                <svg width="28" height="28" viewBox="0 0 100 100">
                   <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
                   <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
                   <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
@@ -195,54 +195,53 @@ export function IntroStep() {
             </div>
 
             {/* 타이틀 */}
-            <p className="text-[10px] tracking-[0.12em] text-white/40 uppercase font-medium mb-2">
+            <p className="text-[10px] tracking-[0.14em] text-white/50 uppercase font-medium mb-2">
               Financial Independence Score
             </p>
-            <h1 className="text-[24px] font-bold text-white leading-tight tracking-tight mb-3">
+            <h1 className="text-[28px] font-bold text-white leading-tight tracking-tight mb-3">
               독립 점수 진단
             </h1>
-            <p className="text-[13px] text-white/50 leading-relaxed">
+            <p className="text-[14px] text-white/60 leading-relaxed mb-10">
               월 수입·지출 구조 기반<br />
               재무 자립 가능성 분석
             </p>
-          </div>
 
-          {/* 여백 - 남은 공간 차지 */}
-          <div className="flex-1 min-h-[60px]" />
-
-          {/* 하단 액션 */}
-          <div>
+            {/* CTA 버튼 - 강한 대비와 시각적 무게감 */}
             <button
               onClick={handleStartClick}
-              className="w-full h-[48px] rounded-[10px] bg-white hover:bg-neutral-100 text-[#0F3D2E] text-[14px] font-semibold shadow-sm transition-colors tracking-tight"
+              className="w-full h-[54px] rounded-[12px] bg-white text-[#0F3D2E] text-[16px] font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] hover:shadow-[0_6px_28px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 tracking-tight"
               aria-label="독립점수 진단 시작하기"
             >
               진단 시작
             </button>
-            <p className="mt-2 text-[10px] text-white/25 text-center">
+
+            {/* 신뢰 문구 - 가독성 확보 */}
+            <p className="mt-4 text-[12px] text-white/60 text-center">
               모든 정보는 익명으로 안전하게 저장됩니다
             </p>
+          </div>
+        </div>
 
-            {/* 통계 */}
-            <div className="mt-6 pt-4 border-t border-white/8">
-              <div className="flex items-center">
-                <div className="text-center flex-1 pr-3 border-r border-white/8">
-                  <span className="text-[15px] font-semibold text-white block tabular-nums">2분</span>
-                  <span className="text-[9px] text-white/35 block">소요 시간</span>
-                </div>
-                <div className="text-center flex-1 px-3 border-r border-white/8">
-                  <span className="text-[15px] font-semibold text-white block tabular-nums">25개</span>
-                  <span className="text-[9px] text-white/35 block">분석 항목</span>
-                </div>
-                <div className="text-center flex-1 pl-3">
-                  <span className="text-[15px] font-semibold text-white block tabular-nums">7개</span>
-                  <span className="text-[9px] text-white/35 block">카테고리</span>
-                </div>
+        {/* 하단 통계 - safe-area 확보, 명확한 분리 */}
+        <div className="w-full max-w-md mx-auto px-6 pb-10">
+          <div className="pt-5 border-t border-white/15">
+            <div className="flex items-center">
+              <div className="text-center flex-1 pr-4 border-r border-white/15">
+                <span className="text-[18px] font-semibold text-white block tabular-nums tracking-tight">2분</span>
+                <span className="text-[10px] text-white/50 mt-0.5 block tracking-wide">소요 시간</span>
+              </div>
+              <div className="text-center flex-1 px-4 border-r border-white/15">
+                <span className="text-[18px] font-semibold text-white block tabular-nums tracking-tight">25개</span>
+                <span className="text-[10px] text-white/50 mt-0.5 block tracking-wide">분석 항목</span>
+              </div>
+              <div className="text-center flex-1 pl-4">
+                <span className="text-[18px] font-semibold text-white block tabular-nums tracking-tight">7개</span>
+                <span className="text-[10px] text-white/50 mt-0.5 block tracking-wide">카테고리</span>
               </div>
             </div>
           </div>
-
         </div>
+
       </div>
     </>
   );
