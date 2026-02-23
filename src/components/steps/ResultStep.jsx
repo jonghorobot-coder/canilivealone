@@ -690,7 +690,7 @@ export function ResultStep() {
         <h1 className="text-[20px] font-bold text-neutral-800 tracking-tight">진단 결과</h1>
       </header>
 
-      {/* 점수 카드 */}
+      {/* 1. 점수 카드 */}
       <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-8 text-center mx-2">
         <p className="text-[13px] text-neutral-400 font-medium mb-5 tracking-wide">독립 가능성 점수</p>
         <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
@@ -702,18 +702,7 @@ export function ResultStep() {
         </p>
       </div>
 
-      {/* 신뢰 안내 */}
-      <p className="text-[13px] text-neutral-400 text-center leading-relaxed mx-4">
-        이 결과는 입력한 정보를 기반으로 계산된 재정 안정성 진단입니다.
-      </p>
-
-      {/* 독립 준비도 인덱스 */}
-      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-4">독립 준비도 인덱스</h3>
-        <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
-      </div>
-
-      {/* 등급별 설명 */}
+      {/* 2. 등급별 설명 */}
       {gradeDetail && (
         <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
           <p className="text-[17px] text-neutral-800 font-bold mb-3 leading-relaxed">{gradeDetail.summary}</p>
@@ -721,33 +710,7 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 주거 유형별 맞춤 분석 */}
-      {result.housingAnalysis && (
-        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2 space-y-5">
-          <div>
-            <h3 className="text-[17px] font-bold text-neutral-800 mb-3">{result.housingAnalysis.title}</h3>
-            <p className="text-[15px] text-neutral-600 leading-relaxed">
-              {result.housingAnalysis.summary}
-            </p>
-            <p className="text-[15px] text-neutral-600 leading-relaxed mt-2">
-              {result.housingAnalysis.details}
-            </p>
-          </div>
-          <div className="border-t border-neutral-100 pt-5">
-            <h4 className="text-[15px] font-semibold text-neutral-700 mb-3">전략 제안</h4>
-            <ul className="space-y-2">
-              {result.housingAnalysis.strategies.map((strategy, index) => (
-                <li key={index} className="flex items-baseline gap-2">
-                  <span className="text-[#0F3D2E] text-[10px]">●</span>
-                  <span className="text-[14px] text-neutral-600 leading-relaxed">{strategy}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* 리스크 플래그 */}
+      {/* 3. 리스크 플래그 */}
       {result.details?.riskFlags?.length > 0 && (
         <div className="space-y-2 mx-2">
           {result.details.riskFlags.map((flag, index) => (
@@ -765,39 +728,7 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 재정 요약 */}
-      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-4">재정 요약</h3>
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-500">월 수입</span>
-            <span className="text-[17px] font-bold text-neutral-800 tabular-nums">
-              {(result.income || 0).toLocaleString()}만원
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-500">입력 지출</span>
-            <span className="text-[17px] font-bold text-neutral-800 tabular-nums">
-              {(result.originalExpenses || 0).toLocaleString()}만원
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-500">보정 지출 (예상)</span>
-            <span className="text-[17px] font-semibold text-neutral-600 tabular-nums">
-              {(result.monthlyRequired || 0).toLocaleString()}만원
-            </span>
-          </div>
-          <div className="divider my-3"></div>
-          <div className="flex justify-between items-center">
-            <span className="text-[14px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
-            <span className="text-[20px] font-bold text-[#0F3D2E] tabular-nums">
-              {(result.safetyAssets || 0).toLocaleString()}만원
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* 카테고리별 점수 */}
+      {/* 4. 카테고리별 점수 */}
       <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
         <h3 className="text-[17px] font-bold text-neutral-800 mb-4">카테고리별 점수</h3>
         <div className="space-y-4">
@@ -829,7 +760,7 @@ export function ResultStep() {
         </div>
       </div>
 
-      {/* 구조 개선 조언 */}
+      {/* 5. 구조 개선 조언 */}
       {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
         <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
           <h3 className="text-[17px] font-bold text-neutral-800 mb-4">구조 개선 분석</h3>
@@ -896,7 +827,71 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 공유 영역 */}
+      {/* 6. 주거 유형별 맞춤 분석 */}
+      {result.housingAnalysis && (
+        <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2 space-y-5">
+          <div>
+            <h3 className="text-[17px] font-bold text-neutral-800 mb-3">{result.housingAnalysis.title}</h3>
+            <p className="text-[15px] text-neutral-600 leading-relaxed">
+              {result.housingAnalysis.summary}
+            </p>
+            <p className="text-[15px] text-neutral-600 leading-relaxed mt-2">
+              {result.housingAnalysis.details}
+            </p>
+          </div>
+          <div className="border-t border-neutral-100 pt-5">
+            <h4 className="text-[15px] font-semibold text-neutral-700 mb-3">전략 제안</h4>
+            <ul className="space-y-2">
+              {result.housingAnalysis.strategies.map((strategy, index) => (
+                <li key={index} className="flex items-baseline gap-2">
+                  <span className="text-[#0F3D2E] text-[10px]">●</span>
+                  <span className="text-[14px] text-neutral-600 leading-relaxed">{strategy}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* 7. 독립 준비도 인덱스 */}
+      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
+        <h3 className="text-[17px] font-bold text-neutral-800 mb-4">독립 준비도 인덱스</h3>
+        <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
+      </div>
+
+      {/* 8. 재정 요약 */}
+      <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
+        <h3 className="text-[17px] font-bold text-neutral-800 mb-4">재정 요약</h3>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <span className="text-[14px] text-neutral-500">월 수입</span>
+            <span className="text-[17px] font-bold text-neutral-800 tabular-nums">
+              {(result.income || 0).toLocaleString()}만원
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[14px] text-neutral-500">입력 지출</span>
+            <span className="text-[17px] font-bold text-neutral-800 tabular-nums">
+              {(result.originalExpenses || 0).toLocaleString()}만원
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[14px] text-neutral-500">보정 지출 (예상)</span>
+            <span className="text-[17px] font-semibold text-neutral-600 tabular-nums">
+              {(result.monthlyRequired || 0).toLocaleString()}만원
+            </span>
+          </div>
+          <div className="divider my-3"></div>
+          <div className="flex justify-between items-center">
+            <span className="text-[14px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
+            <span className="text-[20px] font-bold text-[#0F3D2E] tabular-nums">
+              {(result.safetyAssets || 0).toLocaleString()}만원
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 9. 공유 영역 */}
       <div className="bg-white rounded-xl border border-neutral-100 shadow-sm p-6 mx-2">
         <h3 className="text-[17px] font-bold text-neutral-800 mb-2 text-center">
           결과 저장 및 공유
