@@ -1662,9 +1662,9 @@ export function ResultStep() {
         </button>
       </div>
 
-      {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우 */}
+      {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우 (모바일만, 데스크톱은 사이드바에 있음) */}
       {isSharedResult && (
-        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-6 text-center print:hidden">
+        <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-6 text-center print:hidden">
           <p className="text-white font-semibold text-[15px] mb-1">당신의 점수는 몇 점일까요?</p>
           <p className="text-white/70 text-[12px] mb-4">2분만에 무료로 진단받아 보세요</p>
           <button
