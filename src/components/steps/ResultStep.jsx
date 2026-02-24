@@ -15,6 +15,11 @@ import {
   getFriendScore,
   clearFriendScore,
 } from '../../utils/historyStorage';
+import {
+  generateImprovementRoadmap,
+  getTargetScoreRange,
+  getGradeTargets,
+} from '../../utils/goalSimulation';
 
 const LOADING_DURATION = 2500;
 
@@ -516,6 +521,215 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel }) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// 목표 점수 시뮬레이션 컴포넌트
+function GoalSimulation({ result, expenses, income }) {
+  const [targetScore, setTargetScore] = useState(null);
+  const [roadmap, setRoadmap] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const currentScore = result?.score || 0;
+  const scoreRange = getTargetScoreRange(currentScore);
+  const gradeTargets = getGradeTargets(currentScore);
+
+  // 초기 목표 점수 설정
+  useEffect(() => {
+    if (targetScore === null && currentScore < 100) {
+      setTargetScore(scoreRange.default);
+    }
+  }, [currentScore, scoreRange.default, targetScore]);
+
+  // 시뮬레이션 계산
+  useEffect(() => {
+    if (targetScore && result?.categoryScores) {
+      const newRoadmap = generateImprovementRoadmap({
+        currentScore,
+        targetScore,
+        categoryScores: result.categoryScores,
+        expenses: expenses || {},
+        income: income || result.income || 0,
+      });
+      setRoadmap(newRoadmap);
+    }
+  }, [targetScore, currentScore, result, expenses, income]);
+
+  // 100점이면 시뮬레이션 불필요
+  if (currentScore >= 100) {
+    return null;
+  }
+
+  const handleSliderChange = (e) => {
+    setTargetScore(Number(e.target.value));
+  };
+
+  const handleGradeTargetClick = (score) => {
+    setTargetScore(score);
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-4">
+      {/* 헤더 */}
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[18px]">🎯</span>
+          <h3 className="text-[14px] font-bold text-neutral-800">목표 점수 시뮬레이션</h3>
+        </div>
+        <button
+          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
+          aria-label={isExpanded ? '접기' : '펼치기'}
+        >
+          <svg
+            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* 설명 문구 */}
+      <p className="text-[12px] text-neutral-500 mt-2 leading-relaxed">
+        목표 점수를 설정하면, 현재 상황에서 무엇을 얼마나 개선해야 하는지 계산해드립니다.
+      </p>
+
+      {/* 펼쳐진 내용 */}
+      {isExpanded && (
+        <div className="mt-4 space-y-4 animate-fade-in">
+          {/* 등급 목표 버튼 */}
+          {gradeTargets.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] text-neutral-400 uppercase tracking-wide">등급 목표</p>
+              <div className="flex flex-wrap gap-2">
+                {gradeTargets.slice(0, 3).map((target) => (
+                  <button
+                    key={target.grade}
+                    onClick={() => handleGradeTargetClick(target.targetScore)}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors ${
+                      targetScore === target.targetScore
+                        ? 'bg-[#0F3D2E] text-white'
+                        : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                    }`}
+                  >
+                    {target.grade} ({target.targetScore}점)
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 슬라이더 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] text-neutral-400 uppercase tracking-wide">목표 점수</p>
+              <span className="text-[18px] font-bold text-[#0F3D2E] tabular-nums">{targetScore}점</span>
+            </div>
+            <input
+              type="range"
+              min={scoreRange.min}
+              max={scoreRange.max}
+              value={targetScore || scoreRange.default}
+              onChange={handleSliderChange}
+              className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-[#0F3D2E]"
+            />
+            <div className="flex justify-between text-[10px] text-neutral-400">
+              <span>현재 {currentScore}점</span>
+              <span>100점</span>
+            </div>
+          </div>
+
+          {/* 시뮬레이션 결과 */}
+          {roadmap && (
+            <div className="space-y-4 pt-2 border-t border-neutral-100">
+              {/* 예상 달성 기간 */}
+              <div className="flex items-center gap-3 p-3 bg-[#E8F3EF] rounded-lg">
+                <span className="text-[20px]">📈</span>
+                <div>
+                  <p className="text-[13px] font-semibold text-[#0F3D2E]">
+                    예상 달성 기간: {roadmap.estimatedMonths}개월 이내
+                  </p>
+                  <p className="text-[11px] text-[#0F3D2E]/70">
+                    {roadmap.summary}
+                  </p>
+                </div>
+              </div>
+
+              {/* 개선 항목 */}
+              {roadmap.recommendations.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[12px] font-semibold text-neutral-700 flex items-center gap-1">
+                    <span>🔧</span> 구체적 개선 항목
+                  </p>
+                  <div className="space-y-2">
+                    {roadmap.recommendations.slice(0, 3).map((rec, index) => (
+                      <div
+                        key={`${rec.category}-${index}`}
+                        className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
+                      >
+                        <div className="flex-1">
+                          <p className="text-[13px] text-neutral-700">
+                            {rec.description}
+                          </p>
+                          {rec.difficulty === 'hard' && (
+                            <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded mt-1 inline-block">
+                              실현 난이도 높음
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-right ml-3">
+                          <span className="text-[14px] font-bold text-[#0F3D2E]">
+                            +{Math.round(rec.totalScoreIncrease)}점
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 실행 팁 */}
+              {roadmap.actionTip && (
+                <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg">
+                  <span className="text-[16px]">💡</span>
+                  <p className="text-[12px] text-amber-800 leading-relaxed">
+                    {roadmap.actionTip}
+                  </p>
+                </div>
+              )}
+
+              {/* 달성 불가능 시 안내 */}
+              {!roadmap.isAchievable && !roadmap.alreadyAchieved && (
+                <div className="p-3 bg-neutral-100 rounded-lg">
+                  <p className="text-[12px] text-neutral-600 leading-relaxed">
+                    현재 지출 구조에서는 목표 점수 달성이 어려울 수 있습니다.
+                    수입 증가 또는 주거비 조정을 고려해보세요.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 접힌 상태 미리보기 */}
+      {!isExpanded && roadmap && roadmap.recommendations.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-neutral-100">
+          <p className="text-[12px] text-neutral-600">
+            <span className="font-medium">{roadmap.recommendations[0].description}</span>
+            <span className="text-[#0F3D2E] font-semibold"> {roadmap.recommendations[0].impact}</span>
+          </p>
+          <p className="text-[11px] text-neutral-400 mt-1">
+            탭하여 더 많은 개선 방법 보기
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -1179,6 +1393,15 @@ export function ResultStep() {
           </div>
         </div>
       </div>
+
+      {/* 목표 점수 시뮬레이션 (본인 결과일 때만) */}
+      {!isSharedResult && result && (
+        <GoalSimulation
+          result={result}
+          expenses={expenses}
+          income={income}
+        />
+      )}
 
       {/* 진단 히스토리 (2회 이상 진단 기록이 있을 때만) */}
       {history.length > 1 && !isSharedResult && (
