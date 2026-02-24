@@ -1265,54 +1265,7 @@ export function ResultStep() {
           </p>
         </div>
 
-      {/* 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
-      {friendComparison && !isSharedResult && (
-        <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 text-white">
-          <p className="text-[12px] text-white/70 mb-2">친구와 점수 비교</p>
-          <div className="flex items-center justify-between">
-            <div className="text-center">
-              <p className="text-[11px] text-white/60">친구</p>
-              <p className="text-[28px] font-bold tabular-nums">{friendComparison.score}</p>
-              <p className="text-[11px] text-white/60">{friendComparison.grade}</p>
-            </div>
-            <div className="text-center px-4">
-              <div className={`text-[18px] font-bold ${friendComparison.diff > 0 ? 'text-green-300' : friendComparison.diff < 0 ? 'text-red-300' : 'text-white/80'}`}>
-                {friendComparison.diff > 0 ? '+' : ''}{friendComparison.diff}점
-              </div>
-              <p className="text-[11px] text-white/60">
-                {friendComparison.diff > 0 ? '더 높아요' : friendComparison.diff < 0 ? '더 낮아요' : '동점이에요'}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-[11px] text-white/60">나</p>
-              <p className="text-[28px] font-bold tabular-nums">{result.score}</p>
-              <p className="text-[11px] text-white/60">{result.grade}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 이전 진단 대비 변화 (2회 이상 진단한 경우) */}
-      {previousComparison && !isSharedResult && (
-        <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between">
-          <div>
-            <p className="text-[12px] text-neutral-500 mb-1">이전 진단 대비</p>
-            <p className="text-[13px] text-neutral-700">
-              {new Date(previousComparison.previousDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} 진단 ({previousComparison.previousScore}점)
-            </p>
-          </div>
-          <div className={`text-right ${previousComparison.improved ? 'text-[#0F3D2E]' : previousComparison.diff < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
-            <p className="text-[20px] font-bold tabular-nums">
-              {previousComparison.diff > 0 ? '+' : ''}{previousComparison.diff}점
-            </p>
-            <p className="text-[11px]">
-              {previousComparison.improved ? '상승' : previousComparison.diff < 0 ? '하락' : '유지'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* 2. 등급별 설명 */}
+      {/* 1. 등급별 설명 - 핵심 해석 */}
       {gradeDetail && (
         <div className="bg-white rounded-xl shadow-sm p-4">
           <p className="text-[15px] text-neutral-800 font-bold mb-2 leading-relaxed">{gradeDetail.summary}</p>
@@ -1320,27 +1273,84 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 3. 리스크 플래그 */}
+      {/* 2. 리스크 플래그 */}
       {result.details?.riskFlags?.length > 0 && (
         <div className="space-y-2">
-          {result.details.riskFlags.map((flag, index) => (
+          {result.details.riskFlags
+            .filter(flag => flag.severity !== 'info')
+            .map((flag, index) => (
             <div
               key={index}
-              className={`p-3.5 rounded-xl ${
+              className={`p-3.5 rounded-xl flex items-start gap-2.5 ${
                 flag.severity === 'critical' ? 'bg-red-50' : 'bg-amber-50'
               }`}
             >
+              <span className="text-[14px] flex-shrink-0 mt-0.5">
+                {flag.severity === 'critical' ? '⚠️' : '⚡'}
+              </span>
               <p className={`text-[13px] font-medium leading-relaxed ${
                 flag.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
               }`}>{flag.message}</p>
             </div>
           ))}
+          {/* info 타입은 별도 스타일 */}
+          {result.details.riskFlags
+            .filter(flag => flag.severity === 'info')
+            .map((flag, index) => (
+            <div
+              key={`info-${index}`}
+              className="p-3.5 rounded-xl flex items-start gap-2.5 bg-blue-50"
+            >
+              <span className="text-[14px] flex-shrink-0 mt-0.5">💡</span>
+              <p className="text-[13px] font-medium leading-relaxed text-blue-600">{flag.message}</p>
+            </div>
+          ))}
         </div>
       )}
 
+      {/* 3. 재정 요약 - 핵심 수치 먼저 */}
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
+          <span className="text-[16px]">💰</span>
+          재정 요약
+        </h3>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-[12px] text-neutral-500">월 수입</span>
+            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
+              {(result.income || 0).toLocaleString()}만원
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[12px] text-neutral-500">월 지출</span>
+            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
+              {(result.originalExpenses || 0).toLocaleString()}만원
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[12px] text-neutral-500">월 여유자금</span>
+            <span className={`text-[14px] font-bold tabular-nums ${
+              (result.income || 0) - (result.originalExpenses || 0) >= 0 ? 'text-[#0F3D2E]' : 'text-red-500'
+            }`}>
+              {((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}만원
+            </span>
+          </div>
+          <div className="divider my-2"></div>
+          <div className="flex justify-between items-center">
+            <span className="text-[12px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
+            <span className="text-[16px] font-bold text-[#0F3D2E] tabular-nums">
+              {(result.safetyAssets || 0).toLocaleString()}만원
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* 4. 카테고리별 점수 */}
       <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">카테고리별 점수</h3>
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
+          <span className="text-[16px]">📊</span>
+          카테고리별 점수
+        </h3>
         <div className="space-y-3">
           {result.categoryScores && CATEGORY_ORDER.map((key) => {
             const score = result.categoryScores[key];
@@ -1370,10 +1380,22 @@ export function ResultStep() {
         </div>
       </div>
 
-      {/* 5. 구조 개선 조언 */}
+      {/* 5. 목표 점수 시뮬레이션 - 액션 유도 */}
+      {!isSharedResult && result && (
+        <GoalSimulation
+          result={result}
+          expenses={expenses}
+          income={income}
+        />
+      )}
+
+      {/* 6. 구조 개선 조언 */}
       {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
         <div className="bg-white rounded-xl shadow-sm p-4">
-          <h3 className="text-[14px] font-bold text-neutral-800 mb-3">구조 개선 분석</h3>
+          <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
+            <span className="text-[16px]">🔧</span>
+            구조 개선 분석
+          </h3>
           <div className="space-y-6">
             {getAllCategoryAdvice(result.categoryScores).map((advice) => (
               <div key={advice.categoryId} className="space-y-3">
@@ -1437,11 +1459,14 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 6. 주거 유형별 맞춤 분석 */}
+      {/* 7. 주거 유형별 맞춤 분석 */}
       {result.housingAnalysis && (
         <div className="bg-white rounded-xl shadow-sm p-4 space-y-4">
           <div>
-            <h3 className="text-[17px] font-bold text-neutral-800 mb-3">{result.housingAnalysis.title}</h3>
+            <h3 className="text-[17px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
+              <span className="text-[18px]">🏠</span>
+              {result.housingAnalysis.title}
+            </h3>
             <p className="text-[15px] text-neutral-600 leading-relaxed">
               {result.housingAnalysis.summary}
             </p>
@@ -1463,57 +1488,73 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 7. 독립 준비도 인덱스 */}
+      {/* 8. 독립 준비도 인덱스 */}
       <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">독립 준비도 인덱스</h3>
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
+          <span className="text-[16px]">📈</span>
+          독립 준비도 인덱스
+        </h3>
         <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
       </div>
 
-      {/* 8. 재정 요약 */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">재정 요약</h3>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-500">월 수입</span>
-            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
-              {(result.income || 0).toLocaleString()}만원
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-500">입력 지출</span>
-            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
-              {(result.originalExpenses || 0).toLocaleString()}만원
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-500">보정 지출 (예상)</span>
-            <span className="text-[14px] font-semibold text-neutral-600 tabular-nums">
-              {(result.monthlyRequired || 0).toLocaleString()}만원
-            </span>
-          </div>
-          <div className="divider my-2"></div>
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
-            <span className="text-[16px] font-bold text-[#0F3D2E] tabular-nums">
-              {(result.safetyAssets || 0).toLocaleString()}만원
-            </span>
+      {/* 9. 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
+      {friendComparison && !isSharedResult && (
+        <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 text-white">
+          <p className="text-[12px] text-white/70 mb-2 flex items-center gap-1.5">
+            <span>👥</span> 친구와 점수 비교
+          </p>
+          <div className="flex items-center justify-between">
+            <div className="text-center">
+              <p className="text-[11px] text-white/60">친구</p>
+              <p className="text-[28px] font-bold tabular-nums">{friendComparison.score}</p>
+              <p className="text-[11px] text-white/60">{friendComparison.grade}</p>
+            </div>
+            <div className="text-center px-4">
+              <div className={`text-[18px] font-bold ${friendComparison.diff > 0 ? 'text-green-300' : friendComparison.diff < 0 ? 'text-red-300' : 'text-white/80'}`}>
+                {friendComparison.diff > 0 ? '+' : ''}{friendComparison.diff}점
+              </div>
+              <p className="text-[11px] text-white/60">
+                {friendComparison.diff > 0 ? '더 높아요' : friendComparison.diff < 0 ? '더 낮아요' : '동점이에요'}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-[11px] text-white/60">나</p>
+              <p className="text-[28px] font-bold tabular-nums">{result.score}</p>
+              <p className="text-[11px] text-white/60">{result.grade}</p>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* 목표 점수 시뮬레이션 (본인 결과일 때만) */}
-      {!isSharedResult && result && (
-        <GoalSimulation
-          result={result}
-          expenses={expenses}
-          income={income}
-        />
       )}
 
-      {/* 진단 히스토리 (2회 이상 진단 기록이 있을 때만) */}
+      {/* 10. 이전 진단 대비 변화 (2회 이상 진단한 경우) */}
+      {previousComparison && !isSharedResult && (
+        <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[12px] text-neutral-500 mb-1 flex items-center gap-1.5">
+              <span>📅</span> 이전 진단 대비
+            </p>
+            <p className="text-[13px] text-neutral-700">
+              {new Date(previousComparison.previousDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} 진단 ({previousComparison.previousScore}점)
+            </p>
+          </div>
+          <div className={`text-right ${previousComparison.improved ? 'text-[#0F3D2E]' : previousComparison.diff < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
+            <p className="text-[20px] font-bold tabular-nums">
+              {previousComparison.diff > 0 ? '+' : ''}{previousComparison.diff}점
+            </p>
+            <p className="text-[11px]">
+              {previousComparison.improved ? '상승' : previousComparison.diff < 0 ? '하락' : '유지'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 11. 진단 히스토리 (2회 이상 진단 기록이 있을 때만) */}
       {history.length > 1 && !isSharedResult && (
         <div className="bg-white rounded-xl shadow-sm p-4">
-          <h3 className="text-[14px] font-bold text-neutral-800 mb-3">진단 기록</h3>
+          <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
+            <span className="text-[16px]">📋</span>
+            진단 기록
+          </h3>
           <div className="space-y-2">
             {history.slice(0, 5).map((entry, index) => {
               const isLatest = index === 0;
@@ -1572,8 +1613,11 @@ export function ResultStep() {
       {/* 점수 산정 방식 설명 */}
       <ScoreMethodology />
 
-      {/* 9. 공유 영역 - 모바일 전용 */}
+      {/* 공유 영역 - 모바일 전용 */}
       <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
+        <p className="text-[12px] text-neutral-500 mb-3 flex items-center gap-1.5">
+          <span>🔗</span> 결과 공유하기
+        </p>
         <div className="flex gap-2 mb-2">
           <button
             onClick={handleSaveImage}
@@ -1603,13 +1647,17 @@ export function ResultStep() {
         </button>
       </div>
 
-      {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우, 모바일에서만 표시 (데스크톱은 사이드바에 있음) */}
+      {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우 */}
       {isSharedResult && (
-        <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 text-center print:hidden">
-          <p className="text-white/80 text-[13px] mb-2">독립 준비 상태가 궁금하다면</p>
+        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-6 text-center print:hidden">
+          <div className="w-12 h-12 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span className="text-[24px]">✨</span>
+          </div>
+          <p className="text-white font-semibold text-[15px] mb-1">나도 독립 준비 상태가 궁금하다면?</p>
+          <p className="text-white/70 text-[12px] mb-4">2분만에 무료로 진단받아 보세요</p>
           <button
             onClick={() => window.location.href = '/'}
-            className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors"
+            className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors shadow-lg"
           >
             무료로 진단받기
           </button>
