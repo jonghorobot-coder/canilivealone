@@ -649,8 +649,7 @@ function GoalSimulation({ result, expenses, income }) {
           {roadmap && (
             <div className="space-y-4 pt-2 border-t border-neutral-100">
               {/* 예상 달성 기간 */}
-              <div className="flex items-center gap-3 p-3 bg-[#E8F3EF] rounded-lg">
-                <span className="text-[20px]">📈</span>
+              <div className="p-3 bg-[#E8F3EF] rounded-lg">
                 <div>
                   <p className="text-[13px] font-semibold text-[#0F3D2E]">
                     예상 달성 기간: {roadmap.estimatedMonths}개월 이내
@@ -664,8 +663,8 @@ function GoalSimulation({ result, expenses, income }) {
               {/* 개선 항목 */}
               {roadmap.recommendations.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-[12px] font-semibold text-neutral-700 flex items-center gap-1">
-                    <span>🔧</span> 구체적 개선 항목
+                  <p className="text-[12px] font-semibold text-neutral-700">
+                    구체적 개선 항목
                   </p>
                   <div className="space-y-2">
                     {roadmap.recommendations.slice(0, 3).map((rec, index) => (
@@ -764,10 +763,7 @@ function ScoreMethodology() {
         className="flex items-center justify-between cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-[18px]">🔎</span>
-          <h3 className="text-[14px] font-bold text-neutral-800">이 점수는 어떻게 계산되나요?</h3>
-        </div>
+        <h3 className="text-[14px] font-bold text-neutral-800">이 점수는 어떻게 계산되나요?</h3>
         <button
           className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
           aria-label={isExpanded ? '접기' : '펼치기'}
@@ -1414,8 +1410,8 @@ export function ResultStep() {
       {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
         <div className="bg-white rounded-xl shadow-sm p-4">
           <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
-            <span className="text-[16px]">🔧</span>
-            구조 개선 분석
+            <span className="text-[16px]">🛠</span>
+            개선 분석
           </h3>
           <div className="space-y-6">
             {getAllCategoryAdvice(result.categoryScores).map((advice) => (
@@ -1511,8 +1507,7 @@ export function ResultStep() {
 
       {/* 8. 독립 준비도 인덱스 */}
       <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
-          <span className="text-[16px]">📈</span>
+        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">
           독립 준비도 인덱스
         </h3>
         <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
@@ -1521,8 +1516,8 @@ export function ResultStep() {
       {/* 9. 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
       {friendComparison && !isSharedResult && (
         <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 text-white">
-          <p className="text-[12px] text-white/70 mb-2 flex items-center gap-1.5">
-            <span>👥</span> 친구와 점수 비교
+          <p className="text-[12px] text-white/70 mb-2">
+            친구와 점수 비교
           </p>
           <div className="flex items-center justify-between">
             <div className="text-center">
@@ -1551,8 +1546,8 @@ export function ResultStep() {
       {previousComparison && !isSharedResult && (
         <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between">
           <div>
-            <p className="text-[12px] text-neutral-500 mb-1 flex items-center gap-1.5">
-              <span>📅</span> 이전 진단 대비
+            <p className="text-[12px] text-neutral-500 mb-1">
+              이전 진단 대비
             </p>
             <p className="text-[13px] text-neutral-700">
               {new Date(previousComparison.previousDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} 진단 ({previousComparison.previousScore}점)
@@ -1572,8 +1567,7 @@ export function ResultStep() {
       {/* 11. 진단 히스토리 (2회 이상 진단 기록이 있을 때만) */}
       {history.length > 1 && !isSharedResult && (
         <div className="bg-white rounded-xl shadow-sm p-4">
-          <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
-            <span className="text-[16px]">📋</span>
+          <h3 className="text-[14px] font-bold text-neutral-800 mb-3">
             진단 기록
           </h3>
           <div className="space-y-2">
@@ -1636,8 +1630,8 @@ export function ResultStep() {
 
       {/* 공유 영역 - 모바일 전용 */}
       <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
-        <p className="text-[12px] text-neutral-500 mb-3 flex items-center gap-1.5">
-          <span>🔗</span> 결과 공유하기
+        <p className="text-[12px] text-neutral-500 mb-3">
+          결과 공유하기
         </p>
         <div className="flex gap-2 mb-2">
           <button
@@ -1671,9 +1665,6 @@ export function ResultStep() {
       {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우 */}
       {isSharedResult && (
         <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-6 text-center print:hidden">
-          <div className="w-12 h-12 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-3">
-            <span className="text-[24px]">🤔</span>
-          </div>
           <p className="text-white font-semibold text-[15px] mb-1">당신의 점수는 몇 점일까요?</p>
           <p className="text-white/70 text-[12px] mb-4">2분만에 무료로 진단받아 보세요</p>
           <button
