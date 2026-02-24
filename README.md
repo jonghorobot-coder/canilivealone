@@ -2,7 +2,7 @@
 
 > 월 수입과 지출 구조를 기반으로 재무 독립 가능성을 분석하는 웹 서비스
 
-[![Version](https://img.shields.io/badge/version-1.0.0-0F3D2E)](https://github.com/jonghorobot-coder/canilivealone/releases/tag/v1.0.0)
+[![Version](https://img.shields.io/badge/version-2.0.0-0F3D2E)](https://github.com/jonghorobot-coder/canilivealone/releases/tag/v2.0.0)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black)](https://canilivealone.com)
 
 ## 서비스 소개
@@ -15,7 +15,9 @@
 - 월 수입·지출 기반 재무 분석
 - 5단계 등급 시스템 (매우 안정 ~ 매우 위험)
 - 카테고리별 점수 및 리스크 분석
-- 결과 공유 (링크 복사, 이미지 저장)
+- 목표 점수 시뮬레이션
+- 결과 공유 (링크 복사, 이미지 저장, 카카오톡)
+- 프리미엄 리포트 (유료)
 
 ## 기술 스택
 
@@ -73,6 +75,7 @@ canilivealone/
 │   │   └── supabase.js         # Supabase 클라이언트
 │   │
 │   ├── pages/
+│   │   ├── AdminPage.jsx       # 관리자 페이지
 │   │   ├── NotFound.jsx        # 404 페이지
 │   │   ├── PrivacyPolicy.jsx   # 개인정보 처리방침
 │   │   └── TermsOfService.jsx  # 이용약관
@@ -81,7 +84,12 @@ canilivealone/
 │   │   ├── analytics.js        # GA4 이벤트 추적
 │   │   ├── calculate.js        # 점수 계산 로직
 │   │   ├── format.js           # 숫자 포맷팅
-│   │   └── saveResult.js       # 결과 저장/조회
+│   │   ├── generatePdf.js      # PDF 리포트 생성
+│   │   ├── goalSimulation.js   # 목표 시뮬레이션
+│   │   ├── reportData.js       # 리포트 데이터 분석
+│   │   ├── reportTemplate.js   # 리포트 템플릿
+│   │   ├── saveResult.js       # 결과 저장/조회
+│   │   └── scoreSimulation.js  # 점수 시뮬레이션
 │   │
 │   ├── App.jsx                 # 라우팅 설정
 │   ├── main.jsx                # 앱 진입점
