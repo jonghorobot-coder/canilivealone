@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* 모든 버튼 커서 포인터 */
+button,
+[type="button"],
+[type="submit"],
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="submit"]:disabled {
+  cursor: not-allowed;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
