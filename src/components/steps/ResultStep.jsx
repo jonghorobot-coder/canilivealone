@@ -734,6 +734,113 @@ function GoalSimulation({ result, expenses, income }) {
   );
 }
 
+// 점수 산정 방식 데이터 (실제 코드 가중치 기준)
+const SCORE_METHODOLOGY = {
+  categories: [
+    { id: 'housing', label: '주거비', weight: 25, description: '수입 대비 주거비 비율 및 주거 안정성' },
+    { id: 'savings', label: '저축·비상금', weight: 20, description: '저축률 및 비상자금 보유 수준' },
+    { id: 'food', label: '식비', weight: 15, description: '수입 대비 식비 비율 및 지출 통제력' },
+    { id: 'fixed', label: '고정지출', weight: 10, description: '구독/통신비 등 고정비 관리 능력' },
+    { id: 'transport', label: '교통비', weight: 10, description: '수입 대비 교통비 비율 및 효율성' },
+    { id: 'leisure', label: '여가비', weight: 10, description: '선택적 지출 통제력' },
+    { id: 'misc', label: '생활잡비', weight: 10, description: '소액 지출 인식 및 관리' },
+  ],
+  principles: [
+    '단순 소득이 아닌 "지속 가능한 독립 유지"를 기준으로 평가합니다.',
+    '수입 대비 지출 비율과 재정 관리 능력을 종합 분석합니다.',
+    '비상 상황 대응력(비상금)에 높은 가중치를 부여합니다.',
+  ],
+  disclaimer: '이 점수는 참고용 지표이며, 개인의 소비 습관과 지역 환경에 따라 실제 독립 가능성은 달라질 수 있습니다.',
+};
+
+// 점수 산정 방식 설명 컴포넌트
+function ScoreMethodology() {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-4">
+      {/* 헤더 */}
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[18px]">🔎</span>
+          <h3 className="text-[14px] font-bold text-neutral-800">이 점수는 어떻게 계산되나요?</h3>
+        </div>
+        <button
+          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
+          aria-label={isExpanded ? '접기' : '펼치기'}
+        >
+          <svg
+            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* 펼쳐진 내용 */}
+      {isExpanded && (
+        <div className="mt-4 space-y-4 animate-fade-in">
+          {/* 카테고리별 가중치 */}
+          <div className="space-y-2">
+            <p className="text-[11px] text-neutral-400 uppercase tracking-wide">카테고리별 가중치</p>
+            <div className="space-y-2">
+              {SCORE_METHODOLOGY.categories.map((cat) => (
+                <div key={cat.id} className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[13px] font-medium text-neutral-700">{cat.label}</span>
+                      <span className="text-[12px] font-semibold text-[#0F3D2E] tabular-nums">{cat.weight}%</span>
+                    </div>
+                    <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#0F3D2E] rounded-full transition-all duration-500"
+                        style={{ width: `${cat.weight * 4}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 평가 원칙 */}
+          <div className="space-y-2 pt-2 border-t border-neutral-100">
+            <p className="text-[11px] text-neutral-400 uppercase tracking-wide">평가 원칙</p>
+            <ul className="space-y-1.5">
+              {SCORE_METHODOLOGY.principles.map((principle, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="text-[#0F3D2E] text-[10px] mt-1">●</span>
+                  <span className="text-[12px] text-neutral-600 leading-relaxed">{principle}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 한계 안내 */}
+          <div className="p-3 bg-neutral-50 rounded-lg">
+            <p className="text-[11px] text-neutral-500 leading-relaxed">
+              ⚠️ {SCORE_METHODOLOGY.disclaimer}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 접힌 상태 미리보기 */}
+      {!isExpanded && (
+        <p className="text-[12px] text-neutral-500 mt-2">
+          7개 카테고리의 가중 평균으로 산출됩니다. 탭하여 자세히 보기
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function ResultStep() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { income, expenses, answers, result, setResult, reset, setCurrentStep } = useSurvey();
@@ -1461,6 +1568,9 @@ export function ResultStep() {
           )}
         </div>
       )}
+
+      {/* 점수 산정 방식 설명 */}
+      <ScoreMethodology />
 
       {/* 9. 공유 영역 - 모바일 전용 */}
       <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
