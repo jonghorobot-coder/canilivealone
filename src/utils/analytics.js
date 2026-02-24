@@ -107,4 +107,20 @@ export const AnalyticsEvents = {
     event_category: 'engagement',
     event_label: 'Restart Button Click',
   }),
+
+  // 공유 이벤트 (통합) - share_type, score, grade 포함
+  share: (shareType, score, grade) => trackEvent('share_click', {
+    event_category: 'share',
+    share_type: shareType, // 'link', 'image', 'kakao'
+    score: score,
+    grade: grade,
+  }),
+
+  // 카카오톡 공유
+  shareKakao: (score, grade) => trackEvent('share_kakao', {
+    event_category: 'share',
+    event_label: 'Kakao Share',
+    score: score,
+    grade: grade,
+  }),
 };

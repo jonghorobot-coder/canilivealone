@@ -84,12 +84,62 @@ const SHARE_GRADE_STYLES = {
 };
 
 const GRADE_VERDICT = {
-  '매우 안정': '매우 안정적인 독립이 가능합니다',
-  '안정': '안정적인 독립이 가능합니다',
-  '주의': '독립 전 준비가 필요합니다',
-  '위험': '재정 개선이 필요합니다',
-  '매우 위험': '독립을 권장하지 않습니다',
+  '매우 안정': '당장 독립해도 걱정 없어요',
+  '안정': '조금만 다듬으면 독립 가능해요',
+  '주의': '지금은 조금 불안해요',
+  '위험': '독립하면 힘들 수 있어요',
+  '매우 위험': '지금은 독립을 미루세요',
 };
+
+// 주요 리스크 요인 추출 (상위 2개)
+const getTopRiskFactors = (result) => {
+  const risks = [];
+
+  if (!result?.categoryScores || !result?.income) return risks;
+
+  const income = result.income;
+  const expenses = result.originalExpenses || 0;
+
+  // 주거비 비율
+  const housingRatio = result.details?.housingRatio;
+  if (housingRatio && housingRatio > 30) {
+    risks.push({
+      label: '주거비 비율',
+      value: `${Math.round(housingRatio)}%`,
+      severity: housingRatio > 40 ? 'critical' : 'warning',
+    });
+  }
+
+  // 저축률
+  const savingsRate = income > 0 ? Math.round(((income - expenses) / income) * 100) : 0;
+  if (savingsRate < 20) {
+    risks.push({
+      label: '월 저축률',
+      value: `${savingsRate}%`,
+      severity: savingsRate < 10 ? 'critical' : 'warning',
+    });
+  }
+
+  // 카테고리별 낮은 점수
+  const categoryScores = result.categoryScores;
+  const lowCategories = CATEGORY_ORDER
+    .map(key => ({ key, score: categoryScores[key], label: CATEGORY_LABELS[key] }))
+    .filter(c => c.score < 50)
+    .sort((a, b) => a.score - b.score);
+
+  lowCategories.forEach(cat => {
+    if (risks.length < 2) {
+      risks.push({
+        label: `${cat.label} 점수`,
+        value: `${cat.score}점`,
+        severity: cat.score < 30 ? 'critical' : 'warning',
+      });
+    }
+  });
+
+  return risks.slice(0, 2);
+};
+
 
 const CATEGORY_RISK_LABELS = {
   housing: '주거',
@@ -525,7 +575,7 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel }) {
   );
 }
 
-// 목표 점수 시뮬레이션 컴포넌트
+// 목표 점수 시뮬레이션 컴포넌트 (간소화)
 function GoalSimulation({ result, expenses, income }) {
   const [targetScore, setTargetScore] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
@@ -561,13 +611,19 @@ function GoalSimulation({ result, expenses, income }) {
     return null;
   }
 
-  const handleSliderChange = (e) => {
-    setTargetScore(Number(e.target.value));
-  };
-
   const handleGradeTargetClick = (score) => {
     setTargetScore(score);
   };
+
+  // 달성 가능성 판별
+  const getFeasibilityStatus = () => {
+    if (!roadmap) return null;
+    if (roadmap.alreadyAchieved) return { label: '이미 달성', color: 'text-[#0F3D2E]', bg: 'bg-[#E8F3EF]' };
+    if (roadmap.isAchievable) return { label: '달성 가능', color: 'text-[#0F3D2E]', bg: 'bg-[#E8F3EF]' };
+    return { label: '달성 어려움', color: 'text-amber-600', bg: 'bg-amber-50' };
+  };
+
+  const feasibility = getFeasibilityStatus();
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-4">
@@ -578,7 +634,7 @@ function GoalSimulation({ result, expenses, income }) {
       >
         <div className="flex items-center gap-2">
           <span className="text-[18px]">🎯</span>
-          <h3 className="text-[14px] font-bold text-neutral-800">목표 점수 시뮬레이션</h3>
+          <h3 className="text-[14px] font-bold text-neutral-800">목표 점수 달성 가능성</h3>
         </div>
         <button
           className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
@@ -595,9 +651,9 @@ function GoalSimulation({ result, expenses, income }) {
         </button>
       </div>
 
-      {/* 설명 문구 */}
+      {/* 간단 요약 */}
       <p className="text-[12px] text-neutral-500 mt-2 leading-relaxed">
-        목표 점수를 설정하면, 현재 상황에서 무엇을 얼마나 개선해야 하는지 계산해드립니다.
+        목표 등급을 선택하면 달성 가능성을 분석해드립니다.
       </p>
 
       {/* 펼쳐진 내용 */}
@@ -606,7 +662,7 @@ function GoalSimulation({ result, expenses, income }) {
           {/* 등급 목표 버튼 */}
           {gradeTargets.length > 0 && (
             <div className="space-y-2">
-              <p className="text-[11px] text-neutral-400 uppercase tracking-wide">등급 목표</p>
+              <p className="text-[11px] text-neutral-400 uppercase tracking-wide">목표 등급 선택</p>
               <div className="flex flex-wrap gap-2">
                 {gradeTargets.slice(0, 3).map((target) => (
                   <button
@@ -618,114 +674,72 @@ function GoalSimulation({ result, expenses, income }) {
                         : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                     }`}
                   >
-                    {target.grade} ({target.targetScore}점)
+                    {target.grade}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* 슬라이더 */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] text-neutral-400 uppercase tracking-wide">목표 점수</p>
-              <span className="text-[18px] font-bold text-[#0F3D2E] tabular-nums">{targetScore}점</span>
-            </div>
-            <input
-              type="range"
-              min={scoreRange.min}
-              max={scoreRange.max}
-              value={targetScore || scoreRange.default}
-              onChange={handleSliderChange}
-              className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-[#0F3D2E]"
-            />
-            <div className="flex justify-between text-[10px] text-neutral-400">
-              <span>현재 {currentScore}점</span>
-              <span>100점</span>
-            </div>
-          </div>
-
-          {/* 시뮬레이션 결과 */}
-          {roadmap && (
-            <div className="space-y-4 pt-2 border-t border-neutral-100">
-              {/* 예상 달성 기간 */}
-              <div className="p-3 bg-[#E8F3EF] rounded-lg">
-                <div>
-                  <p className="text-[13px] font-semibold text-[#0F3D2E]">
-                    예상 달성 기간: {roadmap.estimatedMonths}개월 이내
-                  </p>
-                  <p className="text-[11px] text-[#0F3D2E]/70">
-                    {roadmap.summary}
-                  </p>
+          {/* 달성 가능성 결과 */}
+          {roadmap && feasibility && (
+            <div className="space-y-3 pt-3 border-t border-neutral-100">
+              {/* 현재 → 목표 */}
+              <div className="flex items-center justify-center gap-3">
+                <div className="text-center">
+                  <p className="text-[11px] text-neutral-400">현재</p>
+                  <p className="text-[20px] font-bold text-neutral-800 tabular-nums">{currentScore}점</p>
+                </div>
+                <svg className="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+                <div className="text-center">
+                  <p className="text-[11px] text-neutral-400">목표</p>
+                  <p className="text-[20px] font-bold text-[#0F3D2E] tabular-nums">{targetScore}점</p>
                 </div>
               </div>
 
-              {/* 개선 항목 */}
-              {roadmap.recommendations.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-[12px] font-semibold text-neutral-700">
-                    구체적 개선 항목
+              {/* 달성 가능성 배지 */}
+              <div className={`p-3 rounded-lg ${feasibility.bg} text-center`}>
+                <p className={`text-[14px] font-bold ${feasibility.color}`}>
+                  {feasibility.label}
+                </p>
+                {roadmap.estimatedMonths && roadmap.isAchievable && (
+                  <p className="text-[12px] text-neutral-600 mt-1">
+                    예상 소요 기간: 약 {roadmap.estimatedMonths}개월
                   </p>
-                  <div className="space-y-2">
-                    {roadmap.recommendations.slice(0, 3).map((rec, index) => (
-                      <div
-                        key={`${rec.category}-${index}`}
-                        className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
-                      >
-                        <div className="flex-1">
-                          <p className="text-[13px] text-neutral-700">
-                            {rec.description}
-                          </p>
-                          {rec.difficulty === 'hard' && (
-                            <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded mt-1 inline-block">
-                              실현 난이도 높음
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-right ml-3">
-                          <span className="text-[14px] font-bold text-[#0F3D2E]">
-                            +{Math.round(rec.totalScoreIncrease)}점
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* 실행 팁 */}
-              {roadmap.actionTip && (
-                <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg">
-                  <span className="text-[16px]">💡</span>
-                  <p className="text-[12px] text-amber-800 leading-relaxed">
-                    {roadmap.actionTip}
-                  </p>
-                </div>
-              )}
-
-              {/* 달성 불가능 시 안내 */}
-              {!roadmap.isAchievable && !roadmap.alreadyAchieved && (
-                <div className="p-3 bg-neutral-100 rounded-lg">
-                  <p className="text-[12px] text-neutral-600 leading-relaxed">
-                    현재 지출 구조에서는 목표 점수 달성이 어려울 수 있습니다.
-                    수입 증가 또는 주거비 조정을 고려해보세요.
-                  </p>
-                </div>
-              )}
+              {/* 구체적 개선 플랜 유도 */}
+              <div className="p-3 bg-neutral-50 rounded-lg">
+                <p className="text-[12px] text-neutral-600 leading-relaxed mb-2">
+                  구체적인 월별 실행 계획과 카테고리별 절감 목표가 필요하신가요?
+                </p>
+                <button
+                  className="w-full h-9 rounded-lg border border-[#0F3D2E] text-[#0F3D2E] text-[12px] font-semibold hover:bg-[#E8F3EF] transition-colors"
+                  onClick={() => {
+                    // TODO: 유료 서비스 연결
+                    alert('서비스 준비 중입니다. 빠른 시일 내에 만나요!');
+                  }}
+                >
+                  맞춤 리빌드 플랜 받기
+                </button>
+              </div>
             </div>
           )}
         </div>
       )}
 
       {/* 접힌 상태 미리보기 */}
-      {!isExpanded && roadmap && roadmap.recommendations.length > 0 && (
+      {!isExpanded && gradeTargets.length > 0 && (
         <div className="mt-3 pt-3 border-t border-neutral-100">
           <p className="text-[12px] text-neutral-600">
-            <span className="font-medium">{roadmap.recommendations[0].description}</span>
-            <span className="text-[#0F3D2E] font-semibold"> {roadmap.recommendations[0].impact}</span>
+            다음 등급: <span className="font-semibold text-[#0F3D2E]">{gradeTargets[0]?.grade}</span>까지
+            <span className="text-neutral-500"> +{gradeTargets[0]?.targetScore - currentScore}점</span>
           </p>
           <p className="text-[11px] text-neutral-400 mt-1">
-            탭하여 더 많은 개선 방법 보기
+            탭하여 달성 가능성 확인하기
           </p>
         </div>
       )}
@@ -852,6 +866,7 @@ export function ResultStep() {
   const [previousComparison, setPreviousComparison] = useState(null);
   const [friendComparison, setFriendComparison] = useState(null);
   const [history, setHistory] = useState([]);
+  const [showGradeRange, setShowGradeRange] = useState(false);
   const shareCardRef = useRef(null);
 
   const sharedId = searchParams.get('id');
@@ -990,7 +1005,7 @@ export function ResultStep() {
     if (navigator.share && navigator.canShare?.(shareData)) {
       try {
         await navigator.share(shareData);
-        AnalyticsEvents.copyLink();
+        AnalyticsEvents.share('link', result?.score, result?.grade);
       } catch (err) {
         // 사용자가 공유 취소한 경우 무시
         if (err.name !== 'AbortError') {
@@ -1002,7 +1017,7 @@ export function ResultStep() {
       try {
         await navigator.clipboard.writeText(shareUrl);
         showToast('링크가 복사되었습니다');
-        AnalyticsEvents.copyLink();
+        AnalyticsEvents.share('link', result?.score, result?.grade);
       } catch (err) {
         showToast('공유하기에 실패했습니다');
       }
@@ -1062,7 +1077,8 @@ export function ResultStep() {
         ],
       });
 
-      AnalyticsEvents.copyLink();
+      AnalyticsEvents.share('kakao', result?.score, result?.grade);
+      AnalyticsEvents.shareKakao(result?.score, result?.grade);
     } catch (error) {
       console.error('Kakao share error:', error);
       showToast('카카오톡 공유에 실패했습니다');
@@ -1098,6 +1114,7 @@ export function ResultStep() {
       link.click();
 
       showToast('이미지가 저장되었습니다');
+      AnalyticsEvents.share('image', result?.score, result?.grade);
       AnalyticsEvents.saveImage();
     } catch (err) {
       console.error('Image save error:', err);
@@ -1193,12 +1210,57 @@ export function ResultStep() {
               <div className={`inline-block px-4 py-1.5 mt-4 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[14px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
                 {result.grade}
               </div>
-              <p className="text-[12px] text-neutral-500 mt-3">
+              <p className="text-[13px] text-neutral-600 mt-2 font-medium">
                 {GRADE_VERDICT[result.grade]}
               </p>
               <p className="text-[11px] text-neutral-400 mt-4 tracking-wide">
                 현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
               </p>
+
+              {/* 등급 구간표 - 기본 접힘 */}
+              <div className="mt-5 pt-5 border-t border-neutral-100">
+                <button
+                  onClick={() => setShowGradeRange(!showGradeRange)}
+                  className="w-full flex items-center justify-center gap-1.5 text-[12px] text-neutral-500 hover:text-neutral-700 transition-colors"
+                >
+                  <span>점수 기준 보기</span>
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform ${showGradeRange ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {showGradeRange && (
+                  <div className="space-y-1.5 text-left mt-3">
+                    {[
+                      { range: '85~100', grade: '매우 안정', color: 'bg-emerald-500' },
+                      { range: '70~84', grade: '안정', color: 'bg-emerald-400' },
+                      { range: '55~69', grade: '주의', color: 'bg-yellow-400' },
+                      { range: '45~54', grade: '위험', color: 'bg-orange-400' },
+                      { range: '0~44', grade: '매우 위험', color: 'bg-red-400' },
+                    ].map(({ range, grade, color }) => (
+                      <div
+                        key={grade}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] ${
+                          result.grade === grade
+                            ? 'bg-neutral-100 font-semibold'
+                            : 'text-neutral-400'
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${color}`} />
+                        <span className="w-14 tabular-nums">{range}</span>
+                        <span>{grade}</span>
+                        {result.grade === grade && (
+                          <span className="ml-auto text-[10px] text-neutral-500">← 현재</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* 데스크톱: 공유 버튼을 점수 카드에 포함 */}
               <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100 print:hidden">
@@ -1247,133 +1309,165 @@ export function ResultStep() {
 
           {/* 오른쪽: 상세 분석 */}
           <div className="lg:col-span-2 space-y-4 mt-4 lg:mt-0">
-        {/* 모바일 전용 점수 카드 */}
-        <div className="lg:hidden bg-white rounded-xl shadow-sm p-6 text-center">
+        {/* 모바일 전용 점수 카드 - 컴팩트 */}
+        <div className="lg:hidden bg-white rounded-xl shadow-sm p-5 text-center">
           <ScoreGauge score={result.score} showScore={showScore} skipAnimation={isSharedResult} />
-          <div className={`inline-block px-4 py-1.5 mt-4 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${gradeStyle.text} font-semibold text-[14px] ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
-            {result.grade}
+          <div className={`inline-flex items-center gap-2 px-4 py-1.5 mt-3 rounded-full ${gradeStyle.bg} ${gradeStyle.border} border ${(showGrade || isSharedResult) ? (isSharedResult ? '' : 'animate-grade-reveal') : 'opacity-0'}`}>
+            <span className={`${gradeStyle.text} font-bold text-[14px]`}>{result.grade}</span>
           </div>
-          <p className="text-[12px] text-neutral-500 mt-3">
+          <p className="text-[14px] text-neutral-700 mt-2 font-semibold">
             {GRADE_VERDICT[result.grade]}
           </p>
-          <p className="text-[11px] text-neutral-400 mt-4 tracking-wide">
-            현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
+          <p className="text-[10px] text-neutral-400 mt-3">
+            <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단 완료
           </p>
+
+          {/* 등급 구간표 - 기본 접힘 */}
+          <div className="mt-4 pt-3 border-t border-neutral-100">
+            <button
+              onClick={() => setShowGradeRange(!showGradeRange)}
+              className="w-full flex items-center justify-center gap-1.5 text-[11px] text-neutral-400 hover:text-neutral-600 transition-colors"
+            >
+              <span>점수 기준 보기</span>
+              <svg
+                className={`w-3 h-3 transition-transform ${showGradeRange ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showGradeRange && (
+              <div className="space-y-1 text-left mt-2">
+                {[
+                  { range: '85~100', grade: '매우 안정', color: 'bg-emerald-500' },
+                  { range: '70~84', grade: '안정', color: 'bg-emerald-400' },
+                  { range: '55~69', grade: '주의', color: 'bg-yellow-400' },
+                  { range: '45~54', grade: '위험', color: 'bg-orange-400' },
+                  { range: '0~44', grade: '매우 위험', color: 'bg-red-400' },
+                ].map(({ range, grade, color }) => (
+                  <div
+                    key={grade}
+                    className={`flex items-center gap-2 px-2 py-1 rounded text-[11px] ${
+                      result.grade === grade
+                        ? 'bg-neutral-100 font-semibold'
+                        : 'text-neutral-400'
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${color}`} />
+                    <span className="w-12 tabular-nums">{range}</span>
+                    <span>{grade}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 점수 카드 바로 아래 공유 CTA - 전환율 높은 위치 */}
+      {/* 적자 경고 UI - 수입 < 지출인 경우 */}
+      {result.details?.riskFlags?.some(flag => flag.type === 'income_insufficient') && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex-shrink-0 w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[13px] font-bold text-red-800">
+                매달 {Math.abs((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}만원 적자 구조
+              </p>
+              <p className="text-[11px] text-red-600">독립 시 자금 압박 가능성이 매우 높습니다</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 주요 리스크 요인 블록 (상위 2개) */}
+      {(() => {
+        const topRisks = getTopRiskFactors(result);
+        if (topRisks.length === 0) return null;
+        return (
+          <div className="bg-white rounded-xl shadow-sm p-3">
+            <p className="text-[11px] text-neutral-400 uppercase tracking-wide mb-2">주요 리스크 요인</p>
+            <div className="flex gap-2">
+              {topRisks.map((risk, idx) => (
+                <div
+                  key={idx}
+                  className={`flex-1 p-2.5 rounded-lg ${
+                    risk.severity === 'critical' ? 'bg-red-50' : 'bg-amber-50'
+                  }`}
+                >
+                  <p className={`text-[18px] font-bold tabular-nums ${
+                    risk.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
+                  }`}>
+                    {risk.value}
+                  </p>
+                  <p className="text-[11px] text-neutral-500">{risk.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+        {/* 공유 CTA - 모바일 (리스크 바로 아래) */}
         {!isSharedResult && (
-          <div className="lg:hidden bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 print:hidden">
+          <div className="lg:hidden bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-3.5 print:hidden">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white font-semibold text-[14px]">당신의 친구는 몇 점일까요?</p>
-                <p className="text-white/60 text-[11px] mt-0.5">결과를 공유해보세요</p>
+                <p className="text-white font-bold text-[14px]">이 점수… 친구는 몇 점일까요?</p>
+                <p className="text-white/60 text-[11px] mt-0.5">공유하고 비교해보세요</p>
               </div>
               <button
                 onClick={handleKakaoShare}
-                className="flex-shrink-0 h-10 px-4 rounded-lg bg-[#FEE500] text-[#191919] text-[12px] font-semibold flex items-center gap-1.5"
+                className="flex-shrink-0 h-9 px-4 rounded-lg bg-[#FEE500] text-[#191919] text-[12px] font-bold flex items-center gap-1.5 shadow-lg"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#191919">
                   <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
                 </svg>
-                공유
+                공유하기
               </button>
             </div>
           </div>
         )}
 
-      {/* 1. 등급별 설명 - 핵심 해석 */}
-      {gradeDetail && (
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <p className="text-[15px] text-neutral-800 font-bold mb-2 leading-relaxed">{gradeDetail.summary}</p>
-          <p className="text-[13px] text-neutral-500 leading-relaxed">{gradeDetail.details}</p>
-        </div>
-      )}
-
-      {/* 2. 재정 요약 - 객관적 숫자 먼저 (리스크 전에 안정감 부여) */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
-          <span className="text-[16px]">💰</span>
-          재정 요약
-        </h3>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-500">월 수입</span>
-            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
-              {(result.income || 0).toLocaleString()}만원
-            </span>
+      {/* 재정 요약 - 간소화 */}
+      <div className="bg-white rounded-xl shadow-sm p-3">
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <p className="text-[10px] text-neutral-400">월 수입</p>
+            <p className="text-[15px] font-bold text-neutral-800 tabular-nums">
+              {(result.income || 0).toLocaleString()}<span className="text-[11px] font-normal">만</span>
+            </p>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-500">월 지출</span>
-            <span className="text-[14px] font-bold text-neutral-800 tabular-nums">
-              {(result.originalExpenses || 0).toLocaleString()}만원
-            </span>
+          <div>
+            <p className="text-[10px] text-neutral-400">월 지출</p>
+            <p className="text-[15px] font-bold text-neutral-800 tabular-nums">
+              {(result.originalExpenses || 0).toLocaleString()}<span className="text-[11px] font-normal">만</span>
+            </p>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-500">월 여유자금</span>
-            <span className={`text-[14px] font-bold tabular-nums ${
+          <div>
+            <p className="text-[10px] text-neutral-400">여유자금</p>
+            <p className={`text-[15px] font-bold tabular-nums ${
               (result.income || 0) - (result.originalExpenses || 0) >= 0 ? 'text-[#0F3D2E]' : 'text-red-500'
             }`}>
-              {((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}만원
-            </span>
-          </div>
-          <div className="divider my-2"></div>
-          <div className="flex justify-between items-center">
-            <span className="text-[12px] text-neutral-700 font-semibold">권장 비상금 (6개월)</span>
-            <span className="text-[16px] font-bold text-[#0F3D2E] tabular-nums">
-              {(result.safetyAssets || 0).toLocaleString()}만원
-            </span>
+              {((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}<span className="text-[11px] font-normal">만</span>
+            </p>
           </div>
         </div>
       </div>
 
-      {/* 3. 리스크 플래그 */}
-      {result.details?.riskFlags?.length > 0 && (
+      {/* 카테고리별 점수 */}
+      <div className="bg-white rounded-xl shadow-sm p-3">
+        <p className="text-[11px] text-neutral-400 uppercase tracking-wide mb-2">카테고리별 점수</p>
         <div className="space-y-2">
-          {result.details.riskFlags
-            .filter(flag => flag.severity !== 'info')
-            .map((flag, index) => (
-            <div
-              key={index}
-              className={`p-3.5 rounded-xl flex items-start gap-2.5 ${
-                flag.severity === 'critical' ? 'bg-red-50' : 'bg-amber-50'
-              }`}
-            >
-              <span className="text-[14px] flex-shrink-0 mt-0.5">
-                {flag.severity === 'critical' ? '⚠️' : '⚡'}
-              </span>
-              <p className={`text-[13px] font-medium leading-relaxed ${
-                flag.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
-              }`}>{flag.message}</p>
-            </div>
-          ))}
-          {/* info 타입은 별도 스타일 */}
-          {result.details.riskFlags
-            .filter(flag => flag.severity === 'info')
-            .map((flag, index) => (
-            <div
-              key={`info-${index}`}
-              className="p-3.5 rounded-xl flex items-start gap-2.5 bg-blue-50"
-            >
-              <span className="text-[14px] flex-shrink-0 mt-0.5">💡</span>
-              <p className="text-[13px] font-medium leading-relaxed text-blue-600">{flag.message}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 4. 카테고리별 점수 - 어디서 점수가 깎였는지 */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
-          <span className="text-[16px]">📊</span>
-          카테고리별 점수
-        </h3>
-        <div className="space-y-3">
           {result.categoryScores && CATEGORY_ORDER.map((key) => {
             const score = result.categoryScores[key];
             return (
-              <div key={key} className="flex items-center gap-3">
-                <span className="text-[12px] text-neutral-500 w-16 flex-shrink-0 font-medium">
+              <div key={key} className="flex items-center gap-2">
+                <span className="text-[11px] text-neutral-500 w-14 flex-shrink-0">
                   {CATEGORY_LABELS[key]}
                 </span>
                 <div className="flex-1 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
@@ -1385,7 +1479,7 @@ export function ResultStep() {
                     style={{ width: `${score}%` }}
                   />
                 </div>
-                <span className={`text-[12px] font-semibold w-7 text-right tabular-nums ${
+                <span className={`text-[11px] font-semibold w-6 text-right tabular-nums ${
                   score >= 70 ? 'text-[#0F3D2E]' :
                   score >= 50 ? 'text-amber-500' : 'text-red-500'
                 }`}>
@@ -1397,121 +1491,139 @@ export function ResultStep() {
         </div>
       </div>
 
-      {/* 5. 목표 점수 시뮬레이션 - 액션 유도 */}
-      {!isSharedResult && result && (
-        <GoalSimulation
-          result={result}
-          expenses={expenses}
-          income={income}
-        />
+      {/* 6개월 독립 리빌드 플랜 - 유료 전환 핵심 */}
+      {!isSharedResult && (
+        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 text-white">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[18px]">🔒</span>
+            <h3 className="text-[15px] font-bold">6개월 독립 리빌드 플랜</h3>
+          </div>
+
+          {/* 변화 중심 메시지 */}
+          <div className="bg-white/10 rounded-lg p-3 mb-4">
+            <p className="text-[16px] font-bold text-center">
+              현재 {result.score}점 → {Math.min(result.score + 20, 100)}점
+            </p>
+            <p className="text-[12px] text-white/70 text-center mt-1">
+              현실적인 실행 로드맵을 제공합니다
+            </p>
+          </div>
+
+          <ul className="text-[12px] text-white/90 space-y-2 mb-4">
+            <li className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">✓</span>
+              <span>월 절약 가능 금액 자동 계산</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">✓</span>
+              <span>독립 가능 시점 예측</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">✓</span>
+              <span>6개월 실행 체크리스트 PDF 제공</span>
+            </li>
+          </ul>
+
+          <button
+            className="w-full h-11 rounded-lg bg-white text-[#0F3D2E] text-[14px] font-bold hover:bg-neutral-100 transition-colors flex items-center justify-center gap-1.5 shadow-lg"
+            onClick={() => {
+              // TODO: 얼리 액세스 폼 연결
+              window.open('https://forms.gle/placeholder', '_blank');
+            }}
+          >
+            <span>얼리 액세스 신청하기</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <p className="text-[10px] text-white/50 text-center mt-2">
+            베타 오픈 시 우선 안내드립니다
+          </p>
+        </div>
       )}
 
-      {/* 6. 구조 개선 조언 */}
+      {/* 상세 분석 영역 - 무료 신뢰 확보용 */}
       {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
-            <span className="text-[16px]">🛠</span>
-            개선 분석
-          </h3>
-          <div className="space-y-6">
+        <details className="bg-white rounded-xl shadow-sm">
+          <summary className="p-3 cursor-pointer flex items-center justify-between list-none">
+            <div className="flex items-center gap-2">
+              <span className="text-[14px]">🛠</span>
+              <span className="text-[13px] font-bold text-neutral-800">상세 개선 분석</span>
+              <span className="text-[11px] text-neutral-400">
+                ({getAllCategoryAdvice(result.categoryScores).length}개 항목)
+              </span>
+            </div>
+            <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div className="px-3 pb-3 space-y-4">
             {getAllCategoryAdvice(result.categoryScores).map((advice) => (
-              <div key={advice.categoryId} className="space-y-3">
-                {/* 카테고리 헤더 */}
+              <div key={advice.categoryId} className="p-3 bg-neutral-50 rounded-lg space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded text-[11px] font-bold ${
-                    advice.level === 'critical'
-                      ? 'bg-red-100 text-red-600'
-                      : 'bg-amber-100 text-amber-600'
+                  <span className={`inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold ${
+                    advice.level === 'critical' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
                   }`}>
                     {advice.level === 'critical' ? '!' : '△'}
                   </span>
-                  <span className="text-[15px] font-semibold text-neutral-800">
-                    {advice.label}
-                  </span>
-                  <span className={`text-[13px] font-medium tabular-nums ${
+                  <span className="text-[13px] font-semibold text-neutral-800">{advice.label}</span>
+                  <span className={`text-[11px] font-medium tabular-nums ${
                     advice.level === 'critical' ? 'text-red-500' : 'text-amber-500'
-                  }`}>
-                    {advice.score}점
-                  </span>
+                  }`}>{advice.score}점</span>
                 </div>
-
-                {/* 진단 */}
-                <p className="text-[14px] text-neutral-700 leading-relaxed">
-                  {advice.diagnosis}
-                </p>
-
-                {/* 기준 지표 */}
-                <div className="bg-neutral-50 rounded-lg p-3">
-                  <p className="text-[12px] font-medium text-neutral-500 mb-2">기준 지표</p>
-                  <ul className="space-y-1">
-                    {advice.metrics.map((metric, idx) => (
-                      <li key={idx} className="text-[13px] text-neutral-600 flex items-start gap-2">
-                        <span className="text-neutral-400 mt-0.5">•</span>
-                        <span>{metric}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* 개선 조치 */}
-                <div>
-                  <p className="text-[12px] font-medium text-neutral-500 mb-2">개선 조치</p>
-                  <ul className="space-y-1.5">
-                    {advice.actions.map((action, idx) => (
-                      <li key={idx} className="text-[13px] text-neutral-700 flex items-start gap-2">
-                        <span className="text-[#0F3D2E] font-medium mt-0.5">{idx + 1}.</span>
-                        <span>{action}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* 구분선 (마지막 항목 제외) */}
-                {advice !== getAllCategoryAdvice(result.categoryScores).slice(-1)[0] && (
-                  <div className="border-t border-neutral-100 pt-2" />
-                )}
+                <p className="text-[12px] text-neutral-600 leading-relaxed">{advice.diagnosis}</p>
+                <ul className="space-y-1">
+                  {advice.actions.slice(0, 2).map((action, idx) => (
+                    <li key={idx} className="text-[11px] text-neutral-500 flex items-start gap-1.5">
+                      <span className="text-[#0F3D2E]">→</span>
+                      <span>{action}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
-        </div>
+        </details>
       )}
 
-      {/* 7. 주거 유형별 맞춤 분석 */}
+      {/* 주거 유형별 분석 - 접힘 */}
       {result.housingAnalysis && (
-        <div className="bg-white rounded-xl shadow-sm p-4 space-y-4">
-          <div>
-            <h3 className="text-[17px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
-              <span className="text-[18px]">🏠</span>
-              {result.housingAnalysis.title}
-            </h3>
-            <p className="text-[15px] text-neutral-600 leading-relaxed">
-              {result.housingAnalysis.summary}
-            </p>
-            <p className="text-[15px] text-neutral-600 leading-relaxed mt-2">
-              {result.housingAnalysis.details}
-            </p>
-          </div>
-          <div className="border-t border-neutral-100 pt-5">
-            <h4 className="text-[15px] font-semibold text-neutral-700 mb-3">전략 제안</h4>
-            <ul className="space-y-2">
-              {result.housingAnalysis.strategies.map((strategy, index) => (
-                <li key={index} className="flex items-baseline gap-2">
-                  <span className="text-[#0F3D2E] text-[10px]">●</span>
-                  <span className="text-[14px] text-neutral-600 leading-relaxed">{strategy}</span>
-                </li>
+        <details className="bg-white rounded-xl shadow-sm">
+          <summary className="p-3 cursor-pointer flex items-center justify-between list-none">
+            <div className="flex items-center gap-2">
+              <span className="text-[14px]">🏠</span>
+              <span className="text-[13px] font-bold text-neutral-800">{result.housingAnalysis.title}</span>
+            </div>
+            <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div className="px-3 pb-3">
+            <p className="text-[12px] text-neutral-600 leading-relaxed mb-3">{result.housingAnalysis.summary}</p>
+            <div className="space-y-1.5">
+              {result.housingAnalysis.strategies.slice(0, 3).map((strategy, idx) => (
+                <p key={idx} className="text-[11px] text-neutral-500 flex items-start gap-1.5">
+                  <span className="text-[#0F3D2E]">→</span>
+                  <span>{strategy}</span>
+                </p>
               ))}
-            </ul>
+            </div>
           </div>
-        </div>
+        </details>
       )}
 
-      {/* 8. 독립 준비도 인덱스 */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-neutral-800 mb-3">
-          독립 준비도 인덱스
-        </h3>
-        <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
-      </div>
+      {/* 독립 준비도 인덱스 - 접힘 */}
+      <details className="bg-white rounded-xl shadow-sm">
+        <summary className="p-3 cursor-pointer flex items-center justify-between list-none">
+          <span className="text-[13px] font-bold text-neutral-800">독립 준비도 인덱스</span>
+          <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div className="px-3 pb-3">
+          <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
+        </div>
+      </details>
 
       {/* 9. 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
       {friendComparison && !isSharedResult && (
@@ -1628,38 +1740,23 @@ export function ResultStep() {
       {/* 점수 산정 방식 설명 */}
       <ScoreMethodology />
 
-      {/* 공유 영역 - 모바일 전용 */}
-      <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
-        <p className="text-[12px] text-neutral-500 mb-3">
-          결과 공유하기
-        </p>
-        <div className="flex gap-2 mb-2">
+      {/* 공유 영역 - 모바일 전용 (하단) */}
+      <div className="lg:hidden bg-white rounded-xl shadow-sm p-3 print:hidden">
+        <div className="flex gap-2">
           <button
             onClick={handleSaveImage}
             disabled={isImageSaving}
-            className="flex-1 h-11 rounded-[10px] bg-[#0F3D2E] text-white text-[13px] font-semibold disabled:opacity-50 transition-colors hover:bg-[#0a2e22]"
-            aria-label="진단 결과를 이미지로 저장"
+            className="flex-1 h-10 rounded-lg bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50"
           >
             {isImageSaving ? '저장 중...' : '이미지 저장'}
           </button>
           <button
             onClick={handleShare}
-            className="flex-1 h-11 rounded-[10px] border border-neutral-200 text-neutral-700 text-[13px] font-semibold transition-colors hover:bg-neutral-50"
-            aria-label="링크 공유하기"
+            className="flex-1 h-10 rounded-lg border border-neutral-200 text-neutral-600 text-[12px] font-semibold"
           >
             링크 복사
           </button>
         </div>
-        <button
-          onClick={handleKakaoShare}
-          className="w-full h-11 rounded-[10px] bg-[#FEE500] text-[#191919] text-[13px] font-semibold transition-colors hover:bg-[#F5DC00] flex items-center justify-center gap-2"
-          aria-label="카카오톡으로 공유하기"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#191919">
-            <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-          </svg>
-          카카오톡 공유
-        </button>
       </div>
 
       {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우 (모바일만, 데스크톱은 사이드바에 있음) */}

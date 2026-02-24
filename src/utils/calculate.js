@@ -1194,14 +1194,15 @@ export function applyHardCutRules({ score, categoryScores, income, monthlyRequir
   }
 
   // 조건 10: 월 수입 < 월 지출 → "매우 위험" (⚠️ 절대 완화 불가)
+  // 44점 상한 제거 - 점수는 그대로 계산하되 등급만 제한
   if (isIncomeDeficit) {
     riskFlags.push({
       type: 'income_insufficient',
       message: `월 수입(${income}만원)이 예상 지출(${monthlyRequired}만원)보다 적습니다.`,
       severity: 'critical',
+      isDeficit: true,
     });
     maxGrade = '매우 위험';
-    adjustedScore = Math.min(adjustedScore, 44);
   }
 
   // === 등급 결정 ===
