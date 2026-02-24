@@ -34,7 +34,13 @@ export function useSurveyState(initialState) {
 
   // 상태 변경 시 자동 저장 (결과 제외)
   useEffect(() => {
-    if (state.currentStep > 0 && !state.result) {
+    // 결과 도달 시 draft 삭제
+    if (state.result) {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      return;
+    }
+
+    if (state.currentStep > 0) {
       try {
         // 결과와 불필요한 데이터 제외하고 저장
         const draft = {
