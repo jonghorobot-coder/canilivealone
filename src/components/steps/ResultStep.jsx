@@ -1265,6 +1265,27 @@ export function ResultStep() {
           </p>
         </div>
 
+        {/* 점수 카드 바로 아래 공유 CTA - 전환율 높은 위치 */}
+        {!isSharedResult && (
+          <div className="lg:hidden bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 print:hidden">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white font-semibold text-[14px]">당신의 친구는 몇 점일까요?</p>
+                <p className="text-white/60 text-[11px] mt-0.5">결과를 공유해보세요</p>
+              </div>
+              <button
+                onClick={handleKakaoShare}
+                className="flex-shrink-0 h-10 px-4 rounded-lg bg-[#FEE500] text-[#191919] text-[12px] font-semibold flex items-center gap-1.5"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#191919">
+                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                </svg>
+                공유
+              </button>
+            </div>
+          </div>
+        )}
+
       {/* 1. 등급별 설명 - 핵심 해석 */}
       {gradeDetail && (
         <div className="bg-white rounded-xl shadow-sm p-4">
@@ -1273,42 +1294,7 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 2. 리스크 플래그 */}
-      {result.details?.riskFlags?.length > 0 && (
-        <div className="space-y-2">
-          {result.details.riskFlags
-            .filter(flag => flag.severity !== 'info')
-            .map((flag, index) => (
-            <div
-              key={index}
-              className={`p-3.5 rounded-xl flex items-start gap-2.5 ${
-                flag.severity === 'critical' ? 'bg-red-50' : 'bg-amber-50'
-              }`}
-            >
-              <span className="text-[14px] flex-shrink-0 mt-0.5">
-                {flag.severity === 'critical' ? '⚠️' : '⚡'}
-              </span>
-              <p className={`text-[13px] font-medium leading-relaxed ${
-                flag.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
-              }`}>{flag.message}</p>
-            </div>
-          ))}
-          {/* info 타입은 별도 스타일 */}
-          {result.details.riskFlags
-            .filter(flag => flag.severity === 'info')
-            .map((flag, index) => (
-            <div
-              key={`info-${index}`}
-              className="p-3.5 rounded-xl flex items-start gap-2.5 bg-blue-50"
-            >
-              <span className="text-[14px] flex-shrink-0 mt-0.5">💡</span>
-              <p className="text-[13px] font-medium leading-relaxed text-blue-600">{flag.message}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 3. 재정 요약 - 핵심 수치 먼저 */}
+      {/* 2. 재정 요약 - 객관적 숫자 먼저 (리스크 전에 안정감 부여) */}
       <div className="bg-white rounded-xl shadow-sm p-4">
         <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
           <span className="text-[16px]">💰</span>
@@ -1345,7 +1331,42 @@ export function ResultStep() {
         </div>
       </div>
 
-      {/* 4. 카테고리별 점수 */}
+      {/* 3. 리스크 플래그 */}
+      {result.details?.riskFlags?.length > 0 && (
+        <div className="space-y-2">
+          {result.details.riskFlags
+            .filter(flag => flag.severity !== 'info')
+            .map((flag, index) => (
+            <div
+              key={index}
+              className={`p-3.5 rounded-xl flex items-start gap-2.5 ${
+                flag.severity === 'critical' ? 'bg-red-50' : 'bg-amber-50'
+              }`}
+            >
+              <span className="text-[14px] flex-shrink-0 mt-0.5">
+                {flag.severity === 'critical' ? '⚠️' : '⚡'}
+              </span>
+              <p className={`text-[13px] font-medium leading-relaxed ${
+                flag.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
+              }`}>{flag.message}</p>
+            </div>
+          ))}
+          {/* info 타입은 별도 스타일 */}
+          {result.details.riskFlags
+            .filter(flag => flag.severity === 'info')
+            .map((flag, index) => (
+            <div
+              key={`info-${index}`}
+              className="p-3.5 rounded-xl flex items-start gap-2.5 bg-blue-50"
+            >
+              <span className="text-[14px] flex-shrink-0 mt-0.5">💡</span>
+              <p className="text-[13px] font-medium leading-relaxed text-blue-600">{flag.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 4. 카테고리별 점수 - 어디서 점수가 깎였는지 */}
       <div className="bg-white rounded-xl shadow-sm p-4">
         <h3 className="text-[14px] font-bold text-neutral-800 mb-3 flex items-center gap-2">
           <span className="text-[16px]">📊</span>
@@ -1651,9 +1672,9 @@ export function ResultStep() {
       {isSharedResult && (
         <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-6 text-center print:hidden">
           <div className="w-12 h-12 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-3">
-            <span className="text-[24px]">✨</span>
+            <span className="text-[24px]">🤔</span>
           </div>
-          <p className="text-white font-semibold text-[15px] mb-1">나도 독립 준비 상태가 궁금하다면?</p>
+          <p className="text-white font-semibold text-[15px] mb-1">당신의 점수는 몇 점일까요?</p>
           <p className="text-white/70 text-[12px] mb-4">2분만에 무료로 진단받아 보세요</p>
           <button
             onClick={() => window.location.href = '/'}
