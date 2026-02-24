@@ -123,4 +123,127 @@ export const AnalyticsEvents = {
     score: score,
     grade: grade,
   }),
+
+  // 프리미엄 리포트 관련 이벤트
+  premiumPreviewView: (score, grade, riskLevel) => trackEvent('premium_preview_view', {
+    event_category: 'premium',
+    event_label: 'Premium Preview Viewed',
+    score: score,
+    grade: grade,
+    risk_level: riskLevel,
+  }),
+
+  premiumCtaClick: (score, grade, riskLevel) => trackEvent('premium_cta_click', {
+    event_category: 'premium',
+    event_label: 'Premium CTA Click',
+    score: score,
+    grade: grade,
+    risk_level: riskLevel,
+  }),
+
+  premiumPurchaseClick: (score, grade, riskLevel) => trackEvent('premium_purchase_click', {
+    event_category: 'conversion',
+    event_label: 'Premium Purchase Click',
+    score: score,
+    grade: grade,
+    risk_level: riskLevel,
+  }),
+
+  // 프리미엄 모달 열기/닫기 (퍼널 분석)
+  premiumModalOpen: (score, grade) => trackEvent('premium_modal_open', {
+    event_category: 'premium',
+    event_label: 'Premium Modal Opened',
+    score: score,
+    grade: grade,
+  }),
+
+  premiumModalClose: (score, grade, step) => trackEvent('premium_modal_close', {
+    event_category: 'premium',
+    event_label: 'Premium Modal Closed',
+    score: score,
+    grade: grade,
+    exit_step: step, // 'preview', 'email', 'payment' - 어느 단계에서 이탈했는지
+  }),
+
+  // 지출 입력 관련 (진단 진행 퍼널)
+  expenseInputStart: () => trackEvent('expense_input_start', {
+    event_category: 'engagement',
+    event_label: 'First Expense Input',
+  }),
+
+  expenseDeficitWarning: (deficitAmount) => trackEvent('expense_deficit_warning', {
+    event_category: 'engagement',
+    event_label: 'Deficit Warning Shown',
+    deficit_amount: deficitAmount,
+  }),
+
+  // 결과 페이지 상호작용 (사용자 관심사 파악)
+  resultSectionExpand: (sectionName) => trackEvent('result_section_expand', {
+    event_category: 'engagement',
+    event_label: sectionName, // 'goal_simulation', 'score_methodology', 'category_detail'
+  }),
+
+  goalSimulationInteract: (currentScore, targetScore) => trackEvent('goal_simulation_interact', {
+    event_category: 'engagement',
+    event_label: 'Goal Score Selected',
+    current_score: currentScore,
+    target_score: targetScore,
+    score_gap: targetScore - currentScore,
+  }),
+
+  gradeRangeToggle: (isOpen) => trackEvent('grade_range_toggle', {
+    event_category: 'engagement',
+    event_label: isOpen ? 'Grade Range Opened' : 'Grade Range Closed',
+  }),
+
+  // 공유 결과 조회 (바이럴 트래킹)
+  sharedResultView: (score, grade) => trackEvent('shared_result_view', {
+    event_category: 'viral',
+    event_label: 'Shared Result Viewed',
+    score: score,
+    grade: grade,
+  }),
+
+  // 공유 결과에서 본인 진단 시작 (전환)
+  sharedResultToStart: (friendScore, friendGrade) => trackEvent('shared_result_to_start', {
+    event_category: 'conversion',
+    event_label: 'Start From Shared Result',
+    friend_score: friendScore,
+    friend_grade: friendGrade,
+  }),
+
+  // 이전 결과 비교 조회
+  historyCompareView: (currentScore, previousScore) => trackEvent('history_compare_view', {
+    event_category: 'engagement',
+    event_label: 'History Comparison Viewed',
+    current_score: currentScore,
+    previous_score: previousScore,
+    score_change: currentScore - previousScore,
+  }),
+
+  // 공유 실패 (UX 개선 포인트 파악)
+  shareFail: (shareType, errorType) => trackEvent('share_fail', {
+    event_category: 'error',
+    event_label: `${shareType} Share Failed`,
+    share_type: shareType,
+    error_type: errorType,
+  }),
+
+  // 동의 모달 관련
+  consentModalOpen: () => trackEvent('consent_modal_open', {
+    event_category: 'engagement',
+    event_label: 'Consent Modal Opened',
+  }),
+
+  consentModalClose: () => trackEvent('consent_modal_close', {
+    event_category: 'engagement',
+    event_label: 'Consent Modal Closed Without Agree',
+  }),
+
+  // 스크롤 깊이 (결과 페이지에서 어디까지 봤는지)
+  resultScrollDepth: (depthPercent) => trackEvent('result_scroll_depth', {
+    event_category: 'engagement',
+    event_label: `Scrolled ${depthPercent}%`,
+    depth_percent: depthPercent,
+  }),
 };

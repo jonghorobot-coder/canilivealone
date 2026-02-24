@@ -81,40 +81,22 @@ export function SurveyProvider({ children }) {
   const prevStep = useCallback(() => {
     setState((prev) => {
       const newStep = Math.max(prev.currentStep - 1, 0);
-      const currentFilteredQuestions = getFilteredQuestions(prev.answers);
 
-      // 지출 입력 단계에서 인트로로 돌아갈 때: 수입/지출 초기화
+      // 지출 입력 단계에서 인트로로 돌아갈 때: 데이터 유지 (사용자 편의)
       if (prev.currentStep === 1 && newStep === 0) {
         return {
           ...prev,
           currentStep: newStep,
-          income: '',
-          expenses: {
-            housing: '',
-            food: '',
-            fixed: '',
-            transport: '',
-            leisure: '',
-            misc: '',
-            savings: '',
-          },
+          // 수입/지출 데이터 유지 - 사용자가 다시 입력할 필요 없음
         };
       }
 
-      // 질문 단계에서 이전으로 갈 때: 현재 질문의 답변만 초기화
+      // 질문 단계에서 이전으로 갈 때: 답변 유지 (수정 가능하도록)
       if (prev.currentStep >= 2) {
-        const questionIndex = prev.currentStep - 2;
-        const currentQuestion = currentFilteredQuestions[questionIndex];
-
-        const newAnswers = { ...prev.answers };
-        if (currentQuestion) {
-          newAnswers[currentQuestion.id] = null;
-        }
-
         return {
           ...prev,
           currentStep: newStep,
-          answers: newAnswers,
+          // 답변도 유지 - 사용자가 확인하고 수정 가능
         };
       }
 

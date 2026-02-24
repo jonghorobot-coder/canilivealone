@@ -9,6 +9,7 @@ import { ResultStep } from './components/steps/ResultStep';
 import { NotFound } from './pages/NotFound';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
+import { AdminPage } from './pages/AdminPage';
 
 function PageLayout({ children }) {
   return (
@@ -86,6 +87,7 @@ function App() {
       <Route path="/result" element={<ResultPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/mng-x9k2m7" element={<AdminPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

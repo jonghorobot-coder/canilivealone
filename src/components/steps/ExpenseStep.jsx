@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { StepLayout } from '../layout/StepLayout';
 import { NumberInput } from '../common/NumberInput';
 import { useSurvey } from '../../hooks/useSurvey';
@@ -12,10 +12,22 @@ const fixedExpenses = ['fixed', 'savings'];
 
 export function ExpenseStep() {
   const { income, expenses, setIncome, setExpense, nextStep } = useSurvey();
+  const hasTrackedFirstInput = useRef(false);
+  const hasTrackedDeficit = useRef(false);
 
   useEffect(() => {
     AnalyticsEvents.viewExpenseStep();
   }, []);
+
+  // 첫 지출 입력 추적
+  useEffect(() => {
+    if (hasTrackedFirstInput.current) return;
+    const hasAnyExpense = Object.values(expenses).some(val => val && val !== '' && toNumber(val) > 0);
+    if (hasAnyExpense) {
+      AnalyticsEvents.expenseInputStart();
+      hasTrackedFirstInput.current = true;
+    }
+  }, [expenses]);
 
   const incomeValue = toNumber(income);
   const isIncomeZero = income !== '' && incomeValue === 0;
@@ -38,6 +50,15 @@ export function ExpenseStep() {
 
   const livingCategories = expenseCategories.filter(c => livingExpenses.includes(c.id));
   const fixedCategories = expenseCategories.filter(c => fixedExpenses.includes(c.id));
+
+  // 적자 경고 추적 (한 번만)
+  useEffect(() => {
+    if (hasTrackedDeficit.current) return;
+    if (balance < 0 && isIncomeFilled) {
+      AnalyticsEvents.expenseDeficitWarning(Math.abs(balance));
+      hasTrackedDeficit.current = true;
+    }
+  }, [balance, isIncomeFilled]);
 
   return (
     <StepLayout
@@ -139,10 +160,23 @@ export function ExpenseStep() {
 
       {/* 경고 메시지 */}
       {balance < 0 && isIncomeFilled && (
-        <div className="p-4 rounded-[10px] border border-[#FDECEC] bg-[#FDECEC]">
-          <p className="text-[13px] text-[#912018] font-medium tracking-tight">
-            지출이 수입보다 많습니다.
-          </p>
+        <div className="p-4 rounded-[12px] border border-red-200 bg-red-50">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[14px] text-red-800 font-semibold mb-1">
+                월 {Math.abs(balance).toLocaleString()}만원 적자 상태
+              </p>
+              <p className="text-[12px] text-red-600 leading-relaxed">
+                적자 구조로 진단이 진행됩니다.<br />
+                독립 가능성 점수가 낮게 산출될 수 있어요.
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </StepLayout>

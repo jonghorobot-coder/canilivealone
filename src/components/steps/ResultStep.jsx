@@ -20,6 +20,7 @@ import {
   getTargetScoreRange,
   getGradeTargets,
 } from '../../utils/goalSimulation';
+import { generatePremiumPreview } from '../../utils/scoreSimulation';
 
 const LOADING_DURATION = 2500;
 
@@ -190,8 +191,9 @@ function useToast() {
   return { toast, showToast };
 }
 
-function AnalysisLoading() {
+function AnalysisLoading({ onRetry }) {
   const [messageIndex, setMessageIndex] = useState(0);
+  const [showTimeout, setShowTimeout] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -200,19 +202,58 @@ function AnalysisLoading() {
     return () => clearInterval(interval);
   }, []);
 
+  // 8초 후 타임아웃 표시
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowTimeout(true);
+    }, 8000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
-    <div className="min-h-dvh flex items-center justify-center">
-      <div className="text-center">
-        <div className="relative w-12 h-12 mx-auto mb-6">
-          <div className="absolute inset-0 border-2 border-gray-100 rounded-full" />
-          <div className="absolute inset-0 border-2 border-[#0F3D2E] border-t-transparent rounded-full animate-spin" />
-        </div>
-        <p className="text-[18px] font-bold text-neutral-800 mb-3 animate-fade-in" key={messageIndex}>
-          {LOADING_MESSAGES[messageIndex]}
-        </p>
-        <p className="text-[13px] text-neutral-500">
-          입력하신 정보를 분석하고 있습니다
-        </p>
+    <div className="min-h-dvh flex items-center justify-center p-4">
+      <div className="text-center max-w-sm">
+        {!showTimeout ? (
+          <>
+            <div className="relative w-12 h-12 mx-auto mb-6">
+              <div className="absolute inset-0 border-2 border-gray-100 rounded-full" />
+              <div className="absolute inset-0 border-2 border-[#0F3D2E] border-t-transparent rounded-full animate-spin" />
+            </div>
+            <p className="text-[18px] font-bold text-neutral-800 mb-3 animate-fade-in" key={messageIndex}>
+              {LOADING_MESSAGES[messageIndex]}
+            </p>
+            <p className="text-[13px] text-neutral-500">
+              입력하신 정보를 분석하고 있습니다
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-[18px] font-bold text-neutral-800 mb-2">
+              분석이 오래 걸리고 있어요
+            </p>
+            <p className="text-[14px] text-neutral-500 mb-6 leading-relaxed">
+              네트워크 상태를 확인하시고<br />
+              아래 버튼을 눌러 다시 시도해주세요.
+            </p>
+            <button
+              onClick={onRetry}
+              className="w-full h-12 rounded-xl bg-[#0F3D2E] text-white text-[15px] font-semibold hover:bg-[#0a2e22] transition-colors mb-3"
+            >
+              다시 시도하기
+            </button>
+            <button
+              onClick={() => window.location.href = '/'}
+              className="w-full text-neutral-400 text-[13px] hover:text-neutral-600 transition-colors"
+            >
+              처음으로 돌아가기
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -539,9 +580,55 @@ function ShareCard({ result, cardRef }) {
 }
 
 // 다시하기 확인 모달
-function RestartConfirmModal({ isOpen, onConfirm, onCancel }) {
+function RestartConfirmModal({ isOpen, onConfirm, onCancel, isSharedResult = false, friendScore = null }) {
   if (!isOpen) return null;
 
+  // 공유 링크 방문자용 모달
+  if (isSharedResult) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="absolute inset-0 bg-black/50 animate-overlay-bg"
+          onClick={onCancel}
+        />
+        <div className="relative bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content text-center">
+          {/* 점수 비교 시각화 */}
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-3 bg-white/10 rounded-full px-4 py-2">
+              <span className="text-white/70 text-[13px]">친구</span>
+              <span className="text-white font-bold text-[18px]">{friendScore}점</span>
+              <span className="text-white/50">vs</span>
+              <span className="text-[#FEE500] font-bold text-[18px]">?점</span>
+              <span className="text-white/70 text-[13px]">나</span>
+            </div>
+          </div>
+
+          <h3 className="text-[18px] font-bold text-white mb-2">
+            나는 몇 점일까?
+          </h3>
+          <p className="text-[14px] text-white/70 mb-5 leading-relaxed">
+            수입과 지출만 입력하면 끝!<br />
+            <span className="text-white/50 text-[13px]">2분 · 무료 · 회원가입 없음</span>
+          </p>
+
+          <button
+            onClick={onConfirm}
+            className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-100 transition-colors shadow-lg mb-3"
+          >
+            내 점수 확인하기
+          </button>
+          <button
+            onClick={onCancel}
+            className="w-full text-white/50 text-[13px] hover:text-white/70 transition-colors"
+          >
+            나중에 할게요
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 본인 재시작용 모달
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
@@ -550,11 +637,14 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel }) {
       />
       <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content">
         <h3 className="text-[17px] font-bold text-neutral-800 mb-2">
-          진단을 다시 시작하시겠습니까?
+          다시 진단받으시겠어요?
         </h3>
-        <p className="text-[14px] text-neutral-500 mb-6 leading-relaxed">
-          현재 결과는 링크로 저장되어 있습니다.<br />
-          새로운 진단을 시작하면 처음부터 입력하게 됩니다.
+        <p className="text-[14px] text-neutral-500 mb-2 leading-relaxed">
+          수입이나 지출이 바뀌었다면<br />
+          새로운 점수를 확인해보세요.
+        </p>
+        <p className="text-[12px] text-neutral-400 mb-5">
+          현재 결과는 링크로 저장되어 있어요.
         </p>
         <div className="flex gap-3">
           <button
@@ -567,9 +657,229 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel }) {
             onClick={onConfirm}
             className="flex-1 h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors"
           >
-            다시 시작
+            다시 진단받기
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// 모바일 디바이스 감지
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+const KAKAOPAY_LINK = 'https://qr.kakaopay.com/FC3Bnn1CY135606608';
+
+// 프리미엄 리포트 이메일 입력 모달
+function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade }) {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [step, setStep] = useState('email'); // 'email' | 'payment' | 'complete'
+  const [savedEmail, setSavedEmail] = useState('');
+
+  // 모달 열릴 때 이벤트
+  useEffect(() => {
+    if (isOpen) {
+      AnalyticsEvents.premiumModalOpen(score, grade);
+    }
+  }, [isOpen, score, grade]);
+
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleSubmit = async () => {
+    if (!email.trim()) {
+      setError('이메일을 입력해주세요');
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError('올바른 이메일 형식이 아닙니다');
+      return;
+    }
+    setError('');
+
+    // 이메일 저장
+    const success = await onSubmit(email);
+    if (!success) return;
+
+    setSavedEmail(email);
+    setStep('payment');
+  };
+
+  const handlePayment = () => {
+    if (isMobileDevice()) {
+      // 모바일: 새 탭에서 열어서 돌아올 수 있게
+      window.open(KAKAOPAY_LINK, '_blank');
+    } else {
+      // 데스크톱: 새 탭에서 열기 (QR 대신 직접 결제)
+      window.open(KAKAOPAY_LINK, '_blank');
+    }
+    setStep('complete');
+  };
+
+  const handleClose = () => {
+    // 완료 단계가 아닐 때만 이탈 이벤트 추적
+    if (step !== 'complete') {
+      AnalyticsEvents.premiumModalClose(score, grade, step);
+    }
+    setStep('email');
+    setEmail('');
+    setSavedEmail('');
+    setError('');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 animate-overlay-bg"
+        onClick={handleClose}
+      />
+      <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content">
+
+        {/* Step 1: 이메일 입력 */}
+        {step === 'email' && (
+          <>
+            <h3 className="text-[17px] font-bold text-neutral-800 mb-2">
+              리포트 받을 이메일
+            </h3>
+            <p className="text-[14px] text-neutral-500 mb-4 leading-relaxed">
+              결제 확인 후 입력하신 이메일로<br />
+              맞춤 리포트를 발송해드립니다.
+            </p>
+
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError('');
+              }}
+              placeholder="example@email.com"
+              className={`w-full h-12 px-4 rounded-[10px] border ${error ? 'border-red-400' : 'border-neutral-200'} text-[15px] focus:outline-none focus:border-[#0F3D2E] transition-colors`}
+              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            />
+            {error && (
+              <p className="text-[12px] text-red-500 mt-1">{error}</p>
+            )}
+
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleClose}
+                className="flex-1 h-12 rounded-[10px] border border-neutral-200 text-neutral-600 text-[14px] font-semibold hover:bg-neutral-50 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="flex-1 h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors disabled:opacity-50"
+              >
+                {isLoading ? '저장 중...' : '다음'}
+              </button>
+            </div>
+
+            <p className="text-[11px] text-neutral-400 text-center mt-3">
+              결제 금액: 9,900원 (카카오페이)
+            </p>
+          </>
+        )}
+
+        {/* Step 2: 결제 진행 */}
+        {step === 'payment' && (
+          <>
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 bg-[#FEE500] rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#191919">
+                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                </svg>
+              </div>
+              <h3 className="text-[17px] font-bold text-neutral-800 mb-1">
+                카카오페이로 결제
+              </h3>
+              <p className="text-[20px] font-bold text-[#0F3D2E]">9,900원</p>
+            </div>
+
+            <div className="bg-neutral-50 rounded-xl p-4 mb-4">
+              <p className="text-[12px] text-neutral-500 mb-1">리포트 발송 이메일</p>
+              <p className="text-[14px] font-semibold text-neutral-800">{savedEmail}</p>
+            </div>
+
+            <button
+              onClick={handlePayment}
+              className="w-full h-12 rounded-[10px] bg-[#FEE500] text-[#191919] text-[15px] font-bold hover:bg-[#F5DC00] transition-colors flex items-center justify-center gap-2 mb-3"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#191919">
+                <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+              </svg>
+              카카오페이 결제하기
+            </button>
+
+            <button
+              onClick={() => setStep('email')}
+              className="w-full text-neutral-400 text-[13px] hover:text-neutral-600 transition-colors"
+            >
+              이메일 수정하기
+            </button>
+          </>
+        )}
+
+        {/* Step 3: 결제 완료 안내 */}
+        {step === 'complete' && (
+          <>
+            <div className="text-center mb-4">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-[18px] font-bold text-neutral-800 mb-2">
+                결제 요청 완료
+              </h3>
+              <p className="text-[14px] text-neutral-500 leading-relaxed">
+                결제가 정상적으로 완료되면<br />
+                아래 이메일로 리포트를 보내드려요.
+              </p>
+            </div>
+
+            <div className="bg-[#0F3D2E]/5 rounded-xl p-4 mb-4">
+              <p className="text-[12px] text-[#0F3D2E]/60 mb-1">발송 예정 이메일</p>
+              <p className="text-[15px] font-bold text-[#0F3D2E]">{savedEmail}</p>
+            </div>
+
+            <div className="bg-neutral-50 rounded-lg p-3 mb-4">
+              <div className="flex items-start gap-2">
+                <svg className="w-4 h-4 text-neutral-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-[12px] text-neutral-500 leading-relaxed">
+                  결제 확인 후 <strong>24시간 내</strong> 발송됩니다.<br />
+                  스팸함도 확인해주세요.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleClose}
+              className="w-full h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors"
+            >
+              확인
+            </button>
+
+            <button
+              onClick={handlePayment}
+              className="w-full text-neutral-400 text-[13px] mt-3 hover:text-neutral-600 transition-colors"
+            >
+              결제창 다시 열기
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -579,9 +889,9 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel }) {
 function GoalSimulation({ result, expenses, income }) {
   const [targetScore, setTargetScore] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const currentScore = result?.score || 0;
+  // 70점 미만이면 자동 펼침 (개선이 필요한 사용자에게 더 유용)
+  const [isExpanded, setIsExpanded] = useState(currentScore < 70);
   const scoreRange = getTargetScoreRange(currentScore);
   const gradeTargets = getGradeTargets(currentScore);
 
@@ -613,6 +923,7 @@ function GoalSimulation({ result, expenses, income }) {
 
   const handleGradeTargetClick = (score) => {
     setTargetScore(score);
+    AnalyticsEvents.goalSimulationInteract(currentScore, score);
   };
 
   // 달성 가능성 판별
@@ -626,39 +937,37 @@ function GoalSimulation({ result, expenses, income }) {
   const feasibility = getFeasibilityStatus();
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4">
-      {/* 헤더 */}
+    <div className="bg-white rounded-xl shadow-sm">
+      {/* 헤더 - 통일된 스타일 */}
       <div
-        className="flex items-center justify-between cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
+        className="p-4 flex items-center justify-between cursor-pointer"
+        onClick={() => {
+          const newState = !isExpanded;
+          setIsExpanded(newState);
+          if (newState) {
+            AnalyticsEvents.resultSectionExpand('goal_simulation');
+          }
+        }}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-[18px]">🎯</span>
-          <h3 className="text-[14px] font-bold text-neutral-800">목표 점수 달성 가능성</h3>
+        <div className="flex-1">
+          <span className="text-[13px] font-bold text-neutral-800">목표 점수 시뮬레이션</span>
+          <p className="text-[11px] text-neutral-400 mt-0.5">
+            {isExpanded ? '목표 등급을 선택하세요' : '달성 가능성 분석'}
+          </p>
         </div>
-        <button
-          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
-          aria-label={isExpanded ? '접기' : '펼치기'}
+        <svg
+          className={`w-4 h-4 text-neutral-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <svg
-            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
       </div>
-
-      {/* 간단 요약 */}
-      <p className="text-[12px] text-neutral-500 mt-2 leading-relaxed">
-        목표 등급을 선택하면 달성 가능성을 분석해드립니다.
-      </p>
 
       {/* 펼쳐진 내용 */}
       {isExpanded && (
-        <div className="mt-4 space-y-4 animate-fade-in">
+        <div className="px-4 pb-4 space-y-4 border-t border-neutral-100 pt-3">
           {/* 등급 목표 버튼 */}
           {gradeTargets.length > 0 && (
             <div className="space-y-2">
@@ -711,20 +1020,19 @@ function GoalSimulation({ result, expenses, income }) {
                 )}
               </div>
 
-              {/* 구체적 개선 플랜 유도 */}
-              <div className="p-3 bg-neutral-50 rounded-lg">
-                <p className="text-[12px] text-neutral-600 leading-relaxed mb-2">
-                  구체적인 월별 실행 계획과 카테고리별 절감 목표가 필요하신가요?
-                </p>
-                <button
-                  className="w-full h-9 rounded-lg border border-[#0F3D2E] text-[#0F3D2E] text-[12px] font-semibold hover:bg-[#E8F3EF] transition-colors"
-                  onClick={() => {
-                    // TODO: 유료 서비스 연결
-                    alert('서비스 준비 중입니다. 빠른 시일 내에 만나요!');
-                  }}
-                >
-                  맞춤 리빌드 플랜 받기
-                </button>
+              {/* 구체적 개선 플랜 유도 - Coming Soon */}
+              <div className="p-3 bg-neutral-50 rounded-lg opacity-60">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[12px] text-neutral-500">
+                    월별 실행 계획 & 절감 목표
+                  </p>
+                  <span className="text-[10px] bg-neutral-200 text-neutral-500 px-2 py-0.5 rounded-full">
+                    준비 중
+                  </span>
+                </div>
+                <div className="w-full h-9 rounded-lg border border-dashed border-neutral-300 flex items-center justify-center">
+                  <span className="text-[12px] text-neutral-400">맞춤 리빌드 플랜 (곧 출시)</span>
+                </div>
               </div>
             </div>
           )}
@@ -733,14 +1041,16 @@ function GoalSimulation({ result, expenses, income }) {
 
       {/* 접힌 상태 미리보기 */}
       {!isExpanded && gradeTargets.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-neutral-100">
-          <p className="text-[12px] text-neutral-600">
-            다음 등급: <span className="font-semibold text-[#0F3D2E]">{gradeTargets[0]?.grade}</span>까지
-            <span className="text-neutral-500"> +{gradeTargets[0]?.targetScore - currentScore}점</span>
-          </p>
-          <p className="text-[11px] text-neutral-400 mt-1">
-            탭하여 달성 가능성 확인하기
-          </p>
+        <div className="px-4 pb-4 border-t border-neutral-100 pt-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] text-neutral-600">
+              다음 등급: <span className="font-semibold text-[#0F3D2E]">{gradeTargets[0]?.grade}</span>
+              <span className="text-neutral-400 ml-1">(+{gradeTargets[0]?.targetScore - currentScore}점)</span>
+            </p>
+            <span className="text-[10px] text-[#0F3D2E] bg-[#E8F3EF] px-2 py-0.5 rounded-full">
+              탭하여 분석
+            </span>
+          </div>
         </div>
       )}
     </div>
@@ -768,91 +1078,67 @@ const SCORE_METHODOLOGY = {
 
 // 점수 산정 방식 설명 컴포넌트
 function ScoreMethodology() {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4">
-      {/* 헤더 */}
-      <div
-        className="flex items-center justify-between cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <h3 className="text-[14px] font-bold text-neutral-800">이 점수는 어떻게 계산되나요?</h3>
-        <button
-          className="w-6 h-6 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
-          aria-label={isExpanded ? '접기' : '펼치기'}
-        >
-          <svg
-            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      </div>
-
-      {/* 펼쳐진 내용 */}
-      {isExpanded && (
-        <div className="mt-4 space-y-4 animate-fade-in">
-          {/* 카테고리별 가중치 */}
+    <details className="bg-white rounded-xl shadow-sm group">
+      <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
+        <div className="flex-1">
+          <span className="text-[13px] font-bold text-neutral-800">점수 산정 방식</span>
+          <p className="text-[11px] text-neutral-400 mt-0.5">7개 카테고리 가중 평균</p>
+        </div>
+        <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <div className="px-4 pb-4 space-y-4 border-t border-neutral-100 pt-3">
+        {/* 카테고리별 가중치 */}
+        <div className="space-y-2">
+          <p className="text-[11px] text-neutral-400 uppercase tracking-wide">카테고리별 가중치</p>
           <div className="space-y-2">
-            <p className="text-[11px] text-neutral-400 uppercase tracking-wide">카테고리별 가중치</p>
-            <div className="space-y-2">
-              {SCORE_METHODOLOGY.categories.map((cat) => (
-                <div key={cat.id} className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[13px] font-medium text-neutral-700">{cat.label}</span>
-                      <span className="text-[12px] font-semibold text-[#0F3D2E] tabular-nums">{cat.weight}%</span>
-                    </div>
-                    <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#0F3D2E] rounded-full transition-all duration-500"
-                        style={{ width: `${cat.weight * 4}%` }}
-                      />
-                    </div>
+            {SCORE_METHODOLOGY.categories.map((cat) => (
+              <div key={cat.id} className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[13px] font-medium text-neutral-700">{cat.label}</span>
+                    <span className="text-[12px] font-semibold text-[#0F3D2E] tabular-nums">{cat.weight}%</span>
+                  </div>
+                  <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#0F3D2E] rounded-full"
+                      style={{ width: `${cat.weight * 4}%` }}
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 평가 원칙 */}
-          <div className="space-y-2 pt-2 border-t border-neutral-100">
-            <p className="text-[11px] text-neutral-400 uppercase tracking-wide">평가 원칙</p>
-            <ul className="space-y-1.5">
-              {SCORE_METHODOLOGY.principles.map((principle, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="text-[#0F3D2E] text-[10px] mt-1">●</span>
-                  <span className="text-[12px] text-neutral-600 leading-relaxed">{principle}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* 한계 안내 */}
-          <div className="p-3 bg-neutral-50 rounded-lg">
-            <p className="text-[11px] text-neutral-500 leading-relaxed">
-              ⚠️ {SCORE_METHODOLOGY.disclaimer}
-            </p>
+              </div>
+            ))}
           </div>
         </div>
-      )}
 
-      {/* 접힌 상태 미리보기 */}
-      {!isExpanded && (
-        <p className="text-[12px] text-neutral-500 mt-2">
-          7개 카테고리의 가중 평균으로 산출됩니다. 탭하여 자세히 보기
-        </p>
-      )}
-    </div>
+        {/* 평가 원칙 */}
+        <div className="space-y-2 pt-2 border-t border-neutral-100">
+          <p className="text-[11px] text-neutral-400 uppercase tracking-wide">평가 원칙</p>
+          <ul className="space-y-1.5">
+            {SCORE_METHODOLOGY.principles.map((principle, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="text-[#0F3D2E] text-[10px] mt-1">●</span>
+                <span className="text-[12px] text-neutral-600 leading-relaxed">{principle}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* 한계 안내 */}
+        <div className="p-3 bg-neutral-50 rounded-lg">
+          <p className="text-[11px] text-neutral-500 leading-relaxed">
+            ⚠️ {SCORE_METHODOLOGY.disclaimer}
+          </p>
+        </div>
+      </div>
+    </details>
   );
 }
 
 export function ResultStep() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const { income, expenses, answers, result, setResult, reset, setCurrentStep } = useSurvey();
   const { toast, showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
@@ -867,9 +1153,36 @@ export function ResultStep() {
   const [friendComparison, setFriendComparison] = useState(null);
   const [history, setHistory] = useState([]);
   const [showGradeRange, setShowGradeRange] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [isPremiumLoading, setIsPremiumLoading] = useState(false);
   const shareCardRef = useRef(null);
+  const scrollMilestonesRef = useRef(new Set());
 
-  const sharedId = searchParams.get('id');
+  // 스크롤 깊이 추적 (25%, 50%, 75%, 100%)
+  useEffect(() => {
+    if (isLoading || !result) return;
+
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollHeight <= 0) return;
+
+      const scrollPercent = Math.round((window.scrollY / scrollHeight) * 100);
+      const milestones = [25, 50, 75, 100];
+
+      milestones.forEach(milestone => {
+        if (scrollPercent >= milestone && !scrollMilestonesRef.current.has(milestone)) {
+          scrollMilestonesRef.current.add(milestone);
+          AnalyticsEvents.resultScrollDepth(milestone);
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLoading, result]);
+
+  // 컴포넌트 마운트 시점에 URL에 id가 있었는지 (본인 결과 저장 후 id 추가와 구분)
+  const [initialSharedId] = useState(() => new URLSearchParams(window.location.search).get('id'));
 
   // 총 진단 수 조회 (1회)
   useEffect(() => {
@@ -886,21 +1199,24 @@ export function ResultStep() {
     fetchCount();
   }, []);
 
-  // 공유된 결과 조회 (id가 URL에 있는 경우)
+  // 공유된 결과 조회 (처음 마운트 시 URL에 id가 있었던 경우만)
   useEffect(() => {
-    if (!sharedId) return;
+    if (!initialSharedId) return;
 
     async function loadSharedResult() {
       setIsSharedResult(true);
 
-      const sharedResult = await fetchResultById(sharedId);
+      const sharedResult = await fetchResultById(initialSharedId);
 
       if (sharedResult) {
         setResult(sharedResult);
-        setResultId(sharedId);
+        setResultId(initialSharedId);
 
         // 친구 점수 저장 (나중에 비교용)
         saveFriendScore(sharedResult.score, sharedResult.grade);
+
+        // 공유된 결과 조회 이벤트
+        AnalyticsEvents.sharedResultView(sharedResult.score, sharedResult.grade);
       }
 
       // 공유 링크: 로딩/애니메이션 스킵
@@ -912,11 +1228,11 @@ export function ResultStep() {
     }
 
     loadSharedResult();
-  }, [sharedId, setResult]);
+  }, [initialSharedId, setResult]);
 
-  // 새 결과 계산 (id가 URL에 없는 경우)
+  // 새 결과 계산 (처음 마운트 시 URL에 id가 없었던 경우)
   useEffect(() => {
-    if (sharedId) return; // 공유 링크인 경우 스킵
+    if (initialSharedId) return; // 공유 링크인 경우 스킵
 
     setIsLoading(true);
 
@@ -972,9 +1288,17 @@ export function ResultStep() {
     }, LOADING_DURATION);
 
     return () => clearTimeout(timer);
-  }, [income, expenses, answers, setResult, sharedId, setSearchParams]);
+  }, [income, expenses, answers, setResult, initialSharedId, setSearchParams]);
 
   const handleRestartClick = () => {
+    // 공유 링크 방문자는 바로 시작 페이지로 이동 (이미 CTA에서 충분히 안내함)
+    if (isSharedResult) {
+      AnalyticsEvents.sharedResultToStart(result?.score, result?.grade);
+      AnalyticsEvents.restartDiagnosis();
+      window.location.href = '/';
+      return;
+    }
+    // 본인 재시작은 모달로 확인
     setShowRestartModal(true);
   };
 
@@ -1018,13 +1342,14 @@ export function ResultStep() {
         await navigator.clipboard.writeText(shareUrl);
         showToast('링크가 복사되었습니다');
         AnalyticsEvents.share('link', result?.score, result?.grade);
-      } catch (err) {
+      } catch {
         showToast('공유하기에 실패했습니다');
+        AnalyticsEvents.shareFail('link', 'clipboard_error');
       }
     }
   };
 
-  const handleKakaoShare = () => {
+  const handleKakaoShare = async () => {
     const shareUrl = resultId
       ? `${window.location.origin}/result?id=${resultId}`
       : window.location.href;
@@ -1032,17 +1357,23 @@ export function ResultStep() {
     // Kakao SDK 로드 확인
     if (!window.Kakao) {
       console.error('Kakao SDK not loaded');
-      handleShare();
+      // 링크 복사로 대체하고 사용자에게 알림
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('카카오톡을 사용할 수 없어 링크가 복사되었습니다');
+      } catch {
+        showToast('공유 링크를 복사할 수 없습니다');
+      }
       return;
     }
 
     try {
       if (!window.Kakao.isInitialized()) {
         const kakaoKey = import.meta.env.VITE_KAKAO_KEY;
-        console.log('Kakao init with key:', kakaoKey ? 'exists' : 'missing');
         if (!kakaoKey) {
           console.error('VITE_KAKAO_KEY is missing');
-          handleShare();
+          await navigator.clipboard.writeText(shareUrl);
+          showToast('카카오톡을 사용할 수 없어 링크가 복사되었습니다');
           return;
         }
         window.Kakao.init(kakaoKey);
@@ -1081,8 +1412,51 @@ export function ResultStep() {
       AnalyticsEvents.shareKakao(result?.score, result?.grade);
     } catch (error) {
       console.error('Kakao share error:', error);
-      showToast('카카오톡 공유에 실패했습니다');
-      handleShare();
+      AnalyticsEvents.shareFail('kakao', 'sdk_error');
+      // 에러 시 링크 복사로 대체
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('카카오톡 공유 실패 - 링크가 복사되었습니다');
+      } catch {
+        showToast('공유에 실패했습니다');
+      }
+    }
+  };
+
+  // 프리미엄 리포트 이메일 제출
+  const handlePremiumSubmit = async (email) => {
+    setIsPremiumLoading(true);
+    try {
+      // Supabase에 저장
+      const { error } = await supabase
+        .from('premium_requests')
+        .insert({
+          email: email,
+          result_id: resultId,
+          score: result?.score,
+          grade: result?.grade,
+          status: 'pending',
+        });
+
+      if (error) {
+        console.error('Premium request save error:', error);
+        alert('저장에 실패했습니다. 다시 시도해주세요.');
+        setIsPremiumLoading(false);
+        return false;
+      }
+
+      // GA 이벤트
+      const topRisks = getTopRiskFactors(result);
+      const riskLevel = topRisks.length > 0 && topRisks.some(r => r.severity === 'critical') ? 'high' : topRisks.length > 0 ? 'medium' : 'low';
+      AnalyticsEvents.premiumPurchaseClick(result?.score, result?.grade, riskLevel);
+
+      setIsPremiumLoading(false);
+      return true;
+    } catch (err) {
+      console.error('Premium request error:', err);
+      alert('오류가 발생했습니다. 다시 시도해주세요.');
+      setIsPremiumLoading(false);
+      return false;
     }
   };
 
@@ -1120,12 +1494,18 @@ export function ResultStep() {
       console.error('Image save error:', err);
       el.style.visibility = 'hidden';
       showToast('이미지 저장에 실패했습니다');
+      AnalyticsEvents.shareFail('image', 'generation_error');
     } finally {
       setIsImageSaving(false);
     }
   };
 
-  if (isLoading) return <AnalysisLoading />;
+  // 재시도 핸들러
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
+  if (isLoading) return <AnalysisLoading onRetry={handleRetry} />;
 
   if (!result) {
     return (
@@ -1146,7 +1526,6 @@ export function ResultStep() {
   }
 
   const gradeStyle = GRADE_STYLES[result.grade] || {};
-  const gradeDetail = GRADE_DETAILS[result.grade];
 
   return (
     <div className="min-h-dvh bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2] print:bg-white">
@@ -1157,6 +1536,18 @@ export function ResultStep() {
         isOpen={showRestartModal}
         onConfirm={handleRestartConfirm}
         onCancel={handleRestartCancel}
+        isSharedResult={isSharedResult}
+        friendScore={result?.score}
+      />
+
+      {/* 프리미엄 리포트 이메일 모달 */}
+      <PremiumEmailModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onSubmit={handlePremiumSubmit}
+        isLoading={isPremiumLoading}
+        score={result?.score}
+        grade={result?.grade}
       />
 
       {/* 토스트 */}
@@ -1220,7 +1611,11 @@ export function ResultStep() {
               {/* 등급 구간표 - 기본 접힘 */}
               <div className="mt-5 pt-5 border-t border-neutral-100">
                 <button
-                  onClick={() => setShowGradeRange(!showGradeRange)}
+                  onClick={() => {
+                    const newState = !showGradeRange;
+                    setShowGradeRange(newState);
+                    AnalyticsEvents.gradeRangeToggle(newState);
+                  }}
                   className="w-full flex items-center justify-center gap-1.5 text-[12px] text-neutral-500 hover:text-neutral-700 transition-colors"
                 >
                   <span>점수 기준 보기</span>
@@ -1264,6 +1659,8 @@ export function ResultStep() {
 
               {/* 데스크톱: 공유 버튼을 점수 카드에 포함 */}
               <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100 print:hidden">
+                <p className="text-[13px] font-semibold text-neutral-800 mb-1">결과 저장 & 공유</p>
+                <p className="text-[11px] text-neutral-400 mb-3">친구와 점수를 비교해보세요</p>
                 <div className="flex gap-2 mb-2">
                   <button
                     onClick={handleSaveImage}
@@ -1289,19 +1686,31 @@ export function ResultStep() {
                   카카오톡 공유
                 </button>
                 {isSharedResult ? (
-                  <button
-                    onClick={() => window.location.href = '/'}
-                    className="w-full h-10 mt-3 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold transition-colors hover:bg-[#0a2e22]"
-                  >
-                    무료로 진단받기
-                  </button>
+                  <div className="mt-4 pt-4 border-t border-neutral-100">
+                    <div className="flex items-center justify-center gap-2 mb-2 text-[12px]">
+                      <span className="text-neutral-400">친구</span>
+                      <span className="font-bold text-neutral-700">{result?.score}점</span>
+                      <span className="text-neutral-300">vs</span>
+                      <span className="font-bold text-[#0F3D2E]">?점</span>
+                      <span className="text-neutral-400">나</span>
+                    </div>
+                    <button
+                      onClick={handleRestartClick}
+                      className="w-full h-10 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold transition-colors hover:bg-[#0a2e22]"
+                    >
+                      내 점수 확인하기
+                    </button>
+                  </div>
                 ) : (
-                  <button
-                    onClick={handleRestartClick}
-                    className="w-full h-10 mt-3 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
-                  >
-                    처음부터 다시하기
-                  </button>
+                  <div className="mt-4 pt-4 border-t border-neutral-100">
+                    <p className="text-[11px] text-neutral-400 text-center mb-2">수입이나 지출이 바뀌었나요?</p>
+                    <button
+                      onClick={handleRestartClick}
+                      className="w-full h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
+                    >
+                      다시 진단받기
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -1325,7 +1734,11 @@ export function ResultStep() {
           {/* 등급 구간표 - 기본 접힘 */}
           <div className="mt-4 pt-3 border-t border-neutral-100">
             <button
-              onClick={() => setShowGradeRange(!showGradeRange)}
+              onClick={() => {
+                const newState = !showGradeRange;
+                setShowGradeRange(newState);
+                AnalyticsEvents.gradeRangeToggle(newState);
+              }}
               className="w-full flex items-center justify-center gap-1.5 text-[11px] text-neutral-400 hover:text-neutral-600 transition-colors"
             >
               <span>점수 기준 보기</span>
@@ -1362,6 +1775,39 @@ export function ResultStep() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* 모바일 공유 버튼 - 점수 카드 내 (스크롤 없이 접근) */}
+          <div className="mt-4 pt-4 border-t border-neutral-100 print:hidden">
+            <div className="flex gap-2">
+              <button
+                onClick={handleKakaoShare}
+                className="flex-1 h-10 rounded-lg bg-[#FEE500] text-[#191919] text-[12px] font-semibold flex items-center justify-center gap-1.5"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#191919">
+                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                </svg>
+                공유
+              </button>
+              <button
+                onClick={handleSaveImage}
+                disabled={isImageSaving}
+                className="flex-1 h-10 rounded-lg bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {isImageSaving ? '저장 중' : '이미지'}
+              </button>
+              <button
+                onClick={handleShare}
+                className="h-10 w-10 rounded-lg border border-neutral-200 text-neutral-500 flex items-center justify-center"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1408,6 +1854,114 @@ export function ResultStep() {
                 </div>
               ))}
             </div>
+          </div>
+        );
+      })()}
+
+      {/* 점수 상승 설계 리포트 - 유료 전환 핵심 (리스크 바로 뒤 배치) */}
+      {/* TODO: 배포 전 !isSharedResult 조건 복구 필요 */}
+      {(() => {
+        const topRisks = getTopRiskFactors(result);
+        const riskLevel = topRisks.length > 0 && topRisks.some(r => r.severity === 'critical') ? 'high' : topRisks.length > 0 ? 'medium' : 'low';
+        const preview = generatePremiumPreview({
+          result,
+          expenses: expenses || {},
+          income: income || result?.income || 0,
+        });
+
+        return (
+          <div
+            className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 text-white"
+            ref={(el) => {
+              // GA 이벤트: 프리미엄 미리보기 노출 (한 번만 실행)
+              if (el && !el.dataset.tracked) {
+                el.dataset.tracked = 'true';
+                AnalyticsEvents.premiumPreviewView(result.score, result.grade, riskLevel);
+              }
+            }}
+          >
+            {/* 헤더 */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[16px]">📈</span>
+                <h3 className="text-[14px] font-bold">점수 상승 설계 리포트</h3>
+              </div>
+              <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">프리미엄</span>
+            </div>
+
+            {/* 비교 시각화 - Before/After */}
+            <div className="bg-white/10 rounded-lg p-3 mb-3">
+              {/* 현재 vs 목표 점수 */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-center">
+                  <p className="text-[10px] text-white/60">현재</p>
+                  <p className="text-[24px] font-bold tabular-nums">{result.score}점</p>
+                </div>
+                <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+                <div className="text-center">
+                  <p className="text-[10px] text-white/60">목표</p>
+                  <p className="text-[24px] font-bold tabular-nums text-emerald-300">{preview?.targetScore || Math.min(result.score + 20, 100)}점</p>
+                </div>
+              </div>
+
+              {/* 타임라인 비교 바 */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-white/50 w-10">혼자</span>
+                  <div className="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full bg-white/40 rounded-full" style={{ width: '100%' }} />
+                  </div>
+                  <span className="text-[11px] text-white/70 w-14 text-right">{preview?.timeline?.monthsWithoutPlan || 11}개월</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-emerald-300 w-10">플랜</span>
+                  <div className="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${((preview?.timeline?.monthsWithPlan || 6) / (preview?.timeline?.monthsWithoutPlan || 11)) * 100}%` }} />
+                  </div>
+                  <span className="text-[11px] text-emerald-300 font-semibold w-14 text-right">{preview?.timeline?.monthsWithPlan || 6}개월</span>
+                </div>
+              </div>
+
+              {/* 절약 시간 강조 */}
+              <div className="mt-2 pt-2 border-t border-white/10 text-center">
+                <span className="text-[12px] text-white/80">
+                  <span className="text-emerald-300 font-bold">{preview?.timeline?.savedMonths || 5}개월</span> 더 빠르게 독립 준비
+                </span>
+              </div>
+            </div>
+
+            {/* 미리보기 정보 */}
+            {preview?.adjustments?.length > 0 && (
+              <div className="space-y-1.5 mb-3">
+                <p className="text-[10px] text-white/50 uppercase tracking-wide">핵심 개선 영역</p>
+                {preview.adjustments.slice(0, 2).map((adj, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-[11px]">
+                    <span className="text-white/80">{adj.description}</span>
+                    <span className="text-emerald-300 font-semibold">+{adj.scoreDiff}점</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* CTA 버튼 */}
+            <button
+              className="w-full h-11 rounded-lg bg-white text-[#0F3D2E] text-[14px] font-bold hover:bg-neutral-100 transition-colors flex items-center justify-center gap-1.5 shadow-lg"
+              onClick={() => {
+                AnalyticsEvents.premiumCtaClick(result.score, result.grade, riskLevel);
+                setShowPremiumModal(true);
+              }}
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#0F3D2E">
+                <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+              </svg>
+              <span>카카오페이로 구매</span>
+              <span className="text-[12px] font-normal text-[#0F3D2E]/60">9,900원</span>
+            </button>
+            <p className="text-[10px] text-white/50 text-center mt-2">
+              결제 확인 후 이메일로 맞춤 리포트 발송
+            </p>
           </div>
         );
       })()}
@@ -1491,166 +2045,165 @@ export function ResultStep() {
         </div>
       </div>
 
-      {/* 6개월 독립 리빌드 플랜 - 유료 전환 핵심 */}
-      {!isSharedResult && (
-        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 text-white">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[18px]">🔒</span>
-            <h3 className="text-[15px] font-bold">6개월 독립 리빌드 플랜</h3>
-          </div>
 
-          {/* 변화 중심 메시지 */}
-          <div className="bg-white/10 rounded-lg p-3 mb-4">
-            <p className="text-[16px] font-bold text-center">
-              현재 {result.score}점 → {Math.min(result.score + 20, 100)}점
-            </p>
-            <p className="text-[12px] text-white/70 text-center mt-1">
-              현실적인 실행 로드맵을 제공합니다
-            </p>
-          </div>
-
-          <ul className="text-[12px] text-white/90 space-y-2 mb-4">
-            <li className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">✓</span>
-              <span>월 절약 가능 금액 자동 계산</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">✓</span>
-              <span>독립 가능 시점 예측</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">✓</span>
-              <span>6개월 실행 체크리스트 PDF 제공</span>
-            </li>
-          </ul>
-
-          <button
-            className="w-full h-11 rounded-lg bg-white text-[#0F3D2E] text-[14px] font-bold hover:bg-neutral-100 transition-colors flex items-center justify-center gap-1.5 shadow-lg"
-            onClick={() => {
-              // TODO: 얼리 액세스 폼 연결
-              window.open('https://forms.gle/placeholder', '_blank');
-            }}
-          >
-            <span>얼리 액세스 신청하기</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-          <p className="text-[10px] text-white/50 text-center mt-2">
-            베타 오픈 시 우선 안내드립니다
-          </p>
-        </div>
-      )}
-
-      {/* 상세 분석 영역 - 무료 신뢰 확보용 */}
-      {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
-        <details className="bg-white rounded-xl shadow-sm">
-          <summary className="p-3 cursor-pointer flex items-center justify-between list-none">
-            <div className="flex items-center gap-2">
-              <span className="text-[14px]">🛠</span>
-              <span className="text-[13px] font-bold text-neutral-800">상세 개선 분석</span>
-              <span className="text-[11px] text-neutral-400">
-                ({getAllCategoryAdvice(result.categoryScores).length}개 항목)
-              </span>
-            </div>
-            <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <div className="px-3 pb-3 space-y-4">
-            {getAllCategoryAdvice(result.categoryScores).map((advice) => (
-              <div key={advice.categoryId} className="p-3 bg-neutral-50 rounded-lg space-y-2">
+      {/* 상세 분석 영역들 - 통일된 스타일 */}
+      <div className="space-y-2">
+        {/* 상세 개선 분석 */}
+        {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
+          <details className="bg-white rounded-xl shadow-sm group">
+            <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
+              <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold ${
-                    advice.level === 'critical' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
-                  }`}>
-                    {advice.level === 'critical' ? '!' : '△'}
+                  <span className="text-[13px] font-bold text-neutral-800">상세 개선 분석</span>
+                  <span className="text-[10px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full font-medium">
+                    {getAllCategoryAdvice(result.categoryScores).length}개
                   </span>
-                  <span className="text-[13px] font-semibold text-neutral-800">{advice.label}</span>
-                  <span className={`text-[11px] font-medium tabular-nums ${
-                    advice.level === 'critical' ? 'text-red-500' : 'text-amber-500'
-                  }`}>{advice.score}점</span>
                 </div>
-                <p className="text-[12px] text-neutral-600 leading-relaxed">{advice.diagnosis}</p>
-                <ul className="space-y-1">
-                  {advice.actions.slice(0, 2).map((action, idx) => (
-                    <li key={idx} className="text-[11px] text-neutral-500 flex items-start gap-1.5">
-                      <span className="text-[#0F3D2E]">→</span>
-                      <span>{action}</span>
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-[11px] text-neutral-400 mt-0.5">카테고리별 구체적인 개선 방안</p>
               </div>
-            ))}
-          </div>
-        </details>
-      )}
-
-      {/* 주거 유형별 분석 - 접힘 */}
-      {result.housingAnalysis && (
-        <details className="bg-white rounded-xl shadow-sm">
-          <summary className="p-3 cursor-pointer flex items-center justify-between list-none">
-            <div className="flex items-center gap-2">
-              <span className="text-[14px]">🏠</span>
-              <span className="text-[13px] font-bold text-neutral-800">{result.housingAnalysis.title}</span>
-            </div>
-            <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <div className="px-3 pb-3">
-            <p className="text-[12px] text-neutral-600 leading-relaxed mb-3">{result.housingAnalysis.summary}</p>
-            <div className="space-y-1.5">
-              {result.housingAnalysis.strategies.slice(0, 3).map((strategy, idx) => (
-                <p key={idx} className="text-[11px] text-neutral-500 flex items-start gap-1.5">
-                  <span className="text-[#0F3D2E]">→</span>
-                  <span>{strategy}</span>
-                </p>
+              <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div className="px-4 pb-4 space-y-3 border-t border-neutral-100 pt-3">
+              {getAllCategoryAdvice(result.categoryScores).map((advice) => (
+                <div key={advice.categoryId} className="p-3 bg-neutral-50 rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold ${
+                      advice.level === 'critical' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
+                    }`}>
+                      {advice.level === 'critical' ? '!' : '△'}
+                    </span>
+                    <span className="text-[13px] font-semibold text-neutral-800">{advice.label}</span>
+                    <span className={`text-[11px] font-medium tabular-nums ${
+                      advice.level === 'critical' ? 'text-red-500' : 'text-amber-500'
+                    }`}>{advice.score}점</span>
+                  </div>
+                  <p className="text-[12px] text-neutral-600 leading-relaxed">{advice.diagnosis}</p>
+                  <ul className="space-y-1">
+                    {advice.actions.slice(0, 2).map((action, idx) => (
+                      <li key={idx} className="text-[11px] text-neutral-500 flex items-start gap-1.5">
+                        <span className="text-[#0F3D2E]">→</span>
+                        <span>{action}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
             </div>
+          </details>
+        )}
+
+        {/* 주거 유형별 분석 */}
+        {result.housingAnalysis && (
+          <details className="bg-white rounded-xl shadow-sm group">
+            <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
+              <div className="flex-1">
+                <span className="text-[13px] font-bold text-neutral-800">{result.housingAnalysis.title}</span>
+                <p className="text-[11px] text-neutral-400 mt-0.5">선택한 주거 형태 맞춤 전략</p>
+              </div>
+              <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div className="px-4 pb-4 border-t border-neutral-100 pt-3">
+              <p className="text-[12px] text-neutral-600 leading-relaxed mb-3">{result.housingAnalysis.summary}</p>
+              <div className="space-y-1.5">
+                {result.housingAnalysis.strategies.slice(0, 3).map((strategy, idx) => (
+                  <p key={idx} className="text-[11px] text-neutral-500 flex items-start gap-1.5">
+                    <span className="text-[#0F3D2E]">→</span>
+                    <span>{strategy}</span>
+                  </p>
+                ))}
+              </div>
+            </div>
+          </details>
+        )}
+
+        {/* 독립 준비도 인덱스 */}
+        <details className="bg-white rounded-xl shadow-sm group">
+          <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
+            <div className="flex-1">
+              <span className="text-[13px] font-bold text-neutral-800">독립 준비도 인덱스</span>
+              <p className="text-[11px] text-neutral-400 mt-0.5">3가지 핵심 지표 분석</p>
+            </div>
+            <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div className="px-4 pb-4 border-t border-neutral-100 pt-3">
+            <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
           </div>
         </details>
-      )}
-
-      {/* 독립 준비도 인덱스 - 접힘 */}
-      <details className="bg-white rounded-xl shadow-sm">
-        <summary className="p-3 cursor-pointer flex items-center justify-between list-none">
-          <span className="text-[13px] font-bold text-neutral-800">독립 준비도 인덱스</span>
-          <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </summary>
-        <div className="px-3 pb-3">
-          <IndependenceIndex categoryScores={result.categoryScores} showScore={showScore} skipAnimation={isSharedResult} />
-        </div>
-      </details>
+      </div>
 
       {/* 9. 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
       {friendComparison && !isSharedResult && (
-        <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] rounded-xl p-4 text-white">
-          <p className="text-[12px] text-white/70 mb-2">
-            친구와 점수 비교
-          </p>
-          <div className="flex items-center justify-between">
-            <div className="text-center">
-              <p className="text-[11px] text-white/60">친구</p>
-              <p className="text-[28px] font-bold tabular-nums">{friendComparison.score}</p>
-              <p className="text-[11px] text-white/60">{friendComparison.grade}</p>
+        <div className="bg-gradient-to-br from-[#0F3D2E] via-[#1a5c45] to-[#0F3D2E] rounded-2xl p-5 text-white overflow-hidden relative">
+          {/* 배경 장식 */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+          {/* 헤더 */}
+          <div className="flex items-center gap-2 mb-4 relative">
+            <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
             </div>
-            <div className="text-center px-4">
-              <div className={`text-[18px] font-bold ${friendComparison.diff > 0 ? 'text-green-300' : friendComparison.diff < 0 ? 'text-red-300' : 'text-white/80'}`}>
-                {friendComparison.diff > 0 ? '+' : ''}{friendComparison.diff}점
+            <p className="text-[14px] font-semibold text-white/90">친구와 점수 비교</p>
+          </div>
+
+          {/* 비교 카드 */}
+          <div className="flex items-stretch gap-3 relative">
+            {/* 친구 */}
+            <div className="flex-1 bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+              <p className="text-[11px] text-white/60 mb-1">친구</p>
+              <p className="text-[32px] font-bold tabular-nums leading-none">{friendComparison.score}</p>
+              <p className="text-[12px] text-white/70 mt-1">{friendComparison.grade}</p>
+            </div>
+
+            {/* VS 및 차이 */}
+            <div className="flex flex-col items-center justify-center px-2">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                friendComparison.diff > 0 ? 'bg-green-400/20' : friendComparison.diff < 0 ? 'bg-red-400/20' : 'bg-white/20'
+              }`}>
+                <span className={`text-[14px] font-bold ${
+                  friendComparison.diff > 0 ? 'text-green-300' : friendComparison.diff < 0 ? 'text-red-300' : 'text-white/80'
+                }`}>
+                  {friendComparison.diff > 0 ? '+' : ''}{friendComparison.diff}
+                </span>
               </div>
-              <p className="text-[11px] text-white/60">
-                {friendComparison.diff > 0 ? '더 높아요' : friendComparison.diff < 0 ? '더 낮아요' : '동점이에요'}
+              <p className="text-[10px] text-white/50 mt-1">
+                {friendComparison.diff > 0 ? '승리!' : friendComparison.diff < 0 ? '아쉬워요' : '무승부'}
               </p>
             </div>
-            <div className="text-center">
-              <p className="text-[11px] text-white/60">나</p>
-              <p className="text-[28px] font-bold tabular-nums">{result.score}</p>
-              <p className="text-[11px] text-white/60">{result.grade}</p>
+
+            {/* 나 */}
+            <div className={`flex-1 rounded-xl p-4 text-center ${
+              friendComparison.diff >= 0 ? 'bg-white/20 ring-2 ring-white/30' : 'bg-white/10'
+            }`}>
+              <p className="text-[11px] text-white/60 mb-1">나</p>
+              <p className="text-[32px] font-bold tabular-nums leading-none">{result.score}</p>
+              <p className="text-[12px] text-white/70 mt-1">{result.grade}</p>
+              {friendComparison.diff > 0 && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-[12px]">👑</span>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* 공유 유도 */}
+          <button
+            onClick={handleKakaoShare}
+            className="w-full mt-4 h-10 rounded-lg bg-white/20 hover:bg-white/30 text-white text-[13px] font-medium flex items-center justify-center gap-2 transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+              <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+            </svg>
+            다른 친구에게도 공유하기
+          </button>
         </div>
       )}
 
@@ -1741,8 +2294,10 @@ export function ResultStep() {
       <ScoreMethodology />
 
       {/* 공유 영역 - 모바일 전용 (하단) */}
-      <div className="lg:hidden bg-white rounded-xl shadow-sm p-3 print:hidden">
-        <div className="flex gap-2">
+      <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
+        <p className="text-[13px] font-semibold text-neutral-800 mb-1">결과 저장 & 공유</p>
+        <p className="text-[11px] text-neutral-400 mb-3">친구와 점수를 비교해보세요</p>
+        <div className="flex gap-2 mb-2">
           <button
             onClick={handleSaveImage}
             disabled={isImageSaving}
@@ -1757,31 +2312,58 @@ export function ResultStep() {
             링크 복사
           </button>
         </div>
+        <button
+          onClick={handleKakaoShare}
+          className="w-full h-10 rounded-lg bg-[#FEE500] text-[#191919] text-[12px] font-semibold flex items-center justify-center gap-2"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#191919">
+            <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+          </svg>
+          카카오톡 공유
+        </button>
       </div>
 
       {/* 10. 진단받기 CTA - 공유 링크로 들어온 경우 (모바일만, 데스크톱은 사이드바에 있음) */}
       {isSharedResult && (
-        <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-6 text-center print:hidden">
-          <p className="text-white font-semibold text-[15px] mb-1">당신의 점수는 몇 점일까요?</p>
-          <p className="text-white/70 text-[12px] mb-4">2분만에 무료로 진단받아 보세요</p>
+        <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 print:hidden">
+          {/* 점수 비교 시각화 */}
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="text-center">
+              <p className="text-white/60 text-[11px] mb-1">친구</p>
+              <p className="text-white font-bold text-[22px]">{result?.score}점</p>
+            </div>
+            <div className="text-white/40 text-[20px] font-light">vs</div>
+            <div className="text-center">
+              <p className="text-[#FEE500]/80 text-[11px] mb-1">나</p>
+              <p className="text-[#FEE500] font-bold text-[22px]">?점</p>
+            </div>
+          </div>
+
+          <p className="text-white/70 text-[12px] text-center mb-4">
+            2분 · 무료 · 회원가입 없음
+          </p>
+
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={handleRestartClick}
             className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors shadow-lg"
           >
-            무료로 진단받기
+            내 점수 확인하기
           </button>
         </div>
       )}
 
       {/* 다시하기 버튼 - 본인 결과일 때, 모바일에서만 표시 (데스크톱은 사이드바에 있음) */}
       {!isSharedResult && (
-        <div className="lg:hidden pt-2 pb-6 print:hidden">
+        <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
+          <p className="text-[13px] text-neutral-500 mb-3 text-center">
+            수입이나 지출이 바뀌었나요?
+          </p>
           <button
             onClick={handleRestartClick}
-            className="w-full h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
+            className="w-full h-11 rounded-[10px] border border-neutral-200 bg-neutral-50 text-neutral-600 text-[14px] font-medium hover:bg-neutral-100 transition-colors"
             aria-label="진단을 처음부터 다시 시작"
           >
-            처음부터 다시하기
+            다시 진단받기
           </button>
         </div>
       )}

@@ -6,8 +6,7 @@ import { AnalyticsEvents } from '../../utils/analytics';
 export function IntroStep() {
   const { nextStep } = useSurvey();
   const [showConsentModal, setShowConsentModal] = useState(false);
-  const [agreedPrivacy, setAgreedPrivacy] = useState(false);
-  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedAll, setAgreedAll] = useState(false);
 
   useEffect(() => {
     AnalyticsEvents.viewIntro();
@@ -15,23 +14,24 @@ export function IntroStep() {
 
   const handleStartClick = () => {
     setShowConsentModal(true);
+    AnalyticsEvents.consentModalOpen();
   };
 
   const handleCloseModal = () => {
+    AnalyticsEvents.consentModalClose();
     setShowConsentModal(false);
-    setAgreedPrivacy(false);
-    setAgreedTerms(false);
+    setAgreedAll(false);
   };
 
   const handleConfirm = () => {
-    if (agreedPrivacy && agreedTerms) {
+    if (agreedAll) {
       setShowConsentModal(false);
       AnalyticsEvents.startDiagnosis();
       nextStep();
     }
   };
 
-  const canProceed = agreedPrivacy && agreedTerms;
+  const canProceed = agreedAll;
 
   return (
     <>
@@ -65,93 +65,60 @@ export function IntroStep() {
             </div>
 
             {/* 모달 본문 */}
-            <div className="px-6 py-5 space-y-4">
-              {/* 개인정보 처리방침 */}
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex-shrink-0 mt-0.5">
+            <div className="px-6 py-5">
+              {/* 전체 동의 체크박스 */}
+              <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100 transition-colors">
+                <div className="relative flex-shrink-0">
                   <input
                     type="checkbox"
-                    checked={agreedPrivacy}
-                    onChange={(e) => setAgreedPrivacy(e.target.checked)}
+                    checked={agreedAll}
+                    onChange={(e) => setAgreedAll(e.target.checked)}
                     className="sr-only"
                   />
-                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                    agreedPrivacy
+                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                    agreedAll
                       ? 'bg-[#0F3D2E] border-[#0F3D2E]'
                       : 'border-neutral-300 group-hover:border-neutral-400'
                   }`}>
-                    {agreedPrivacy && (
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    {agreedAll && (
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-medium text-neutral-800">[필수] 개인정보 처리방침 동의</span>
-                  </div>
-                  <p className="text-[12px] text-neutral-500 mt-1 leading-relaxed">
-                    진단에 입력하신 수입·지출 정보가 결과 분석에 활용됩니다.
-                  </p>
+                <span className="text-[15px] font-semibold text-neutral-800">약관 전체 동의</span>
+              </label>
+
+              {/* 약관 상세 (접힌 형태로 표시) */}
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[13px] text-neutral-500">개인정보 처리방침</span>
                   <Link
                     to="/privacy"
                     target="_blank"
-                    className="inline-flex items-center gap-1 text-[12px] text-[#0F3D2E] font-medium mt-1 hover:underline"
+                    className="text-[12px] text-[#0F3D2E] font-medium hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    전문 보기
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
+                    보기
                   </Link>
                 </div>
-              </label>
-
-              {/* 구분선 */}
-              <div className="border-t border-neutral-100" />
-
-              {/* 서비스 이용약관 */}
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex-shrink-0 mt-0.5">
-                  <input
-                    type="checkbox"
-                    checked={agreedTerms}
-                    onChange={(e) => setAgreedTerms(e.target.checked)}
-                    className="sr-only"
-                  />
-                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                    agreedTerms
-                      ? 'bg-[#0F3D2E] border-[#0F3D2E]'
-                      : 'border-neutral-300 group-hover:border-neutral-400'
-                  }`}>
-                    {agreedTerms && (
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-medium text-neutral-800">[필수] 서비스 이용약관 동의</span>
-                  </div>
-                  <p className="text-[12px] text-neutral-500 mt-1 leading-relaxed">
-                    진단 결과는 참고용이며, 전문 재무 상담을 대체하지 않습니다.
-                  </p>
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[13px] text-neutral-500">서비스 이용약관</span>
                   <Link
                     to="/terms"
                     target="_blank"
-                    className="inline-flex items-center gap-1 text-[12px] text-[#0F3D2E] font-medium mt-1 hover:underline"
+                    className="text-[12px] text-[#0F3D2E] font-medium hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    전문 보기
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
+                    보기
                   </Link>
                 </div>
-              </label>
+              </div>
+
+              <p className="text-[11px] text-neutral-400 mt-4 leading-relaxed">
+                입력하신 정보는 결과 분석에만 활용되며, 진단 결과는 참고용입니다.
+              </p>
             </div>
 
             {/* 모달 푸터 */}

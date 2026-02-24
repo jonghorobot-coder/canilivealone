@@ -114,7 +114,7 @@ function calculateTotalScoreImpact(category, categoryScoreChange) {
  * @param {number} params.currentCategoryScore - 현재 카테고리 점수
  * @returns {Array} 개선 시나리오 배열
  */
-function calculateExpenseReductionScenarios({ category, currentAmount, income, currentCategoryScore }) {
+function calculateExpenseReductionScenarios({ category, currentAmount, income }) {
   const scenarios = [];
   if (income <= 0 || currentAmount <= 0) return scenarios;
 
