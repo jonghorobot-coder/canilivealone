@@ -39,25 +39,26 @@ export function AdminPage() {
     localStorage.setItem('admin_showCancelled', showCancelled);
   }, [showCancelled]);
 
+  // 요청 목록 로드 함수
+  const loadRequests = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('premium_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error loading requests:', error);
+      alert('데이터 로드 실패: ' + error.message);
+    } else {
+      setRequests(data || []);
+    }
+    setLoading(false);
+  };
+
   // 요청 목록 로드
   useEffect(() => {
     if (!isAuthenticated) return;
-
-    async function loadRequests() {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('premium_requests')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading requests:', error);
-      } else {
-        setRequests(data || []);
-      }
-      setLoading(false);
-    }
-
     loadRequests();
   }, [isAuthenticated]);
 
@@ -169,19 +170,30 @@ export function AdminPage() {
 
   // 상태 업데이트
   const handleStatusUpdate = async (id, newStatus) => {
-    const { error } = await supabase
+    // .select()를 추가하여 실제 업데이트 결과를 확인
+    const { data, error } = await supabase
       .from('premium_requests')
       .update({ status: newStatus })
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (error) {
       console.error('Status update error:', error);
-      alert('상태 업데이트에 실패했습니다.');
-    } else {
-      setRequests(prev =>
-        prev.map(r => r.id === id ? { ...r, status: newStatus } : r)
-      );
+      alert('상태 업데이트 실패: ' + error.message);
+      return;
     }
+
+    // 업데이트된 행이 없으면 (RLS 문제 등)
+    if (!data || data.length === 0) {
+      console.error('No rows updated - possible RLS issue');
+      alert('업데이트된 항목이 없습니다. Supabase RLS 정책을 확인하세요.');
+      return;
+    }
+
+    // 성공 - 로컬 상태 업데이트
+    setRequests(prev =>
+      prev.map(r => r.id === id ? { ...r, status: newStatus } : r)
+    );
   };
 
   // 영구 삭제
@@ -273,15 +285,27 @@ export function AdminPage() {
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-bold text-gray-800">프리미엄 리포트 관리</h1>
-          <button
-            onClick={() => {
-              localStorage.removeItem('admin_auth');
-              setIsAuthenticated(false);
-            }}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            로그아웃
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={loadRequests}
+              disabled={loading}
+              className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 flex items-center gap-1.5"
+            >
+              <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              새로고침
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem('admin_auth');
+                setIsAuthenticated(false);
+              }}
+              className="text-sm text-gray-500 hover:text-gray-700"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       </header>
 

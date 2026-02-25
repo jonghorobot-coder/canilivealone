@@ -672,11 +672,11 @@ const isMobileDevice = () => {
 
 const KAKAOPAY_LINK = 'https://qr.kakaopay.com/FC3Bnn1CY135606608';
 
-// 프리미엄 리포트 이메일 입력 모달 (2단계로 단순화)
+// 프리미엄 리포트 이메일 입력 모달
 function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade }) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [step, setStep] = useState('email'); // 'email' | 'complete'
+  const [step, setStep] = useState('email'); // 'email' | 'payment' | 'complete'
   const [savedEmail, setSavedEmail] = useState('');
 
   // 모달 열릴 때 이벤트
@@ -690,7 +690,7 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const handleSubmitAndPay = async () => {
+  const handleSubmit = async () => {
     if (!email.trim()) {
       setError('이메일을 입력해주세요');
       return;
@@ -706,13 +706,22 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
     if (!success) return;
 
     setSavedEmail(email);
+    setStep('payment');
+  };
 
-    // 바로 카카오페이 결제 페이지로 이동
-    window.open(KAKAOPAY_LINK, '_blank');
+  const handlePayment = () => {
+    if (isMobileDevice()) {
+      // 모바일: 새 탭에서 열어서 돌아올 수 있게
+      window.open(KAKAOPAY_LINK, '_blank');
+    } else {
+      // 데스크톱: 새 탭에서 열기 (QR 대신 직접 결제)
+      window.open(KAKAOPAY_LINK, '_blank');
+    }
     setStep('complete');
   };
 
   const handleClose = () => {
+    // 완료 단계가 아닐 때만 이탈 이벤트 추적
     if (step !== 'complete') {
       AnalyticsEvents.premiumModalClose(score, grade, step);
     }
@@ -733,7 +742,7 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
       />
       <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content">
 
-        {/* Step 1: 이메일 입력 + 바로 결제 */}
+        {/* Step 1: 이메일 입력 */}
         {step === 'email' && (
           <>
             <h3 className="text-[17px] font-bold text-neutral-800 mb-2">
@@ -754,59 +763,120 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
               placeholder="example@email.com"
               className={`w-full h-12 px-4 rounded-[10px] border ${error ? 'border-red-400' : 'border-neutral-200'} text-[15px] focus:outline-none focus:border-[#0F3D2E] transition-colors`}
               autoFocus
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmitAndPay()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             />
             {error && (
               <p className="text-[12px] text-red-500 mt-1">{error}</p>
             )}
 
-            <button
-              onClick={handleSubmitAndPay}
-              disabled={isLoading}
-              className="w-full h-12 mt-4 rounded-[10px] bg-[#FEE500] text-[#191919] text-[15px] font-bold hover:bg-[#F5DC00] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#191919">
-                <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-              </svg>
-              {isLoading ? '처리 중...' : '카카오페이 9,900원 결제'}
-            </button>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleClose}
+                className="flex-1 h-12 rounded-[10px] border border-neutral-200 text-neutral-600 text-[14px] font-semibold hover:bg-neutral-50 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="flex-1 h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors disabled:opacity-50"
+              >
+                {isLoading ? '저장 중...' : '다음'}
+              </button>
+            </div>
 
-            <button
-              onClick={handleClose}
-              className="w-full text-neutral-400 text-[13px] mt-3 hover:text-neutral-600 transition-colors"
-            >
-              취소
-            </button>
+            <p className="text-[11px] text-neutral-400 text-center mt-3">
+              결제 금액: 9,900원 (카카오페이)
+            </p>
           </>
         )}
 
-        {/* Step 2: 완료 안내 (간소화) */}
-        {step === 'complete' && (
+        {/* Step 2: 결제 진행 */}
+        {step === 'payment' && (
           <>
             <div className="text-center mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              <div className="w-12 h-12 bg-[#FEE500] rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#191919">
+                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
                 </svg>
               </div>
               <h3 className="text-[17px] font-bold text-neutral-800 mb-1">
-                결제 진행 중
+                카카오페이로 결제
               </h3>
-              <p className="text-[13px] text-neutral-500">
-                결제 완료 후 24시간 내 발송됩니다
-              </p>
+              <p className="text-[20px] font-bold text-[#0F3D2E]">9,900원</p>
             </div>
 
-            <div className="bg-neutral-50 rounded-xl p-3 mb-4 text-center">
-              <p className="text-[12px] text-neutral-500">발송 이메일</p>
+            <div className="bg-neutral-50 rounded-xl p-4 mb-4">
+              <p className="text-[12px] text-neutral-500 mb-1">리포트 발송 이메일</p>
               <p className="text-[14px] font-semibold text-neutral-800">{savedEmail}</p>
             </div>
 
             <button
+              onClick={handlePayment}
+              className="w-full h-12 rounded-[10px] bg-[#FEE500] text-[#191919] text-[15px] font-bold hover:bg-[#F5DC00] transition-colors flex items-center justify-center gap-2 mb-3"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#191919">
+                <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+              </svg>
+              카카오페이 결제하기
+            </button>
+
+            <button
+              onClick={() => setStep('email')}
+              className="w-full text-neutral-400 text-[13px] hover:text-neutral-600 transition-colors"
+            >
+              이메일 수정하기
+            </button>
+          </>
+        )}
+
+        {/* Step 3: 결제 완료 안내 */}
+        {step === 'complete' && (
+          <>
+            <div className="text-center mb-4">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-[18px] font-bold text-neutral-800 mb-2">
+                결제 요청 완료
+              </h3>
+              <p className="text-[14px] text-neutral-500 leading-relaxed">
+                결제가 정상적으로 완료되면<br />
+                아래 이메일로 리포트를 보내드려요.
+              </p>
+            </div>
+
+            <div className="bg-[#0F3D2E]/5 rounded-xl p-4 mb-4">
+              <p className="text-[12px] text-[#0F3D2E]/60 mb-1">발송 예정 이메일</p>
+              <p className="text-[15px] font-bold text-[#0F3D2E]">{savedEmail}</p>
+            </div>
+
+            <div className="bg-neutral-50 rounded-lg p-3 mb-4">
+              <div className="flex items-start gap-2">
+                <svg className="w-4 h-4 text-neutral-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-[12px] text-neutral-500 leading-relaxed">
+                  결제 확인 후 <strong>24시간 내</strong> 발송됩니다.<br />
+                  스팸함도 확인해주세요.
+                </p>
+              </div>
+            </div>
+
+            <button
               onClick={handleClose}
-              className="w-full h-11 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors"
+              className="w-full h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors"
             >
               확인
+            </button>
+
+            <button
+              onClick={handlePayment}
+              className="w-full text-neutral-400 text-[13px] mt-3 hover:text-neutral-600 transition-colors"
+            >
+              결제창 다시 열기
             </button>
           </>
         )}
@@ -820,8 +890,8 @@ function GoalSimulation({ result, expenses, income }) {
   const [targetScore, setTargetScore] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
   const currentScore = result?.score || 0;
-  // 기본 접힘 상태 (UI 단순화)
-  const [isExpanded, setIsExpanded] = useState(false);
+  // 70점 미만이면 자동 펼침 (개선이 필요한 사용자에게 더 유용)
+  const [isExpanded, setIsExpanded] = useState(currentScore < 70);
   const scoreRange = getTargetScoreRange(currentScore);
   const gradeTargets = getGradeTargets(currentScore);
 
@@ -1043,26 +1113,6 @@ function ScoreMethodology() {
           </div>
         </div>
 
-        {/* 등급 기준 */}
-        <div className="space-y-2 pt-2 border-t border-neutral-100">
-          <p className="text-[11px] text-neutral-400 uppercase tracking-wide">등급 기준</p>
-          <div className="grid grid-cols-5 gap-1">
-            {[
-              { range: '85-100', grade: '매우 안정', color: 'bg-emerald-500' },
-              { range: '70-84', grade: '안정', color: 'bg-emerald-400' },
-              { range: '55-69', grade: '주의', color: 'bg-yellow-400' },
-              { range: '45-54', grade: '위험', color: 'bg-orange-400' },
-              { range: '0-44', grade: '매우 위험', color: 'bg-red-400' },
-            ].map(({ range, grade, color }) => (
-              <div key={grade} className="text-center p-2 bg-neutral-50 rounded-lg">
-                <div className={`w-2 h-2 rounded-full ${color} mx-auto mb-1`} />
-                <p className="text-[10px] font-semibold text-neutral-700">{grade}</p>
-                <p className="text-[9px] text-neutral-400 tabular-nums">{range}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* 평가 원칙 */}
         <div className="space-y-2 pt-2 border-t border-neutral-100">
           <p className="text-[11px] text-neutral-400 uppercase tracking-wide">평가 원칙</p>
@@ -1102,6 +1152,7 @@ export function ResultStep() {
   const [previousComparison, setPreviousComparison] = useState(null);
   const [friendComparison, setFriendComparison] = useState(null);
   const [history, setHistory] = useState([]);
+  const [showGradeRange, setShowGradeRange] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isPremiumLoading, setIsPremiumLoading] = useState(false);
   const shareCardRef = useRef(null);
@@ -1557,48 +1608,109 @@ export function ResultStep() {
                 현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
               </p>
 
-              {/* 데스크톱: 공유 버튼 (단순화) */}
-              <div className="hidden lg:block mt-5 pt-5 border-t border-neutral-100 print:hidden">
-                <div className="flex gap-2 mb-2">
-                  <button
-                    onClick={handleKakaoShare}
-                    className="flex-1 h-10 rounded-[8px] bg-[#FEE500] text-[#191919] text-[12px] font-semibold transition-colors hover:bg-[#F5DC00] flex items-center justify-center gap-1.5"
+              {/* 등급 구간표 - 기본 접힘 */}
+              <div className="mt-5 pt-5 border-t border-neutral-100">
+                <button
+                  onClick={() => {
+                    const newState = !showGradeRange;
+                    setShowGradeRange(newState);
+                    AnalyticsEvents.gradeRangeToggle(newState);
+                  }}
+                  className="w-full flex items-center justify-center gap-1.5 text-[12px] text-neutral-500 hover:text-neutral-700 transition-colors"
+                >
+                  <span>점수 기준 보기</span>
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform ${showGradeRange ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#191919">
-                      <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-                    </svg>
-                    공유
-                  </button>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {showGradeRange && (
+                  <div className="space-y-1.5 text-left mt-3">
+                    {[
+                      { range: '85~100', grade: '매우 안정', color: 'bg-emerald-500' },
+                      { range: '70~84', grade: '안정', color: 'bg-emerald-400' },
+                      { range: '55~69', grade: '주의', color: 'bg-yellow-400' },
+                      { range: '45~54', grade: '위험', color: 'bg-orange-400' },
+                      { range: '0~44', grade: '매우 위험', color: 'bg-red-400' },
+                    ].map(({ range, grade, color }) => (
+                      <div
+                        key={grade}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] ${
+                          result.grade === grade
+                            ? 'bg-neutral-100 font-semibold'
+                            : 'text-neutral-400'
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${color}`} />
+                        <span className="w-14 tabular-nums">{range}</span>
+                        <span>{grade}</span>
+                        {result.grade === grade && (
+                          <span className="ml-auto text-[10px] text-neutral-500">← 현재</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 데스크톱: 공유 버튼을 점수 카드에 포함 */}
+              <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100 print:hidden">
+                <p className="text-[13px] font-semibold text-neutral-800 mb-1">결과 저장 & 공유</p>
+                <p className="text-[11px] text-neutral-400 mb-3">친구와 점수를 비교해보세요</p>
+                <div className="flex gap-2 mb-2">
                   <button
                     onClick={handleSaveImage}
                     disabled={isImageSaving}
                     className="flex-1 h-10 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50 transition-colors hover:bg-[#0a2e22]"
                   >
-                    {isImageSaving ? '저장 중' : '이미지'}
+                    {isImageSaving ? '저장 중...' : '이미지 저장'}
                   </button>
                   <button
                     onClick={handleShare}
-                    className="h-10 w-10 rounded-[8px] border border-neutral-200 text-neutral-500 flex items-center justify-center transition-colors hover:bg-neutral-50"
+                    className="flex-1 h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
+                    링크 복사
                   </button>
                 </div>
+                <button
+                  onClick={handleKakaoShare}
+                  className="w-full h-10 rounded-[8px] bg-[#FEE500] text-[#191919] text-[12px] font-semibold transition-colors hover:bg-[#F5DC00] flex items-center justify-center gap-2"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#191919">
+                    <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                  </svg>
+                  카카오톡 공유
+                </button>
                 {isSharedResult ? (
-                  <button
-                    onClick={handleRestartClick}
-                    className="w-full h-10 mt-2 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold transition-colors hover:bg-[#0a2e22]"
-                  >
-                    내 점수 확인하기
-                  </button>
+                  <div className="mt-4 pt-4 border-t border-neutral-100">
+                    <div className="flex items-center justify-center gap-2 mb-2 text-[12px]">
+                      <span className="text-neutral-400">친구</span>
+                      <span className="font-bold text-neutral-700">{result?.score}점</span>
+                      <span className="text-neutral-300">vs</span>
+                      <span className="font-bold text-[#0F3D2E]">?점</span>
+                      <span className="text-neutral-400">나</span>
+                    </div>
+                    <button
+                      onClick={handleRestartClick}
+                      className="w-full h-10 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold transition-colors hover:bg-[#0a2e22]"
+                    >
+                      내 점수 확인하기
+                    </button>
+                  </div>
                 ) : (
-                  <button
-                    onClick={handleRestartClick}
-                    className="w-full text-neutral-400 text-[11px] mt-3 hover:text-neutral-600 transition-colors"
-                  >
-                    다시 진단받기
-                  </button>
+                  <div className="mt-4 pt-4 border-t border-neutral-100">
+                    <p className="text-[11px] text-neutral-400 text-center mb-2">수입이나 지출이 바뀌었나요?</p>
+                    <button
+                      onClick={handleRestartClick}
+                      className="w-full h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
+                    >
+                      다시 진단받기
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -1619,16 +1731,62 @@ export function ResultStep() {
             <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단 완료
           </p>
 
+          {/* 등급 구간표 - 기본 접힘 */}
+          <div className="mt-4 pt-3 border-t border-neutral-100">
+            <button
+              onClick={() => {
+                const newState = !showGradeRange;
+                setShowGradeRange(newState);
+                AnalyticsEvents.gradeRangeToggle(newState);
+              }}
+              className="w-full flex items-center justify-center gap-1.5 text-[11px] text-neutral-400 hover:text-neutral-600 transition-colors"
+            >
+              <span>점수 기준 보기</span>
+              <svg
+                className={`w-3 h-3 transition-transform ${showGradeRange ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showGradeRange && (
+              <div className="space-y-1 text-left mt-2">
+                {[
+                  { range: '85~100', grade: '매우 안정', color: 'bg-emerald-500' },
+                  { range: '70~84', grade: '안정', color: 'bg-emerald-400' },
+                  { range: '55~69', grade: '주의', color: 'bg-yellow-400' },
+                  { range: '45~54', grade: '위험', color: 'bg-orange-400' },
+                  { range: '0~44', grade: '매우 위험', color: 'bg-red-400' },
+                ].map(({ range, grade, color }) => (
+                  <div
+                    key={grade}
+                    className={`flex items-center gap-2 px-2 py-1 rounded text-[11px] ${
+                      result.grade === grade
+                        ? 'bg-neutral-100 font-semibold'
+                        : 'text-neutral-400'
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${color}`} />
+                    <span className="w-12 tabular-nums">{range}</span>
+                    <span>{grade}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* 모바일 점수 카드 하단 */}
           <div className="mt-4 pt-4 border-t border-neutral-100 print:hidden">
             {isSharedResult ? (
               <>
-                {/* 공유 링크 방문자: CTA 우선 */}
+                {/* 공유 방문자: 내 점수 확인 CTA 우선 */}
                 <button
                   onClick={handleRestartClick}
                   className="w-full h-11 rounded-lg bg-[#0F3D2E] text-white text-[14px] font-bold mb-3"
                 >
-                  내 점수 확인하기
+                  나도 진단받기
                 </button>
                 <div className="flex gap-2">
                   <button
@@ -1651,7 +1809,7 @@ export function ResultStep() {
               </>
             ) : (
               <>
-                {/* 본인 결과: 공유 우선 */}
+                {/* 본인 결과: 공유 버튼 */}
                 <div className="flex gap-2">
                   <button
                     onClick={handleKakaoShare}
@@ -1733,9 +1891,8 @@ export function ResultStep() {
         );
       })()}
 
-      {/* 점수 상승 설계 리포트 - 유료 전환 핵심 (리스크 바로 뒤 배치) */}
-      {/* TODO: 배포 전 !isSharedResult 조건 복구 필요 */}
-      {(() => {
+      {/* 점수 상승 설계 리포트 - 본인 결과일 때만 표시 */}
+      {!isSharedResult && (() => {
         const topRisks = getTopRiskFactors(result);
         const riskLevel = topRisks.length > 0 && topRisks.some(r => r.severity === 'critical') ? 'high' : topRisks.length > 0 ? 'medium' : 'low';
         const preview = generatePremiumPreview({
@@ -1947,6 +2104,33 @@ export function ResultStep() {
             </div>
           </details>
         )}
+
+        {/* 주거 유형별 분석 */}
+        {result.housingAnalysis && (
+          <details className="bg-white rounded-xl shadow-sm group">
+            <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
+              <div className="flex-1">
+                <span className="text-[13px] font-bold text-neutral-800">{result.housingAnalysis.title}</span>
+                <p className="text-[11px] text-neutral-400 mt-0.5">선택한 주거 형태 맞춤 전략</p>
+              </div>
+              <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div className="px-4 pb-4 border-t border-neutral-100 pt-3">
+              <p className="text-[12px] text-neutral-600 leading-relaxed mb-3">{result.housingAnalysis.summary}</p>
+              <div className="space-y-1.5">
+                {result.housingAnalysis.strategies.slice(0, 3).map((strategy, idx) => (
+                  <p key={idx} className="text-[11px] text-neutral-500 flex items-start gap-1.5">
+                    <span className="text-[#0F3D2E]">→</span>
+                    <span>{strategy}</span>
+                  </p>
+                ))}
+              </div>
+            </div>
+          </details>
+        )}
+
       </div>
 
       {/* 9. 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
@@ -2105,9 +2289,10 @@ export function ResultStep() {
       {/* 점수 산정 방식 설명 */}
       <ScoreMethodology />
 
-      {/* 진단받기 CTA - 공유 링크로 들어온 경우 (모바일만) */}
+      {/* 진단받기 CTA - 공유 링크로 들어온 경우 (모바일만, 데스크톱은 사이드바에 있음) */}
       {isSharedResult && (
         <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 print:hidden">
+          {/* 점수 비교 시각화 */}
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="text-center">
               <p className="text-white/60 text-[11px] mb-1">친구</p>
@@ -2119,9 +2304,11 @@ export function ResultStep() {
               <p className="text-[#FEE500] font-bold text-[22px]">?점</p>
             </div>
           </div>
+
           <p className="text-white/70 text-[12px] text-center mb-4">
             2분 · 무료 · 회원가입 없음
           </p>
+
           <button
             onClick={handleRestartClick}
             className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors shadow-lg"
@@ -2131,15 +2318,18 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 다시하기 - 텍스트 버튼으로 단순화 */}
+      {/* 다시하기 버튼 - 본인 결과일 때, 모바일에서만 표시 (데스크톱은 사이드바에 있음) */}
       {!isSharedResult && (
-        <div className="lg:hidden text-center py-4 print:hidden">
+        <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 print:hidden">
+          <p className="text-[13px] text-neutral-500 mb-3 text-center">
+            수입이나 지출이 바뀌었나요?
+          </p>
           <button
             onClick={handleRestartClick}
-            className="text-neutral-400 text-[13px] hover:text-neutral-600 transition-colors"
+            className="w-full h-11 rounded-[10px] border border-neutral-200 bg-neutral-50 text-neutral-600 text-[14px] font-medium hover:bg-neutral-100 transition-colors"
             aria-label="진단을 처음부터 다시 시작"
           >
-            수입이나 지출이 바뀌었나요? <span className="underline">다시 진단받기</span>
+            다시 진단받기
           </button>
         </div>
       )}

@@ -2,7 +2,7 @@
 
 > 월 수입과 지출 구조를 기반으로 재무 독립 가능성을 분석하는 웹 서비스
 
-[![Version](https://img.shields.io/badge/version-2.0.0-0F3D2E)](https://github.com/jonghorobot-coder/canilivealone/releases/tag/v2.0.0)
+[![Version](https://img.shields.io/badge/version-2.1.0-0F3D2E)](https://github.com/jonghorobot-coder/canilivealone/releases/tag/v2.1.0)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black)](https://canilivealone.com)
 
 ## 서비스 소개
@@ -149,6 +149,35 @@ npm run build
 ## 배포
 
 Vercel에 연결하면 `main` 브랜치 push 시 자동 배포됩니다.
+
+## 변경 이력 (Changelog)
+
+### v2.1.0 (2025-02-25)
+
+**결과 페이지 UX 개선**
+- 모바일/데스크톱/공유 방문자별 최적화된 UI 제공
+- 중복 공유 CTA 섹션 제거 및 통합
+- 공유 방문자용 "나도 진단받기" CTA 점수 카드 내 배치
+- 프리미엄 CTA: 공유 방문자에게는 미표시 (본인 결과에서만 노출)
+- "독립 준비도 인덱스" 제거 (카테고리 점수와 중복)
+
+**관리자 페이지 개선**
+- 상태 업데이트 시 실제 저장 여부 확인 로직 추가
+- RLS 정책 오류 시 명확한 에러 메시지 표시
+- 새로고침 버튼 추가
+
+**핵심 원칙**
+- 무료로도 충분한 독립 가능성 분석 제공
+- 점수, 등급, 7개 카테고리 분석, 리스크 요인, 개선 방안 모두 무료
+- 프리미엄은 "점수 상승 설계 리포트"로 부가 가치 제공
+
+### v2.0.0 (2025-02-24)
+
+- 전면 리뉴얼 (React 19 + Vite 7 + TailwindCSS 4)
+- 점수 산정 로직 고도화 (7개 카테고리 가중 평균)
+- 프리미엄 리포트 시스템 도입
+- 목표 점수 시뮬레이션 기능
+- 공유 기능 강화 (카카오톡, 이미지 저장, 링크 복사)
 
 ## 라이선스
 
