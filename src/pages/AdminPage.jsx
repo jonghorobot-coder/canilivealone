@@ -11,7 +11,10 @@ export function AdminPage() {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [generating, setGenerating] = useState(null);
-  const [showCancelled, setShowCancelled] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(() => {
+    return localStorage.getItem('admin_showCancelled') === 'true';
+  });
+  const [deleting, setDeleting] = useState(null);
 
   // 간단한 비밀번호 인증
   const ADMIN_PASSWORD = 'canilivealone2026';
@@ -30,6 +33,11 @@ export function AdminPage() {
       setIsAuthenticated(true);
     }
   }, []);
+
+  // showCancelled 상태 저장
+  useEffect(() => {
+    localStorage.setItem('admin_showCancelled', showCancelled);
+  }, [showCancelled]);
 
   // 요청 목록 로드
   useEffect(() => {
@@ -174,6 +182,29 @@ export function AdminPage() {
         prev.map(r => r.id === id ? { ...r, status: newStatus } : r)
       );
     }
+  };
+
+  // 영구 삭제
+  const handleDelete = async (id, email) => {
+    if (!confirm(`정말 "${email}" 요청을 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+      return;
+    }
+
+    setDeleting(id);
+
+    const { error } = await supabase
+      .from('premium_requests')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Delete error:', error);
+      alert('삭제에 실패했습니다.');
+    } else {
+      setRequests(prev => prev.filter(r => r.id !== id));
+    }
+
+    setDeleting(null);
   };
 
   // 로그인 화면
@@ -401,12 +432,21 @@ export function AdminPage() {
                           </button>
                         )}
                         {request.status === 'cancelled' && (
-                          <button
-                            onClick={() => handleStatusUpdate(request.id, 'pending')}
-                            className="px-3 py-1 text-xs bg-blue-400 text-white rounded hover:bg-blue-500"
-                          >
-                            ↩ 복구
-                          </button>
+                          <>
+                            <button
+                              onClick={() => handleStatusUpdate(request.id, 'pending')}
+                              className="px-3 py-1 text-xs bg-blue-400 text-white rounded hover:bg-blue-500"
+                            >
+                              ↩ 복구
+                            </button>
+                            <button
+                              onClick={() => handleDelete(request.id, request.email)}
+                              disabled={deleting === request.id}
+                              className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                            >
+                              {deleting === request.id ? '삭제 중...' : '영구 삭제'}
+                            </button>
+                          </>
                         )}
                       </div>
                     </td>
