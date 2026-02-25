@@ -1657,37 +1657,12 @@ export function ResultStep() {
                 )}
               </div>
 
-              {/* 데스크톱: 공유 버튼을 점수 카드에 포함 */}
+              {/* 데스크톱: 하단 액션 영역 */}
               <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100 print:hidden">
-                <p className="text-[13px] font-semibold text-neutral-800 mb-1">결과 저장 & 공유</p>
-                <p className="text-[11px] text-neutral-400 mb-3">친구와 점수를 비교해보세요</p>
-                <div className="flex gap-2 mb-2">
-                  <button
-                    onClick={handleSaveImage}
-                    disabled={isImageSaving}
-                    className="flex-1 h-10 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50 transition-colors hover:bg-[#0a2e22]"
-                  >
-                    {isImageSaving ? '저장 중...' : '이미지 저장'}
-                  </button>
-                  <button
-                    onClick={handleShare}
-                    className="flex-1 h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
-                  >
-                    링크 복사
-                  </button>
-                </div>
-                <button
-                  onClick={handleKakaoShare}
-                  className="w-full h-10 rounded-[8px] bg-[#FEE500] text-[#191919] text-[12px] font-semibold transition-colors hover:bg-[#F5DC00] flex items-center justify-center gap-2"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#191919">
-                    <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-                  </svg>
-                  카카오톡 공유
-                </button>
                 {isSharedResult ? (
-                  <div className="mt-4 pt-4 border-t border-neutral-100">
-                    <div className="flex items-center justify-center gap-2 mb-2 text-[12px]">
+                  /* 공유 방문자: 내 점수 확인 CTA만 (남의 결과를 공유할 이유 없음) */
+                  <>
+                    <div className="flex items-center justify-center gap-2 mb-3 text-[12px]">
                       <span className="text-neutral-400">친구</span>
                       <span className="font-bold text-neutral-700">{result?.score}점</span>
                       <span className="text-neutral-300">vs</span>
@@ -1700,17 +1675,46 @@ export function ResultStep() {
                     >
                       내 점수 확인하기
                     </button>
-                  </div>
+                  </>
                 ) : (
-                  <div className="mt-4 pt-4 border-t border-neutral-100">
-                    <p className="text-[11px] text-neutral-400 text-center mb-2">수입이나 지출이 바뀌었나요?</p>
+                  /* 본인 결과: 공유 버튼 + 다시 진단 */
+                  <>
+                    <p className="text-[13px] font-semibold text-neutral-800 mb-1">결과 저장 & 공유</p>
+                    <p className="text-[11px] text-neutral-400 mb-3">친구와 점수를 비교해보세요</p>
+                    <div className="flex gap-2 mb-2">
+                      <button
+                        onClick={handleSaveImage}
+                        disabled={isImageSaving}
+                        className="flex-1 h-10 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50 transition-colors hover:bg-[#0a2e22]"
+                      >
+                        {isImageSaving ? '저장 중...' : '이미지 저장'}
+                      </button>
+                      <button
+                        onClick={handleShare}
+                        className="flex-1 h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
+                      >
+                        링크 복사
+                      </button>
+                    </div>
                     <button
-                      onClick={handleRestartClick}
-                      className="w-full h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
+                      onClick={handleKakaoShare}
+                      className="w-full h-10 rounded-[8px] bg-[#FEE500] text-[#191919] text-[12px] font-semibold transition-colors hover:bg-[#F5DC00] flex items-center justify-center gap-2"
                     >
-                      다시 진단받기
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#191919">
+                        <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                      </svg>
+                      카카오톡 공유
                     </button>
-                  </div>
+                    <div className="mt-4 pt-4 border-t border-neutral-100">
+                      <p className="text-[11px] text-neutral-400 text-center mb-2">수입이나 지출이 바뀌었나요?</p>
+                      <button
+                        onClick={handleRestartClick}
+                        className="w-full h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
+                      >
+                        다시 진단받기
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -1780,33 +1784,13 @@ export function ResultStep() {
           {/* 모바일 점수 카드 하단 */}
           <div className="mt-4 pt-4 border-t border-neutral-100 print:hidden">
             {isSharedResult ? (
-              <>
-                {/* 공유 방문자: 내 점수 확인 CTA 우선 */}
-                <button
-                  onClick={handleRestartClick}
-                  className="w-full h-11 rounded-lg bg-[#0F3D2E] text-white text-[14px] font-bold mb-3"
-                >
-                  나도 진단받기
-                </button>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleKakaoShare}
-                    className="flex-1 h-9 rounded-lg bg-[#FEE500] text-[#191919] text-[11px] font-semibold flex items-center justify-center gap-1"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#191919">
-                      <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-                    </svg>
-                    공유
-                  </button>
-                  <button
-                    onClick={handleSaveImage}
-                    disabled={isImageSaving}
-                    className="flex-1 h-9 rounded-lg border border-neutral-200 text-neutral-600 text-[11px] font-semibold disabled:opacity-50"
-                  >
-                    {isImageSaving ? '저장 중' : '이미지 저장'}
-                  </button>
-                </div>
-              </>
+              /* 공유 방문자: 내 점수 확인 CTA만 표시 (남의 결과를 공유할 이유 없음) */
+              <button
+                onClick={handleRestartClick}
+                className="w-full h-11 rounded-lg bg-[#0F3D2E] text-white text-[14px] font-bold"
+              >
+                나도 진단받기
+              </button>
             ) : (
               <>
                 {/* 본인 결과: 공유 버튼 */}
