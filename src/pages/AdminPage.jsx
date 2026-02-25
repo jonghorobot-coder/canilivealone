@@ -204,18 +204,30 @@ export function AdminPage() {
 
     setDeleting(id);
 
-    const { error } = await supabase
+    // .select()로 실제 삭제 여부 확인
+    const { data, error } = await supabase
       .from('premium_requests')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (error) {
       console.error('Delete error:', error);
-      alert('삭제에 실패했습니다.');
-    } else {
-      setRequests(prev => prev.filter(r => r.id !== id));
+      alert('삭제 실패: ' + error.message);
+      setDeleting(null);
+      return;
     }
 
+    // 삭제된 행이 없으면 (RLS 문제 등)
+    if (!data || data.length === 0) {
+      console.error('No rows deleted - possible RLS issue');
+      alert('삭제된 항목이 없습니다. Supabase RLS 정책(DELETE)을 확인하세요.');
+      setDeleting(null);
+      return;
+    }
+
+    // 성공 - 로컬 상태 업데이트
+    setRequests(prev => prev.filter(r => r.id !== id));
     setDeleting(null);
   };
 
