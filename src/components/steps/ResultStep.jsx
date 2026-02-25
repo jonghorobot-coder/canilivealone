@@ -15,11 +15,6 @@ import {
   getFriendScore,
   clearFriendScore,
 } from '../../utils/historyStorage';
-import {
-  generateImprovementRoadmap,
-  getTargetScoreRange,
-  getGradeTargets,
-} from '../../utils/goalSimulation';
 import { generatePremiumPreview } from '../../utils/scoreSimulation';
 
 const LOADING_DURATION = 2500;
@@ -301,59 +296,6 @@ function ScoreGauge({ score, showScore, skipAnimation = false }) {
   );
 }
 
-function IndependenceIndex({ categoryScores, showScore, skipAnimation = false }) {
-  const indices = [
-    { label: '재정 안정성', key: ['housing', 'savings'] },
-    { label: '지출 통제력', key: ['food', 'leisure', 'misc'] },
-    { label: '비상 대응력', key: ['fixed', 'transport'] },
-  ];
-
-  const calculateIndexScore = (keys) => {
-    if (!categoryScores) return 0;
-    const scores = keys.map(k => categoryScores[k] || 0);
-    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  };
-
-  const getBarColor = (score) => {
-    if (score >= 70) return 'emerald'; // blue in CSS
-    if (score >= 50) return 'amber';
-    return 'rose';
-  };
-
-  return (
-    <div className="space-y-4">
-      {indices.map((index, i) => {
-        const score = calculateIndexScore(index.key);
-        const colorClass = getBarColor(score);
-        return (
-          <div
-            key={index.label}
-            className={skipAnimation ? '' : 'animate-fade-in'}
-            style={skipAnimation ? {} : { animationDelay: `${i * 0.1}s` }}
-          >
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-[14px] font-medium text-neutral-600">{index.label}</span>
-              <span className={`text-[14px] font-semibold tabular-nums ${
-                colorClass === 'emerald' ? 'text-[#0F3D2E]' :
-                colorClass === 'amber' ? 'text-amber-500' : 'text-red-500'
-              }`}>{score}</span>
-            </div>
-            <div className="index-bar">
-              <div
-                className={`index-bar-fill ${colorClass}`}
-                style={{
-                  width: (showScore || skipAnimation) ? `${score}%` : '0%',
-                  transition: skipAnimation ? 'none' : undefined,
-                }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function ShareCard({ result, cardRef }) {
   const gradeStyle = SHARE_GRADE_STYLES[result?.grade] || { bg: '#F3F4F6', border: '#9CA3AF', text: '#6B7280' };
   const score = result?.score ?? 0;
@@ -615,7 +557,7 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel, isSharedResult = fal
             onClick={onConfirm}
             className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-100 transition-colors shadow-lg mb-3"
           >
-            내 점수 확인하기
+            나도 진단받기
           </button>
           <button
             onClick={onCancel}
@@ -881,178 +823,6 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
           </>
         )}
       </div>
-    </div>
-  );
-}
-
-// 목표 점수 시뮬레이션 컴포넌트 (간소화)
-function GoalSimulation({ result, expenses, income }) {
-  const [targetScore, setTargetScore] = useState(null);
-  const [roadmap, setRoadmap] = useState(null);
-  const currentScore = result?.score || 0;
-  // 70점 미만이면 자동 펼침 (개선이 필요한 사용자에게 더 유용)
-  const [isExpanded, setIsExpanded] = useState(currentScore < 70);
-  const scoreRange = getTargetScoreRange(currentScore);
-  const gradeTargets = getGradeTargets(currentScore);
-
-  // 초기 목표 점수 설정
-  useEffect(() => {
-    if (targetScore === null && currentScore < 100) {
-      setTargetScore(scoreRange.default);
-    }
-  }, [currentScore, scoreRange.default, targetScore]);
-
-  // 시뮬레이션 계산
-  useEffect(() => {
-    if (targetScore && result?.categoryScores) {
-      const newRoadmap = generateImprovementRoadmap({
-        currentScore,
-        targetScore,
-        categoryScores: result.categoryScores,
-        expenses: expenses || {},
-        income: income || result.income || 0,
-      });
-      setRoadmap(newRoadmap);
-    }
-  }, [targetScore, currentScore, result, expenses, income]);
-
-  // 100점이면 시뮬레이션 불필요
-  if (currentScore >= 100) {
-    return null;
-  }
-
-  const handleGradeTargetClick = (score) => {
-    setTargetScore(score);
-    AnalyticsEvents.goalSimulationInteract(currentScore, score);
-  };
-
-  // 달성 가능성 판별
-  const getFeasibilityStatus = () => {
-    if (!roadmap) return null;
-    if (roadmap.alreadyAchieved) return { label: '이미 달성', color: 'text-[#0F3D2E]', bg: 'bg-[#E8F3EF]' };
-    if (roadmap.isAchievable) return { label: '달성 가능', color: 'text-[#0F3D2E]', bg: 'bg-[#E8F3EF]' };
-    return { label: '달성 어려움', color: 'text-amber-600', bg: 'bg-amber-50' };
-  };
-
-  const feasibility = getFeasibilityStatus();
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm">
-      {/* 헤더 - 통일된 스타일 */}
-      <div
-        className="p-4 flex items-center justify-between cursor-pointer"
-        onClick={() => {
-          const newState = !isExpanded;
-          setIsExpanded(newState);
-          if (newState) {
-            AnalyticsEvents.resultSectionExpand('goal_simulation');
-          }
-        }}
-      >
-        <div className="flex-1">
-          <span className="text-[13px] font-bold text-neutral-800">목표 점수 시뮬레이션</span>
-          <p className="text-[11px] text-neutral-400 mt-0.5">
-            {isExpanded ? '목표 등급을 선택하세요' : '달성 가능성 분석'}
-          </p>
-        </div>
-        <svg
-          className={`w-4 h-4 text-neutral-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-
-      {/* 펼쳐진 내용 */}
-      {isExpanded && (
-        <div className="px-4 pb-4 space-y-4 border-t border-neutral-100 pt-3">
-          {/* 등급 목표 버튼 */}
-          {gradeTargets.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-[11px] text-neutral-400 uppercase tracking-wide">목표 등급 선택</p>
-              <div className="flex flex-wrap gap-2">
-                {gradeTargets.slice(0, 3).map((target) => (
-                  <button
-                    key={target.grade}
-                    onClick={() => handleGradeTargetClick(target.targetScore)}
-                    className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors ${
-                      targetScore === target.targetScore
-                        ? 'bg-[#0F3D2E] text-white'
-                        : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                    }`}
-                  >
-                    {target.grade}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 달성 가능성 결과 */}
-          {roadmap && feasibility && (
-            <div className="space-y-3 pt-3 border-t border-neutral-100">
-              {/* 현재 → 목표 */}
-              <div className="flex items-center justify-center gap-3">
-                <div className="text-center">
-                  <p className="text-[11px] text-neutral-400">현재</p>
-                  <p className="text-[20px] font-bold text-neutral-800 tabular-nums">{currentScore}점</p>
-                </div>
-                <svg className="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-                <div className="text-center">
-                  <p className="text-[11px] text-neutral-400">목표</p>
-                  <p className="text-[20px] font-bold text-[#0F3D2E] tabular-nums">{targetScore}점</p>
-                </div>
-              </div>
-
-              {/* 달성 가능성 배지 */}
-              <div className={`p-3 rounded-lg ${feasibility.bg} text-center`}>
-                <p className={`text-[14px] font-bold ${feasibility.color}`}>
-                  {feasibility.label}
-                </p>
-                {roadmap.estimatedMonths && roadmap.isAchievable && (
-                  <p className="text-[12px] text-neutral-600 mt-1">
-                    예상 소요 기간: 약 {roadmap.estimatedMonths}개월
-                  </p>
-                )}
-              </div>
-
-              {/* 구체적 개선 플랜 유도 - Coming Soon */}
-              <div className="p-3 bg-neutral-50 rounded-lg opacity-60">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[12px] text-neutral-500">
-                    월별 실행 계획 & 절감 목표
-                  </p>
-                  <span className="text-[10px] bg-neutral-200 text-neutral-500 px-2 py-0.5 rounded-full">
-                    준비 중
-                  </span>
-                </div>
-                <div className="w-full h-9 rounded-lg border border-dashed border-neutral-300 flex items-center justify-center">
-                  <span className="text-[12px] text-neutral-400">맞춤 리빌드 플랜 (곧 출시)</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 접힌 상태 미리보기 */}
-      {!isExpanded && gradeTargets.length > 0 && (
-        <div className="px-4 pb-4 border-t border-neutral-100 pt-3">
-          <div className="flex items-center justify-between">
-            <p className="text-[12px] text-neutral-600">
-              다음 등급: <span className="font-semibold text-[#0F3D2E]">{gradeTargets[0]?.grade}</span>
-              <span className="text-neutral-400 ml-1">(+{gradeTargets[0]?.targetScore - currentScore}점)</span>
-            </p>
-            <span className="text-[10px] text-[#0F3D2E] bg-[#E8F3EF] px-2 py-0.5 rounded-full">
-              탭하여 분석
-            </span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -1673,7 +1443,7 @@ export function ResultStep() {
                       onClick={handleRestartClick}
                       className="w-full h-10 rounded-[8px] bg-[#0F3D2E] text-white text-[12px] font-semibold transition-colors hover:bg-[#0a2e22]"
                     >
-                      내 점수 확인하기
+                      나도 진단받기
                     </button>
                   </>
                 ) : (
@@ -2297,7 +2067,7 @@ export function ResultStep() {
             onClick={handleRestartClick}
             className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors shadow-lg"
           >
-            내 점수 확인하기
+            나도 진단받기
           </button>
         </div>
       )}
