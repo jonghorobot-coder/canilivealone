@@ -1043,6 +1043,26 @@ function ScoreMethodology() {
           </div>
         </div>
 
+        {/* 등급 기준 */}
+        <div className="space-y-2 pt-2 border-t border-neutral-100">
+          <p className="text-[11px] text-neutral-400 uppercase tracking-wide">등급 기준</p>
+          <div className="grid grid-cols-5 gap-1">
+            {[
+              { range: '85-100', grade: '매우 안정', color: 'bg-emerald-500' },
+              { range: '70-84', grade: '안정', color: 'bg-emerald-400' },
+              { range: '55-69', grade: '주의', color: 'bg-yellow-400' },
+              { range: '45-54', grade: '위험', color: 'bg-orange-400' },
+              { range: '0-44', grade: '매우 위험', color: 'bg-red-400' },
+            ].map(({ range, grade, color }) => (
+              <div key={grade} className="text-center p-2 bg-neutral-50 rounded-lg">
+                <div className={`w-2 h-2 rounded-full ${color} mx-auto mb-1`} />
+                <p className="text-[10px] font-semibold text-neutral-700">{grade}</p>
+                <p className="text-[9px] text-neutral-400 tabular-nums">{range}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* 평가 원칙 */}
         <div className="space-y-2 pt-2 border-t border-neutral-100">
           <p className="text-[11px] text-neutral-400 uppercase tracking-wide">평가 원칙</p>
@@ -1599,37 +1619,70 @@ export function ResultStep() {
             <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단 완료
           </p>
 
-          {/* 모바일 공유 버튼 - 점수 카드 내 (단순화) */}
+          {/* 모바일 점수 카드 하단 */}
           <div className="mt-4 pt-4 border-t border-neutral-100 print:hidden">
-            <div className="flex gap-2">
-              <button
-                onClick={handleKakaoShare}
-                className="flex-1 h-10 rounded-lg bg-[#FEE500] text-[#191919] text-[12px] font-semibold flex items-center justify-center gap-1.5"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#191919">
-                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-                </svg>
-                공유
-              </button>
-              <button
-                onClick={handleSaveImage}
-                disabled={isImageSaving}
-                className="flex-1 h-10 rounded-lg bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50 flex items-center justify-center gap-1.5"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                {isImageSaving ? '저장 중' : '이미지'}
-              </button>
-              <button
-                onClick={handleShare}
-                className="h-10 w-10 rounded-lg border border-neutral-200 text-neutral-500 flex items-center justify-center"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              </button>
-            </div>
+            {isSharedResult ? (
+              <>
+                {/* 공유 링크 방문자: CTA 우선 */}
+                <button
+                  onClick={handleRestartClick}
+                  className="w-full h-11 rounded-lg bg-[#0F3D2E] text-white text-[14px] font-bold mb-3"
+                >
+                  내 점수 확인하기
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleKakaoShare}
+                    className="flex-1 h-9 rounded-lg bg-[#FEE500] text-[#191919] text-[11px] font-semibold flex items-center justify-center gap-1"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#191919">
+                      <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                    </svg>
+                    공유
+                  </button>
+                  <button
+                    onClick={handleSaveImage}
+                    disabled={isImageSaving}
+                    className="flex-1 h-9 rounded-lg border border-neutral-200 text-neutral-600 text-[11px] font-semibold disabled:opacity-50"
+                  >
+                    {isImageSaving ? '저장 중' : '이미지 저장'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* 본인 결과: 공유 우선 */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleKakaoShare}
+                    className="flex-1 h-10 rounded-lg bg-[#FEE500] text-[#191919] text-[12px] font-semibold flex items-center justify-center gap-1.5"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#191919">
+                      <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+                    </svg>
+                    공유
+                  </button>
+                  <button
+                    onClick={handleSaveImage}
+                    disabled={isImageSaving}
+                    className="flex-1 h-10 rounded-lg bg-[#0F3D2E] text-white text-[12px] font-semibold disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {isImageSaving ? '저장 중' : '이미지'}
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="h-10 w-10 rounded-lg border border-neutral-200 text-neutral-500 flex items-center justify-center"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
