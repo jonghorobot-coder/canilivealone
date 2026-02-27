@@ -1,5 +1,6 @@
 // 주거 형태 값 상수
 export const HOUSING_TYPES = {
+  OWNED: 'owned',
   RENT_STABLE: 'rent_stable',
   RENT_LOW: 'rent_low',
   GOSIWON: 'gosiwon_share',
@@ -7,8 +8,17 @@ export const HOUSING_TYPES = {
   JEONSE_LOAN: 'jeonse_loan',
 };
 
-// 월세/반전세 유형 (임대료 인상 대비 질문 대상)
-const RENT_TYPES = [HOUSING_TYPES.RENT_STABLE, HOUSING_TYPES.RENT_LOW, HOUSING_TYPES.JEONSE_SAFE];
+// 월세 유형 (임대료 인상 대비 질문 대상) - 전세는 임대료 인상 개념이 아니므로 제외
+const RENT_TYPES = [HOUSING_TYPES.RENT_STABLE, HOUSING_TYPES.RENT_LOW];
+
+// 임대 유형 (계약 안전성 질문 대상) - 자가는 계약 관련 질문 불필요
+const RENTAL_TYPES = [
+  HOUSING_TYPES.RENT_STABLE,
+  HOUSING_TYPES.RENT_LOW,
+  HOUSING_TYPES.GOSIWON,
+  HOUSING_TYPES.JEONSE_SAFE,
+  HOUSING_TYPES.JEONSE_LOAN,
+];
 
 export const questions = [
   // ===== 주거비 (housing) =====
@@ -21,6 +31,7 @@ export const questions = [
     title: '주거 형태',
     question: '독립 후 예상하는 주거 형태는 무엇인가요?',
     options: [
+      { label: '자가 (본인 소유 주택)', value: 'owned', scoreImpact: 0 },
       { label: '월세 (보증금 1,000만원 이상)', value: 'rent_stable', scoreImpact: 0 },
       { label: '월세 (보증금 500만원 미만)', value: 'rent_low', scoreImpact: 0 },
       { label: '고시원 / 쉐어하우스', value: 'gosiwon_share', scoreImpact: 0 },
@@ -29,13 +40,14 @@ export const questions = [
     ],
   },
 
-  // 2. 공통 질문: 주거비 비상자금 (모든 사용자)
+  // 2. 조건부 질문: 주거비 비상자금 (임대 유형만 - 자가는 계약 유지 개념 없음)
   {
     id: 'housing_emergency',
     category: 'housing',
     categoryLabel: '주거비',
     title: '주거비 비상자금',
     question: '소득이 중단될 경우 주거 계약을 유지하기 위한 별도 대비 자금은 몇 개월치입니까?',
+    showWhen: { questionId: 'housing_q1', values: RENTAL_TYPES },
     options: [
       { label: '6개월 이상', value: 'over_6months', scoreImpact: 0 },
       { label: '3~5개월', value: '3_5months', scoreImpact: -15 },
@@ -58,13 +70,14 @@ export const questions = [
     ],
   },
 
-  // 4. 공통 질문: 계약 안전성 (모든 사용자)
+  // 4. 조건부 질문: 계약 안전성 (임대 유형만 - 자가 제외)
   {
     id: 'housing_contract_safety',
     category: 'housing',
     categoryLabel: '주거비',
     title: '계약 안전성',
     question: '전입신고, 확정일자, 보증보험에 대해 이해하고 있나요?',
+    showWhen: { questionId: 'housing_q1', values: RENTAL_TYPES },
     options: [
       { label: '잘 이해하고 준비 예정', value: 'well_prepared', scoreImpact: 0 },
       { label: '일부만 이해', value: 'partial', scoreImpact: -5 },
@@ -538,6 +551,17 @@ export function getCategoryByIndex(index, categories) {
 
 // 주거 유형별 분석 텍스트
 export const HOUSING_ANALYSIS = {
+  [HOUSING_TYPES.OWNED]: {
+    title: '자가 분석',
+    summary: '주거 안정성이 가장 높은 구조입니다.',
+    details: '월세나 전세 부담이 없어 재정적으로 안정적입니다. 주택 유지비와 세금 관리가 핵심입니다.',
+    strategies: [
+      '주택 유지·보수비 월 예산 별도 책정',
+      '재산세, 종합부동산세 납부 일정 파악',
+      '주택 화재보험 등 필수 보험 점검',
+      '장기 수선 계획 수립 (10년 단위)',
+    ],
+  },
   [HOUSING_TYPES.RENT_STABLE]: {
     title: '월세 분석',
     summary: '비교적 안정적인 주거 구조입니다.',
