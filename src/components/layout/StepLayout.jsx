@@ -28,15 +28,15 @@ export function StepLayout({
   // 첫 질문(주거 형태)에 답했는지 확인 - 답하기 전에는 총 질문 수가 확정되지 않음
   const isHousingTypeSelected = !!answers?.housing_q1;
 
-  // 진행률 계산
-  const progressPercent = isQuestionStep
-    ? ((questionIndex + 1) / questions.length) * 100
-    : (currentStep / totalSteps) * 100;
+  // 진행률 계산 - 전체 스텝 기준으로 통일 (인트로 제외)
+  // totalSteps에서 인트로(0)를 제외한 실제 진행 단계 수
+  const visibleTotalSteps = totalSteps; // 지출입력 + 질문들 + 결과
+  const progressPercent = (currentStep / visibleTotalSteps) * 100;
 
-  // 첫 질문 답변 전에는 총 수 표시하지 않음
-  const progressLabel = isQuestionStep
-    ? (isHousingTypeSelected ? `${questionIndex + 1}/${questions.length}` : `${questionIndex + 1}`)
-    : `${currentStep}/${totalSteps}`;
+  // 주거 유형 선택 전에는 총 수 표시하지 않음 (조건부 질문 수가 확정되지 않음)
+  const progressLabel = isHousingTypeSelected
+    ? `${currentStep}/${visibleTotalSteps}`
+    : `${currentStep}`;
 
   return (
     <div className="min-h-dvh flex flex-col bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2]">
