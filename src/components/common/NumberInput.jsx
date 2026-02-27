@@ -50,7 +50,7 @@ export function NumberInput({
         <label htmlFor={inputId} className="block mb-2">
           <span className="text-[13px] font-semibold text-neutral-700 tracking-tight">{label}</span>
           {description && (
-            <span className="block text-[11px] text-neutral-400 mt-0.5">{description}</span>
+            <span className="block text-[11px] text-neutral-500 mt-0.5">{description}</span>
           )}
         </label>
       )}
@@ -69,13 +69,13 @@ export function NumberInput({
           className={`w-full h-11 px-3 pr-12 text-[15px] font-medium text-neutral-800 tabular-nums tracking-tight
                      bg-white border rounded-[10px]
                      focus:outline-none focus:ring-1
-                     transition-colors duration-150 placeholder:text-neutral-300
+                     transition-colors duration-150 placeholder:text-neutral-400
                      ${hasError
                        ? 'border-[#B42318] focus:border-[#B42318] focus:ring-[#B42318]/20'
                        : 'border-neutral-200 focus:border-[#0F3D2E] focus:ring-[#0F3D2E]/20'
                      }`}
         />
-        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-[13px] font-medium">
+        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 text-[13px] font-medium">
           {unit}
         </span>
       </div>

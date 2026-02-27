@@ -24,7 +24,7 @@ export function NotFound() {
           </div>
 
           {/* 텍스트 */}
-          <p className="text-[11px] tracking-[0.1em] text-neutral-400 uppercase font-medium mb-3">
+          <p className="text-[11px] tracking-[0.1em] text-neutral-500 uppercase font-medium mb-3">
             404 Error
           </p>
           <h1 className="text-[22px] font-bold text-neutral-900 tracking-tight mb-2">
@@ -45,7 +45,7 @@ export function NotFound() {
           </Link>
 
           {/* 서브 텍스트 */}
-          <p className="mt-4 text-[13px] text-neutral-400">
+          <p className="mt-4 text-[13px] text-neutral-500">
             독립점수 진단을 시작해보세요
           </p>
         </div>

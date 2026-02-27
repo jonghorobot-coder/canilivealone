@@ -113,7 +113,7 @@ export function QuestionStep({ question }) {
       {/* 절반 진행 토스트 */}
       {showHalfwayToast && (
         <div className="fixed top-20 left-1/2 z-40 -translate-x-1/2 animate-halfway-pop">
-          <div className="bg-white text-neutral-600 px-4 py-2.5 rounded-[10px] border border-neutral-100 shadow-sm">
+          <div className="bg-white text-neutral-600 px-4 py-2.5 rounded-[10px] border border-neutral-200 shadow-sm">
             <span className="text-[13px] font-medium tracking-tight">절반 이상 진행되었습니다</span>
           </div>
         </div>
@@ -176,7 +176,7 @@ export function QuestionStep({ question }) {
                     {option.label}
                   </span>
                   {option.description && (
-                    <span className="text-[11px] text-neutral-400 mt-0.5 block">
+                    <span className="text-[11px] text-neutral-500 mt-0.5 block">
                       {option.description}
                     </span>
                   )}
@@ -188,7 +188,7 @@ export function QuestionStep({ question }) {
 
         {/* 선택 안내 */}
         {!isSelected && (
-          <p className="text-center text-[13px] text-neutral-400 mt-4">
+          <p className="text-center text-[13px] text-neutral-500 mt-4">
             하나를 선택해주세요
           </p>
         )}

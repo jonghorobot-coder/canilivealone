@@ -243,7 +243,7 @@ function AnalysisLoading({ onRetry }) {
             </button>
             <button
               onClick={() => window.location.href = '/'}
-              className="w-full text-neutral-400 text-[13px] hover:text-neutral-600 transition-colors"
+              className="w-full text-neutral-500 text-[13px] hover:text-neutral-600 transition-colors"
             >
               처음으로 돌아가기
             </button>
@@ -585,7 +585,7 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel, isSharedResult = fal
           수입이나 지출이 바뀌었다면<br />
           새로운 점수를 확인해보세요.
         </p>
-        <p className="text-[12px] text-neutral-400 mb-5">
+        <p className="text-[12px] text-neutral-500 mb-5">
           현재 결과는 링크로 저장되어 있어요.
         </p>
         <div className="flex gap-3">
@@ -727,7 +727,7 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
               </button>
             </div>
 
-            <p className="text-[11px] text-neutral-400 text-center mt-3">
+            <p className="text-[11px] text-neutral-500 text-center mt-3">
               결제 금액: 9,900원 (카카오페이)
             </p>
           </>
@@ -765,7 +765,7 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
 
             <button
               onClick={() => setStep('email')}
-              className="w-full text-neutral-400 text-[13px] hover:text-neutral-600 transition-colors"
+              className="w-full text-neutral-500 text-[13px] hover:text-neutral-600 transition-colors"
             >
               이메일 수정하기
             </button>
@@ -797,7 +797,7 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
 
             <div className="bg-neutral-50 rounded-lg p-3 mb-4">
               <div className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-neutral-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-neutral-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-[12px] text-neutral-500 leading-relaxed">
@@ -816,7 +816,7 @@ function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade 
 
             <button
               onClick={handlePayment}
-              className="w-full text-neutral-400 text-[13px] mt-3 hover:text-neutral-600 transition-colors"
+              className="w-full text-neutral-500 text-[13px] mt-3 hover:text-neutral-600 transition-colors"
             >
               결제창 다시 열기
             </button>
@@ -853,16 +853,16 @@ function ScoreMethodology() {
       <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
         <div className="flex-1">
           <span className="text-[13px] font-bold text-neutral-800">점수 산정 방식</span>
-          <p className="text-[11px] text-neutral-400 mt-0.5">7개 카테고리 가중 평균</p>
+          <p className="text-[11px] text-neutral-500 mt-0.5">7개 카테고리 가중 평균</p>
         </div>
-        <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-neutral-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>
       </summary>
-      <div className="px-4 pb-4 space-y-4 border-t border-neutral-100 pt-3">
+      <div className="px-4 pb-4 space-y-4 border-t border-neutral-200 pt-3">
         {/* 카테고리별 가중치 */}
         <div className="space-y-2">
-          <p className="text-[11px] text-neutral-400 uppercase tracking-wide">카테고리별 가중치</p>
+          <p className="text-[11px] text-neutral-500 uppercase tracking-wide">카테고리별 가중치</p>
           <div className="space-y-2">
             {SCORE_METHODOLOGY.categories.map((cat) => (
               <div key={cat.id} className="flex items-center gap-3">
@@ -884,8 +884,8 @@ function ScoreMethodology() {
         </div>
 
         {/* 평가 원칙 */}
-        <div className="space-y-2 pt-2 border-t border-neutral-100">
-          <p className="text-[11px] text-neutral-400 uppercase tracking-wide">평가 원칙</p>
+        <div className="space-y-2 pt-2 border-t border-neutral-200">
+          <p className="text-[11px] text-neutral-500 uppercase tracking-wide">평가 원칙</p>
           <ul className="space-y-1.5">
             {SCORE_METHODOLOGY.principles.map((principle, index) => (
               <li key={index} className="flex items-start gap-2">
@@ -1282,7 +1282,7 @@ export function ResultStep() {
       <div className="min-h-dvh flex items-center justify-center">
         <div className="text-center px-6">
           <p className="text-neutral-500 mb-2 text-[15px]">결과를 불러올 수 없습니다.</p>
-          <p className="text-neutral-400 mb-6 text-[13px]">링크가 만료되었거나 일시적인 오류입니다.</p>
+          <p className="text-neutral-500 mb-6 text-[13px]">링크가 만료되었거나 일시적인 오류입니다.</p>
           <button
             onClick={() => window.location.href = '/'}
             className="btn-primary w-full py-4"
@@ -1328,7 +1328,7 @@ export function ResultStep() {
       )}
 
       {/* 데스크톱: 상단 네비게이션 */}
-      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-white border-b border-neutral-100">
+      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-white border-b border-neutral-200">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-[#0F3D2E] rounded-[8px] flex items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 100 100">
@@ -1374,12 +1374,12 @@ export function ResultStep() {
               <p className="text-[13px] text-neutral-600 mt-2 font-medium">
                 {GRADE_VERDICT[result.grade]}
               </p>
-              <p className="text-[11px] text-neutral-400 mt-4 tracking-wide">
+              <p className="text-[11px] text-neutral-500 mt-4 tracking-wide">
                 현재까지 <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했습니다
               </p>
 
               {/* 등급 구간표 - 기본 접힘 */}
-              <div className="mt-5 pt-5 border-t border-neutral-100">
+              <div className="mt-5 pt-5 border-t border-neutral-200">
                 <button
                   onClick={() => {
                     const newState = !showGradeRange;
@@ -1412,7 +1412,7 @@ export function ResultStep() {
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] ${
                           result.grade === grade
                             ? 'bg-neutral-100 font-semibold'
-                            : 'text-neutral-400'
+                            : 'text-neutral-500'
                         }`}
                       >
                         <span className={`w-2 h-2 rounded-full ${color}`} />
@@ -1428,16 +1428,16 @@ export function ResultStep() {
               </div>
 
               {/* 데스크톱: 하단 액션 영역 */}
-              <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-100 print:hidden">
+              <div className="hidden lg:block mt-6 pt-6 border-t border-neutral-200 print:hidden">
                 {isSharedResult ? (
                   /* 공유 방문자: 내 점수 확인 CTA만 (남의 결과를 공유할 이유 없음) */
                   <>
                     <div className="flex items-center justify-center gap-2 mb-3 text-[12px]">
-                      <span className="text-neutral-400">친구</span>
+                      <span className="text-neutral-500">친구</span>
                       <span className="font-bold text-neutral-700">{result?.score}점</span>
-                      <span className="text-neutral-300">vs</span>
+                      <span className="text-neutral-400">vs</span>
                       <span className="font-bold text-[#0F3D2E]">?점</span>
-                      <span className="text-neutral-400">나</span>
+                      <span className="text-neutral-500">나</span>
                     </div>
                     <button
                       onClick={handleRestartClick}
@@ -1450,7 +1450,7 @@ export function ResultStep() {
                   /* 본인 결과: 공유 버튼 + 다시 진단 */
                   <>
                     <p className="text-[13px] font-semibold text-neutral-800 mb-1">결과 저장 & 공유</p>
-                    <p className="text-[11px] text-neutral-400 mb-3">친구와 점수를 비교해보세요</p>
+                    <p className="text-[11px] text-neutral-500 mb-3">친구와 점수를 비교해보세요</p>
                     <div className="flex gap-2 mb-2">
                       <button
                         onClick={handleSaveImage}
@@ -1475,8 +1475,8 @@ export function ResultStep() {
                       </svg>
                       카카오톡 공유
                     </button>
-                    <div className="mt-4 pt-4 border-t border-neutral-100">
-                      <p className="text-[11px] text-neutral-400 text-center mb-2">수입이나 지출이 바뀌었나요?</p>
+                    <div className="mt-4 pt-4 border-t border-neutral-200">
+                      <p className="text-[11px] text-neutral-500 text-center mb-2">수입이나 지출이 바뀌었나요?</p>
                       <button
                         onClick={handleRestartClick}
                         className="w-full h-10 rounded-[8px] border border-neutral-200 text-neutral-600 text-[12px] font-semibold transition-colors hover:bg-neutral-50"
@@ -1501,19 +1501,19 @@ export function ResultStep() {
           <p className="text-[14px] text-neutral-700 mt-2 font-semibold">
             {GRADE_VERDICT[result.grade]}
           </p>
-          <p className="text-[10px] text-neutral-400 mt-3">
+          <p className="text-[10px] text-neutral-500 mt-3">
             <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단 완료
           </p>
 
           {/* 등급 구간표 - 기본 접힘 */}
-          <div className="mt-4 pt-3 border-t border-neutral-100">
+          <div className="mt-4 pt-3 border-t border-neutral-200">
             <button
               onClick={() => {
                 const newState = !showGradeRange;
                 setShowGradeRange(newState);
                 AnalyticsEvents.gradeRangeToggle(newState);
               }}
-              className="w-full flex items-center justify-center gap-1.5 text-[11px] text-neutral-400 hover:text-neutral-600 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 text-[11px] text-neutral-500 hover:text-neutral-600 transition-colors"
             >
               <span>점수 기준 보기</span>
               <svg
@@ -1539,7 +1539,7 @@ export function ResultStep() {
                     className={`flex items-center gap-2 px-2 py-1 rounded text-[11px] ${
                       result.grade === grade
                         ? 'bg-neutral-100 font-semibold'
-                        : 'text-neutral-400'
+                        : 'text-neutral-500'
                     }`}
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${color}`} />
@@ -1552,7 +1552,7 @@ export function ResultStep() {
           </div>
 
           {/* 모바일 점수 카드 하단 */}
-          <div className="mt-4 pt-4 border-t border-neutral-100 print:hidden">
+          <div className="mt-4 pt-4 border-t border-neutral-200 print:hidden">
             {isSharedResult ? (
               /* 공유 방문자: 내 점수 확인 CTA만 표시 (남의 결과를 공유할 이유 없음) */
               <button
@@ -1623,7 +1623,7 @@ export function ResultStep() {
         if (topRisks.length === 0) return null;
         return (
           <div className="bg-white rounded-xl shadow-sm p-3">
-            <p className="text-[11px] text-neutral-400 uppercase tracking-wide mb-2">주요 리스크 요인</p>
+            <p className="text-[11px] text-neutral-500 uppercase tracking-wide mb-2">주요 리스크 요인</p>
             <div className="flex gap-2">
               {topRisks.map((risk, idx) => (
                 <div
@@ -1756,19 +1756,19 @@ export function ResultStep() {
       <div className="bg-white rounded-xl shadow-sm p-3">
         <div className="grid grid-cols-3 gap-2 text-center">
           <div>
-            <p className="text-[10px] text-neutral-400">월 수입</p>
+            <p className="text-[10px] text-neutral-500">월 수입</p>
             <p className="text-[15px] font-bold text-neutral-800 tabular-nums">
               {(result.income || 0).toLocaleString()}<span className="text-[11px] font-normal">만</span>
             </p>
           </div>
           <div>
-            <p className="text-[10px] text-neutral-400">월 지출</p>
+            <p className="text-[10px] text-neutral-500">월 지출</p>
             <p className="text-[15px] font-bold text-neutral-800 tabular-nums">
               {(result.originalExpenses || 0).toLocaleString()}<span className="text-[11px] font-normal">만</span>
             </p>
           </div>
           <div>
-            <p className="text-[10px] text-neutral-400">여유자금</p>
+            <p className="text-[10px] text-neutral-500">여유자금</p>
             <p className={`text-[15px] font-bold tabular-nums ${
               (result.income || 0) - (result.originalExpenses || 0) >= 0 ? 'text-[#0F3D2E]' : 'text-red-500'
             }`}>
@@ -1780,7 +1780,7 @@ export function ResultStep() {
 
       {/* 카테고리별 점수 */}
       <div className="bg-white rounded-xl shadow-sm p-3">
-        <p className="text-[11px] text-neutral-400 uppercase tracking-wide mb-2">카테고리별 점수</p>
+        <p className="text-[11px] text-neutral-500 uppercase tracking-wide mb-2">카테고리별 점수</p>
         <div className="space-y-2">
           {result.categoryScores && CATEGORY_ORDER.map((key) => {
             const score = result.categoryScores[key];
@@ -1824,13 +1824,13 @@ export function ResultStep() {
                     {getAllCategoryAdvice(result.categoryScores).length}개
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-400 mt-0.5">카테고리별 구체적인 개선 방안</p>
+                <p className="text-[11px] text-neutral-500 mt-0.5">카테고리별 구체적인 개선 방안</p>
               </div>
-              <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-neutral-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div className="px-4 pb-4 space-y-3 border-t border-neutral-100 pt-3">
+            <div className="px-4 pb-4 space-y-3 border-t border-neutral-200 pt-3">
               {getAllCategoryAdvice(result.categoryScores).map((advice) => (
                 <div key={advice.categoryId} className="p-3 bg-neutral-50 rounded-lg space-y-2">
                   <div className="flex items-center gap-2">
@@ -1865,13 +1865,13 @@ export function ResultStep() {
             <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
               <div className="flex-1">
                 <span className="text-[13px] font-bold text-neutral-800">{result.housingAnalysis.title}</span>
-                <p className="text-[11px] text-neutral-400 mt-0.5">선택한 주거 형태 맞춤 전략</p>
+                <p className="text-[11px] text-neutral-500 mt-0.5">선택한 주거 형태 맞춤 전략</p>
               </div>
-              <svg className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-neutral-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div className="px-4 pb-4 border-t border-neutral-100 pt-3">
+            <div className="px-4 pb-4 border-t border-neutral-200 pt-3">
               <p className="text-[12px] text-neutral-600 leading-relaxed mb-3">{result.housingAnalysis.summary}</p>
               <div className="space-y-1.5">
                 {result.housingAnalysis.strategies.slice(0, 3).map((strategy, idx) => (
@@ -1994,7 +1994,7 @@ export function ResultStep() {
               return (
                 <div
                   key={entry.id}
-                  className={`flex items-center justify-between py-2 ${!isLatest ? 'border-t border-neutral-100' : ''}`}
+                  className={`flex items-center justify-between py-2 ${!isLatest ? 'border-t border-neutral-200' : ''}`}
                 >
                   <div className="flex items-center gap-3">
                     {isLatest && (
@@ -2011,7 +2011,7 @@ export function ResultStep() {
                   </div>
                   <div className="flex items-center gap-3">
                     {diff !== null && (
-                      <span className={`text-[11px] ${diff > 0 ? 'text-[#0F3D2E]' : diff < 0 ? 'text-red-500' : 'text-neutral-400'}`}>
+                      <span className={`text-[11px] ${diff > 0 ? 'text-[#0F3D2E]' : diff < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
                         {diff > 0 ? '+' : ''}{diff}
                       </span>
                     )}
@@ -2033,7 +2033,7 @@ export function ResultStep() {
             })}
           </div>
           {history.length > 5 && (
-            <p className="text-[11px] text-neutral-400 text-center mt-3">
+            <p className="text-[11px] text-neutral-500 text-center mt-3">
               최근 5회 기록만 표시됩니다
             </p>
           )}
@@ -2094,7 +2094,7 @@ export function ResultStep() {
 
       {/* 데스크톱: 하단 푸터 */}
       <footer className="hidden lg:block px-8 xl:px-16 py-6 border-t border-neutral-200 bg-white mt-8">
-        <div className="max-w-5xl mx-auto flex items-center justify-between text-neutral-400 text-[13px]">
+        <div className="max-w-5xl mx-auto flex items-center justify-between text-neutral-500 text-[13px]">
           <p>© 2026 독립점수 ver2. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <a href="mailto:canilivealone.help@gmail.com" className="hover:text-neutral-600 transition-colors">canilivealone.help@gmail.com</a>

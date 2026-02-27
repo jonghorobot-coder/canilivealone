@@ -116,7 +116,7 @@ export function IntroStep() {
                 </div>
               </div>
 
-              <p className="text-[11px] text-neutral-400 mt-4 leading-relaxed">
+              <p className="text-[11px] text-neutral-500 mt-4 leading-relaxed">
                 입력하신 정보는 결과 분석에만 활용되며, 진단 결과는 참고용입니다.
               </p>
             </div>
@@ -129,7 +129,7 @@ export function IntroStep() {
                 className={`w-full h-[52px] rounded-[10px] text-[15px] font-semibold transition-colors tracking-tight ${
                   canProceed
                     ? 'bg-[#0F3D2E] hover:bg-[#0a2e22] text-white'
-                    : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                    : 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
                 }`}
                 aria-label="동의하고 진단 시작"
               >
@@ -243,7 +243,7 @@ export function IntroStep() {
                     </div>
                     <div>
                       <p className="text-[14px] font-semibold text-neutral-800">독립 점수</p>
-                      <p className="text-[12px] text-neutral-400">재무 자립도 분석</p>
+                      <p className="text-[12px] text-neutral-500">재무 자립도 분석</p>
                     </div>
                   </div>
 
@@ -266,7 +266,7 @@ export function IntroStep() {
                   </div>
 
                   {/* 카테고리 미리보기 */}
-                  <div className="space-y-3 pt-4 border-t border-neutral-100">
+                  <div className="space-y-3 pt-4 border-t border-neutral-200">
                     {[
                       { label: '주거비', value: 82 },
                       { label: '식비', value: 68 },

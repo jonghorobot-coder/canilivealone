@@ -19,7 +19,7 @@ export function TermsOfService() {
           <h1 className="text-[28px] font-bold text-neutral-900 tracking-tight">
             서비스 이용약관
           </h1>
-          <p className="text-[14px] text-neutral-400 mt-2">
+          <p className="text-[14px] text-neutral-500 mt-2">
             최종 수정일: 2025년 2월 22일
           </p>
         </header>
@@ -152,7 +152,7 @@ export function TermsOfService() {
         </article>
 
         {/* 하단 */}
-        <footer className="mt-12 pt-8 border-t border-neutral-100">
+        <footer className="mt-12 pt-8 border-t border-neutral-200">
           <Link
             to="/"
             className="inline-flex items-center justify-center w-full h-[48px] rounded-[10px] bg-[#0F3D2E] hover:bg-[#0a2e22] text-white text-[15px] font-semibold transition-colors"

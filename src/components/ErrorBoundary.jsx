@@ -56,7 +56,7 @@ class ErrorBoundary extends Component {
               </div>
 
               {/* 텍스트 */}
-              <p className="text-[11px] tracking-[0.1em] text-neutral-400 uppercase font-medium mb-3">
+              <p className="text-[11px] tracking-[0.1em] text-neutral-500 uppercase font-medium mb-3">
                 Error
               </p>
               <h1 className="text-[22px] font-bold text-neutral-900 tracking-tight mb-2">
@@ -86,7 +86,7 @@ class ErrorBoundary extends Component {
               </div>
 
               {/* 서브 텍스트 */}
-              <p className="mt-4 text-[13px] text-neutral-400">
+              <p className="mt-4 text-[13px] text-neutral-500">
                 문제가 지속되면 잠시 후 다시 시도해주세요
               </p>
             </div>

@@ -4,7 +4,7 @@ export function ProgressBar({ current, total, label }) {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-[12px] text-neutral-400 tracking-wide">
+        <span className="text-[12px] text-neutral-500 tracking-wide">
           {label || `${current} / ${total}`}
         </span>
         <span className="text-[12px] font-medium text-neutral-500 tabular-nums">

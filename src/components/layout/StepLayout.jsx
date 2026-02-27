@@ -36,7 +36,7 @@ export function StepLayout({
   return (
     <div className="min-h-dvh flex flex-col bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2]">
       {/* 데스크톱: 상단 네비게이션 */}
-      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-white border-b border-neutral-100">
+      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-white border-b border-neutral-200">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-[#0F3D2E] rounded-[8px] flex items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 100 100">
@@ -87,7 +87,7 @@ export function StepLayout({
 
       {/* Main Content */}
       <main className="flex-1 py-4 px-4 pb-24 space-y-4 lg:py-8 lg:px-8 lg:pb-8 lg:flex lg:justify-center">
-        <div className="lg:w-full lg:max-w-2xl lg:bg-white lg:rounded-2xl lg:shadow-sm lg:border lg:border-neutral-100 lg:p-8">
+        <div className="lg:w-full lg:max-w-2xl lg:bg-white lg:rounded-2xl lg:shadow-sm lg:border lg:border-neutral-200 lg:p-8">
           {/* 타이틀 영역 */}
           {(title || subtitle) && (
             <div className="mb-3 lg:mb-6">
@@ -97,7 +97,7 @@ export function StepLayout({
                 </h1>
               )}
               {subtitle && (
-                <p className="text-[12px] lg:text-[14px] text-neutral-400 mt-1 lg:mt-2 leading-relaxed">
+                <p className="text-[12px] lg:text-[14px] text-neutral-500 mt-1 lg:mt-2 leading-relaxed">
                   {subtitle}
                 </p>
               )}
@@ -110,7 +110,7 @@ export function StepLayout({
           </div>
 
           {/* 데스크톱: 인라인 버튼 */}
-          <div className="hidden lg:flex gap-3 mt-8 pt-6 border-t border-neutral-100">
+          <div className="hidden lg:flex gap-3 mt-8 pt-6 border-t border-neutral-200">
             {showBackButton && currentStep > 0 && (
               <button
                 onClick={handleBack}
@@ -125,7 +125,7 @@ export function StepLayout({
                 disabled={nextDisabled}
                 className={`flex-1 h-12 rounded-[10px] text-[15px] font-semibold transition-colors ${
                   nextDisabled
-                    ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                    ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
                     : 'bg-[#0F3D2E] text-white hover:bg-[#0a2e22]'
                 }`}
               >
@@ -137,7 +137,7 @@ export function StepLayout({
       </main>
 
       {/* 모바일: Footer */}
-      <footer className="lg:hidden sticky bottom-0 z-20 bg-white border-t border-neutral-100 py-2.5 px-4" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
+      <footer className="lg:hidden sticky bottom-0 z-20 bg-white border-t border-neutral-200 py-2.5 px-4" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
         <div className="flex gap-2">
           {showBackButton && currentStep > 0 && (
             <button
@@ -153,7 +153,7 @@ export function StepLayout({
               disabled={nextDisabled}
               className={`flex-1 h-11 rounded-[10px] text-[14px] font-semibold transition-colors ${
                 nextDisabled
-                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                  ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
                   : 'bg-[#0F3D2E] text-white hover:bg-[#0a2e22]'
               }`}
             >
