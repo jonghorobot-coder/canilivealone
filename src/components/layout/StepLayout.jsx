@@ -14,7 +14,7 @@ export function StepLayout({
   onNext,
   onBack,
 }) {
-  const { currentStep, totalSteps, prevStep, stepInfo, questions } = useSurvey();
+  const { currentStep, totalSteps, prevStep, stepInfo, questions, answers } = useSurvey();
   const { isQuestionStep, questionIndex } = stepInfo;
 
   const handleBack = () => {
@@ -25,12 +25,17 @@ export function StepLayout({
     }
   };
 
+  // 첫 질문(주거 형태)에 답했는지 확인 - 답하기 전에는 총 질문 수가 확정되지 않음
+  const isHousingTypeSelected = !!answers?.housing_q1;
+
   // 진행률 계산
   const progressPercent = isQuestionStep
     ? ((questionIndex + 1) / questions.length) * 100
     : (currentStep / totalSteps) * 100;
+
+  // 첫 질문 답변 전에는 총 수 표시하지 않음
   const progressLabel = isQuestionStep
-    ? `${questionIndex + 1}/${questions.length}`
+    ? (isHousingTypeSelected ? `${questionIndex + 1}/${questions.length}` : `${questionIndex + 1}`)
     : `${currentStep}/${totalSteps}`;
 
   return (
