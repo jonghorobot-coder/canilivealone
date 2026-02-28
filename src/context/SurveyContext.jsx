@@ -33,10 +33,10 @@ export const SurveyContext = createContext(null);
 export function SurveyProvider({ children }) {
   const [state, setState, resetState] = useSurveyState(initialState);
 
-  // 현재 답변 상태에 따라 필터링된 질문 목록
+  // 현재 답변 상태와 지출 입력에 따라 필터링된 질문 목록
   const filteredQuestions = useMemo(() => {
-    return getFilteredQuestions(state.answers);
-  }, [state.answers]);
+    return getFilteredQuestions(state.answers, state.expenses);
+  }, [state.answers, state.expenses]);
 
   // 필터링된 질문 기반 카테고리
   const questionCategories = useMemo(() => {
@@ -53,21 +53,17 @@ export function SurveyProvider({ children }) {
 
   const nextStep = useCallback(() => {
     setState((prev) => {
-      const currentFilteredQuestions = getFilteredQuestions(prev.answers);
+      const currentFilteredQuestions = getFilteredQuestions(prev.answers, prev.expenses);
       const currentTotalSteps = currentFilteredQuestions.length + 2;
       const newStep = Math.min(prev.currentStep + 1, currentTotalSteps);
       const isQuestionStep = newStep >= 2 && newStep < currentTotalSteps;
       const questionIndex = isQuestionStep ? newStep - 2 : -1;
 
-      // 다음 스텝이 카테고리의 첫 질문인지 확인
+      // 첫 질문 진입 시에만 모달 표시 (지출입력 → 질문 전환 시)
       let pendingCategoryModal = null;
-      if (isQuestionStep && questionIndex >= 0) {
+      if (isQuestionStep && questionIndex === 0) {
         const nextQuestion = currentFilteredQuestions[questionIndex];
-        const categories = getQuestionCategories(currentFilteredQuestions);
-        const categoryInfo = categories.find(c => c.id === nextQuestion?.category);
-        if (categoryInfo && questionIndex === categoryInfo.startIndex) {
-          pendingCategoryModal = nextQuestion.category;
-        }
+        pendingCategoryModal = nextQuestion?.category || null;
       }
 
       return {

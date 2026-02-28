@@ -483,14 +483,26 @@ export const questions = [
   },
 ];
 
+// 선택적 카테고리 (입력 안 하면 질문 스킵)
+export const OPTIONAL_EXPENSE_CATEGORIES = ['leisure', 'misc'];
+
 /**
  * 현재 답변 상태에 따라 표시할 질문 목록을 필터링합니다.
  * @param {Object} answers - 현재까지의 답변 { questionId: value }
+ * @param {Object} expenses - 지출 입력값 { categoryId: value }
  * @returns {Array} 필터링된 질문 배열
  */
-export function getFilteredQuestions(answers = {}) {
+export function getFilteredQuestions(answers = {}, expenses = {}) {
   return questions.filter((q) => {
-    // showWhen 조건이 없으면 항상 표시
+    // 선택적 카테고리(여가비, 생활잡비)의 질문인 경우
+    // 해당 카테고리에 금액이 입력되지 않았으면 질문 스킵
+    if (OPTIONAL_EXPENSE_CATEGORIES.includes(q.category)) {
+      const expenseValue = expenses[q.category];
+      const hasValue = expenseValue && expenseValue !== '' && parseInt(expenseValue, 10) > 0;
+      if (!hasValue) return false;
+    }
+
+    // showWhen 조건이 없으면 표시
     if (!q.showWhen) return true;
 
     const { questionId, values } = q.showWhen;

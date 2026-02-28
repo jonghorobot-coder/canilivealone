@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, forwardRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { domToPng } from 'modern-screenshot';
 import { useSurvey } from '../../hooks/useSurvey';
@@ -847,9 +847,9 @@ const SCORE_METHODOLOGY = {
 };
 
 // 점수 산정 방식 설명 컴포넌트
-function ScoreMethodology() {
+const ScoreMethodology = forwardRef(function ScoreMethodology(props, ref) {
   return (
-    <details className="bg-white rounded-xl shadow-sm group">
+    <details ref={ref} className="bg-white rounded-xl shadow-sm group">
       <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
         <div className="flex-1">
           <span className="text-[13px] font-bold text-neutral-800">점수 산정 방식</span>
@@ -905,7 +905,7 @@ function ScoreMethodology() {
       </div>
     </details>
   );
-}
+});
 
 export function ResultStep() {
   const [, setSearchParams] = useSearchParams();
@@ -927,6 +927,7 @@ export function ResultStep() {
   const [isPremiumLoading, setIsPremiumLoading] = useState(false);
   const shareCardRef = useRef(null);
   const scrollMilestonesRef = useRef(new Set());
+  const detailsRefs = useRef([]);  // 상세 분석 details 요소들
 
   // 스크롤 깊이 추적 (25%, 50%, 75%, 100%)
   useEffect(() => {
@@ -1082,6 +1083,28 @@ export function ResultStep() {
 
   const handleRestartCancel = () => {
     setShowRestartModal(false);
+  };
+
+  // 상세 분석 섹션으로 스크롤 + 웨이브 애니메이션
+  const handleScrollToDetails = () => {
+    const firstDetails = detailsRefs.current[0];
+    if (firstDetails) {
+      firstDetails.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // 스크롤 완료 후 웨이브 애니메이션
+      setTimeout(() => {
+        detailsRefs.current.forEach((el, index) => {
+          if (el) {
+            setTimeout(() => {
+              el.classList.add('animate-details-pulse');
+              setTimeout(() => {
+                el.classList.remove('animate-details-pulse');
+              }, 1400);
+            }, index * 250);
+          }
+        });
+      }, 300);
+    }
   };
 
   const handleShare = async () => {
@@ -1810,12 +1833,22 @@ export function ResultStep() {
         </div>
       </div>
 
+      {/* 상세 분석 확인하기 버튼 */}
+      <button
+        onClick={handleScrollToDetails}
+        className="w-full py-4 rounded-full bg-[#0F3D2E] text-white font-bold text-[18px] flex items-center justify-center gap-2 hover:bg-[#0a2e22] transition-all shadow-lg active:scale-[0.98]"
+      >
+        <span>상세 분석 확인하기</span>
+        <svg className="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </button>
 
       {/* 상세 분석 영역들 - 통일된 스타일 */}
       <div className="space-y-2">
         {/* 상세 개선 분석 */}
         {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
-          <details className="bg-white rounded-xl shadow-sm group">
+          <details ref={el => detailsRefs.current[0] = el} className="bg-white rounded-xl shadow-sm group">
             <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -1861,7 +1894,7 @@ export function ResultStep() {
 
         {/* 주거 유형별 분석 */}
         {result.housingAnalysis && (
-          <details className="bg-white rounded-xl shadow-sm group">
+          <details ref={el => detailsRefs.current[1] = el} className="bg-white rounded-xl shadow-sm group">
             <summary className="p-4 cursor-pointer flex items-center justify-between list-none">
               <div className="flex-1">
                 <span className="text-[13px] font-bold text-neutral-800">{result.housingAnalysis.title}</span>
@@ -2041,7 +2074,7 @@ export function ResultStep() {
       )}
 
       {/* 점수 산정 방식 설명 */}
-      <ScoreMethodology />
+      <ScoreMethodology ref={el => detailsRefs.current[2] = el} />
 
       {/* 진단받기 CTA - 공유 링크로 들어온 경우 (모바일만, 데스크톱은 사이드바에 있음) */}
       {isSharedResult && (

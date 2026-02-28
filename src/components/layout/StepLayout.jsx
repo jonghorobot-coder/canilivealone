@@ -13,6 +13,7 @@ export function StepLayout({
   nextDisabled = false,
   onNext,
   onBack,
+  animateIn = false,
 }) {
   const { currentStep, totalSteps, prevStep, stepInfo, questions, answers } = useSurvey();
   const { isQuestionStep, questionIndex } = stepInfo;
@@ -39,29 +40,44 @@ export function StepLayout({
     : `${currentStep}`;
 
   return (
-    <div className="min-h-dvh flex flex-col bg-[#FAFAFA] lg:bg-gradient-to-br lg:from-[#f8faf9] lg:to-[#f0f4f2]">
-      {/* 데스크톱: 상단 네비게이션 */}
-      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-white border-b border-neutral-200">
+    <div className="min-h-dvh flex flex-col bg-[#0F3D2E] relative overflow-hidden">
+      {/* 데스크톱: 사이드 장식 - 왼쪽 가장자리에서 잘린 원호 */}
+      <div className="hidden lg:block fixed -left-64 xl:-left-48 top-1/2 -translate-y-1/2 pointer-events-none">
+        <div className="w-[32rem] h-[32rem] rounded-full border border-white/[0.08]" />
+      </div>
+      <div className="hidden lg:block fixed -left-80 xl:-left-64 top-[20%] pointer-events-none">
+        <div className="w-[40rem] h-[40rem] rounded-full border border-white/[0.05]" />
+      </div>
+
+      {/* 데스크톱: 사이드 장식 - 오른쪽 가장자리에서 잘린 원호 */}
+      <div className="hidden lg:block fixed -right-64 xl:-right-48 top-[35%] pointer-events-none">
+        <div className="w-[32rem] h-[32rem] rounded-full border border-white/[0.08]" />
+      </div>
+      <div className="hidden lg:block fixed -right-96 xl:-right-80 top-[55%] pointer-events-none">
+        <div className="w-[48rem] h-[48rem] rounded-full border border-white/[0.05]" />
+      </div>
+      {/* 데스크톱: 상단 네비게이션 - 딥그린 테마 */}
+      <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-[#0a2e22] border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-[#0F3D2E] rounded-[8px] flex items-center justify-center">
+          <div className="w-9 h-9 bg-white/15 rounded-[8px] flex items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 100 100">
               <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
               <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
               <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
             </svg>
           </div>
-          <span className="text-[#0F3D2E] font-bold text-[17px] tracking-tight">독립점수</span>
+          <span className="text-white font-bold text-[20px] tracking-tight">독립점수</span>
         </div>
         {showProgress && (
           <div className="flex items-center gap-4">
-            <span className="text-[13px] text-neutral-500">진행률</span>
-            <div className="w-48 h-2 bg-neutral-100 rounded-full overflow-hidden">
+            <span className="text-[16px] text-white/60">진행률</span>
+            <div className="w-48 h-2 bg-white/20 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#0F3D2E] rounded-full transition-all duration-300"
+                className="h-full bg-white rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[13px] font-medium text-[#0F3D2E] tabular-nums">{progressLabel}</span>
+            <span className="text-[15px] font-semibold text-white tabular-nums">{progressLabel}</span>
           </div>
         )}
       </nav>
@@ -83,26 +99,26 @@ export function StepLayout({
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[11px] text-white/60 flex-shrink-0 tabular-nums">
+            <span className="text-[12px] text-white/60 flex-shrink-0 tabular-nums">
               {progressLabel}
             </span>
           </div>
         )}
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 py-4 px-4 pb-24 space-y-4 lg:py-8 lg:px-8 lg:pb-8 lg:flex lg:justify-center">
-        <div className="lg:w-full lg:max-w-2xl lg:bg-white lg:rounded-2xl lg:shadow-sm lg:border lg:border-neutral-200 lg:p-8">
+      {/* Main Content - 모바일/데스크톱 통일 */}
+      <main className="flex-1 py-5 px-4 pb-24 space-y-5 lg:py-8 lg:pb-8 lg:flex lg:justify-center">
+        <div className="w-full lg:max-w-2xl">
           {/* 타이틀 영역 */}
           {(title || subtitle) && (
-            <div className="mb-3 lg:mb-6">
+            <div className={`mb-6 ${animateIn ? 'animate-stagger animate-stagger-1' : ''}`}>
               {title && (
-                <h1 className="text-[16px] lg:text-[20px] font-semibold text-neutral-800 tracking-tight leading-snug">
+                <h1 className="text-[28px] lg:text-[34px] font-bold text-white tracking-tight leading-snug">
                   {title}
                 </h1>
               )}
               {subtitle && (
-                <p className="text-[12px] lg:text-[14px] text-neutral-500 mt-1 lg:mt-2 leading-relaxed">
+                <p className="text-[17px] lg:text-[18px] text-white/60 mt-2">
                   {subtitle}
                 </p>
               )}
@@ -114,12 +130,12 @@ export function StepLayout({
             {children}
           </div>
 
-          {/* 데스크톱: 인라인 버튼 */}
-          <div className="hidden lg:flex gap-3 mt-8 pt-6 border-t border-neutral-200">
+          {/* 데스크톱: 인라인 버튼 - 모바일 스타일과 통일 */}
+          <div className="hidden lg:flex gap-3 mt-8">
             {showBackButton && currentStep > 0 && (
               <button
                 onClick={handleBack}
-                className="flex-shrink-0 px-6 h-12 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[14px] font-medium hover:bg-neutral-50 transition-colors"
+                className="flex-shrink-0 px-6 h-14 rounded-[12px] border border-white/20 bg-white/10 text-white text-[17px] font-bold hover:bg-white/15 transition-colors"
               >
                 이전
               </button>
@@ -128,10 +144,10 @@ export function StepLayout({
               <button
                 onClick={onNext}
                 disabled={nextDisabled}
-                className={`flex-1 h-12 rounded-[10px] text-[15px] font-semibold transition-colors ${
+                className={`flex-1 h-14 rounded-[12px] text-[18px] font-bold transition-colors ${
                   nextDisabled
-                    ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
-                    : 'bg-[#0F3D2E] text-white hover:bg-[#0a2e22]'
+                    ? 'bg-white/20 text-white/40 cursor-not-allowed'
+                    : 'bg-white text-[#0F3D2E] hover:bg-white/90'
                 }`}
               >
                 {nextLabel}
@@ -141,13 +157,13 @@ export function StepLayout({
         </div>
       </main>
 
-      {/* 모바일: Footer */}
-      <footer className="lg:hidden sticky bottom-0 z-20 bg-white border-t border-neutral-200 py-2.5 px-4" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
-        <div className="flex gap-2">
+      {/* 모바일: Footer - 버튼 스타일 변경 */}
+      <footer className="lg:hidden sticky bottom-0 z-20 bg-[#0F3D2E] border-t border-white/10 py-3 px-4" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+        <div className="flex gap-3">
           {showBackButton && currentStep > 0 && (
             <button
               onClick={handleBack}
-              className="flex-shrink-0 px-4 h-11 rounded-[10px] border border-neutral-200 bg-white text-neutral-600 text-[13px] font-medium hover:bg-neutral-50 transition-colors"
+              className="flex-shrink-0 px-6 h-14 rounded-[12px] border border-white/20 bg-white/10 text-white text-[17px] font-bold hover:bg-white/15 transition-colors"
             >
               이전
             </button>
@@ -156,10 +172,10 @@ export function StepLayout({
             <button
               onClick={onNext}
               disabled={nextDisabled}
-              className={`flex-1 h-11 rounded-[10px] text-[14px] font-semibold transition-colors ${
+              className={`flex-1 h-14 rounded-[12px] text-[18px] font-bold transition-colors ${
                 nextDisabled
-                  ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
-                  : 'bg-[#0F3D2E] text-white hover:bg-[#0a2e22]'
+                  ? 'bg-white/20 text-white/50 cursor-not-allowed'
+                  : 'bg-white text-[#0F3D2E] hover:bg-white/90'
               }`}
             >
               {nextLabel}

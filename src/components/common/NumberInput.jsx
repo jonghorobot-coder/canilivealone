@@ -14,6 +14,7 @@ export function NumberInput({
   className = '',
   max = MAX_VALUE,
   error = '',
+  icon = null,
 }) {
   const inputRef = useRef(null);
   const id = useId();
@@ -22,16 +23,10 @@ export function NumberInput({
 
   const handleChange = (e) => {
     const rawValue = parseNumber(e.target.value);
-
-    // 숫자 외 입력은 parseNumber에서 이미 차단됨
-    // 음수는 parseNumber가 숫자만 추출하므로 불가능
-
-    // 최대값 제한 (1억 이상 차단)
     const numValue = parseInt(rawValue, 10);
     if (!isNaN(numValue) && numValue > max) {
-      return; // 입력 차단
+      return;
     }
-
     onChange(rawValue);
   };
 
@@ -45,42 +40,57 @@ export function NumberInput({
   const hasError = !!error;
 
   return (
-    <div className={className}>
-      {label && (
-        <label htmlFor={inputId} className="block mb-2">
-          <span className="text-[13px] font-semibold text-neutral-700 tracking-tight">{label}</span>
-          {description && (
-            <span className="block text-[11px] text-neutral-500 mt-0.5">{description}</span>
+    <div className={`bg-white rounded-3xl shadow-sm border border-neutral-100 p-6 ${className}`}>
+      <div className="flex items-center gap-4">
+        {/* 왼쪽: 아이콘 */}
+        {icon && (
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E8F3EF] to-[#D1E7DD] flex items-center justify-center flex-shrink-0">
+            {icon}
+          </div>
+        )}
+
+        {/* 중앙: 라벨 + 설명 */}
+        <div className="flex-1 min-w-0">
+          {label && (
+            <label htmlFor={inputId} className="block">
+              <span className="text-[18px] font-bold text-neutral-800 tracking-tight block leading-tight">{label}</span>
+              {description && (
+                <span className="block text-[15px] text-neutral-400 mt-1">{description}</span>
+              )}
+            </label>
           )}
-        </label>
-      )}
-      <div className="relative">
-        <input
-          ref={inputRef}
-          id={inputId}
-          type="text"
-          inputMode="numeric"
-          value={displayValue}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          placeholder={placeholder}
-          aria-invalid={hasError}
-          aria-describedby={hasError ? errorId : undefined}
-          className={`w-full h-11 px-3 pr-12 text-[15px] font-medium text-neutral-800 tabular-nums tracking-tight
-                     bg-white border rounded-[10px]
-                     focus:outline-none focus:ring-1
-                     transition-colors duration-150 placeholder:text-neutral-400
-                     ${hasError
-                       ? 'border-[#B42318] focus:border-[#B42318] focus:ring-[#B42318]/20'
-                       : 'border-neutral-200 focus:border-[#0F3D2E] focus:ring-[#0F3D2E]/20'
-                     }`}
-        />
-        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 text-[13px] font-medium">
-          {unit}
-        </span>
+        </div>
+
+        {/* 오른쪽: 입력창 */}
+        <div className="relative flex-shrink-0">
+          <input
+            ref={inputRef}
+            id={inputId}
+            type="text"
+            inputMode="numeric"
+            value={displayValue}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            placeholder={placeholder}
+            aria-invalid={hasError}
+            aria-describedby={hasError ? errorId : undefined}
+            className={`w-[140px] h-14 px-4 pr-14 text-[20px] font-bold text-neutral-800 tabular-nums text-right
+                       bg-neutral-50 border-2 rounded-2xl
+                       focus:outline-none focus:bg-white
+                       transition-all duration-200 placeholder:text-neutral-300 placeholder:font-normal
+                       ${hasError
+                         ? 'border-red-300 focus:border-red-400'
+                         : 'border-neutral-200 focus:border-[#0F3D2E]'
+                       }`}
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 text-[16px] font-medium pointer-events-none">
+            {unit}
+          </span>
+        </div>
       </div>
+
       {hasError && (
-        <p id={errorId} className="mt-1.5 text-[11px] text-[#B42318] font-medium">{error}</p>
+        <p id={errorId} className="mt-3 text-[15px] text-red-500 font-semibold">{error}</p>
       )}
     </div>
   );

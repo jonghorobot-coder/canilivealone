@@ -249,12 +249,16 @@ const CATEGORY_ORDER = ['housing', 'food', 'fixed', 'transport', 'leisure', 'mis
 /**
  * 모든 카테고리의 개선 조언 반환 (입력 순서대로)
  * @param {Object} categoryScores - 카테고리별 점수 객체
+ * @param {Array} activeCategories - 활성화된 카테고리 목록 (선택적 카테고리 필터링용)
  * @returns {Array} 조언 배열 (stable 제외, 입력 순서대로 정렬)
  */
-export function getAllCategoryAdvice(categoryScores) {
+export function getAllCategoryAdvice(categoryScores, activeCategories = null) {
   if (!categoryScores) return [];
 
-  const adviceList = CATEGORY_ORDER
+  // activeCategories가 제공되면 해당 목록만 사용, 아니면 전체 카테고리 사용
+  const categoriesToCheck = activeCategories || CATEGORY_ORDER;
+
+  const adviceList = categoriesToCheck
     .map((categoryId) => {
       const score = categoryScores[categoryId];
       if (score === undefined) return null;

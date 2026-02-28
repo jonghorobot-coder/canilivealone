@@ -10,6 +10,12 @@ import './index.css';
 // Google Analytics 초기화
 initGA();
 
+// 새로고침 시 스크롤 맨 위로 (브라우저의 scroll restoration 비활성화)
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
 // 인스타그램 등 인앱 브라우저에서 웹뷰가 숨겨졌다가 다시 보일 때 새로고침
 // 인앱 브라우저는 X 눌러도 페이지를 메모리에 유지하므로 이 처리가 필요함
 let hiddenTime = 0;

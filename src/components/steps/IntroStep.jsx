@@ -54,10 +54,10 @@ export function IntroStep() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-[18px] font-bold text-white tracking-tight">
+                  <h2 className="text-[20px] font-bold text-white tracking-tight">
                     서비스 이용 동의
                   </h2>
-                  <p className="text-[13px] text-white/70 mt-0.5">
+                  <p className="text-[15px] text-white/70 mt-0.5">
                     진단을 시작하기 전에 확인해주세요
                   </p>
                 </div>
@@ -87,28 +87,28 @@ export function IntroStep() {
                     )}
                   </div>
                 </div>
-                <span className="text-[15px] font-semibold text-neutral-800">약관 전체 동의</span>
+                <span className="text-[17px] font-bold text-neutral-800">약관 전체 동의</span>
               </label>
 
               {/* 약관 상세 (접힌 형태로 표시) */}
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-[13px] text-neutral-500">개인정보 처리방침</span>
+                  <span className="text-[15px] text-neutral-500">개인정보 처리방침</span>
                   <Link
                     to="/privacy"
                     target="_blank"
-                    className="text-[12px] text-[#0F3D2E] font-medium hover:underline"
+                    className="text-[14px] text-[#0F3D2E] font-semibold hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     보기
                   </Link>
                 </div>
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-[13px] text-neutral-500">서비스 이용약관</span>
+                  <span className="text-[15px] text-neutral-500">서비스 이용약관</span>
                   <Link
                     to="/terms"
                     target="_blank"
-                    className="text-[12px] text-[#0F3D2E] font-medium hover:underline"
+                    className="text-[14px] text-[#0F3D2E] font-semibold hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     보기
@@ -116,7 +116,7 @@ export function IntroStep() {
                 </div>
               </div>
 
-              <p className="text-[11px] text-neutral-500 mt-4 leading-relaxed">
+              <p className="text-[14px] text-neutral-500 mt-4 leading-relaxed">
                 입력하신 정보는 결과 분석에만 활용되며, 진단 결과는 참고용입니다.
               </p>
             </div>
@@ -126,7 +126,7 @@ export function IntroStep() {
               <button
                 onClick={handleConfirm}
                 disabled={!canProceed}
-                className={`w-full h-[52px] rounded-[10px] text-[15px] font-semibold transition-colors tracking-tight ${
+                className={`w-full h-[56px] rounded-[12px] text-[18px] font-bold transition-colors tracking-tight ${
                   canProceed
                     ? 'bg-[#0F3D2E] hover:bg-[#0a2e22] text-white'
                     : 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
@@ -137,7 +137,7 @@ export function IntroStep() {
               </button>
               <button
                 onClick={handleCloseModal}
-                className="w-full h-[44px] rounded-[10px] text-[14px] font-medium text-neutral-500 hover:bg-neutral-100 transition-colors"
+                className="w-full h-[48px] rounded-[10px] text-[16px] font-semibold text-neutral-500 hover:bg-neutral-100 transition-colors"
                 aria-label="취소하고 돌아가기"
               >
                 취소
@@ -159,10 +159,10 @@ export function IntroStep() {
                 <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
               </svg>
             </div>
-            <span className="text-white font-bold text-[18px] tracking-tight">독립점수</span>
+            <span className="text-white font-bold text-[20px] tracking-tight">독립점수</span>
           </div>
           <div className="flex items-center gap-6">
-            <span className="text-white/60 text-[14px]">재무 자립 가능성 분석 서비스</span>
+            <span className="text-white/60 text-[16px]">재무 자립 가능성 분석 서비스</span>
           </div>
         </nav>
 
@@ -184,13 +184,13 @@ export function IntroStep() {
               </div>
 
               {/* 타이틀 */}
-              <p className="text-[10px] lg:text-[11px] tracking-[0.14em] text-white/50 uppercase font-medium mb-2 lg:mb-3">
+              <p className="text-[13px] lg:text-[15px] tracking-[0.14em] text-white/50 uppercase font-medium mb-2 lg:mb-3">
                 Financial Independence Score
               </p>
-              <h1 className="text-[28px] lg:text-[42px] xl:text-[48px] font-bold text-white leading-tight tracking-tight mb-3 lg:mb-4">
+              <h1 className="text-[34px] lg:text-[52px] xl:text-[58px] font-bold text-white leading-tight tracking-tight mb-4 lg:mb-5">
                 독립 점수 진단
               </h1>
-              <p className="text-[14px] lg:text-[17px] text-white/60 leading-relaxed mb-7 lg:mb-8">
+              <p className="text-[17px] lg:text-[20px] text-white/60 leading-relaxed mb-8 lg:mb-10">
                 <span className="lg:hidden">월 수입·지출 구조 기반<br />재무 자립 가능성 분석</span>
                 <span className="hidden lg:inline">월 수입과 지출 구조를 분석하여<br />재무적 독립 가능성을 진단합니다</span>
               </p>
@@ -198,32 +198,32 @@ export function IntroStep() {
               {/* CTA 버튼 */}
               <button
                 onClick={handleStartClick}
-                className="w-full lg:w-auto lg:px-12 h-[54px] lg:h-[56px] rounded-[12px] bg-white text-[#0F3D2E] text-[16px] lg:text-[17px] font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] hover:shadow-[0_6px_28px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 tracking-tight"
+                className="w-full lg:w-auto lg:px-14 h-[58px] lg:h-[62px] rounded-[14px] bg-white text-[#0F3D2E] text-[18px] lg:text-[20px] font-bold shadow-[0_4px_20px_rgba(255,255,255,0.3)] hover:shadow-[0_6px_28px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 tracking-tight"
                 aria-label="독립점수 진단 시작하기"
               >
                 무료 진단 시작하기
               </button>
 
               {/* 신뢰 문구 */}
-              <p className="mt-3 text-[11px] lg:text-[13px] text-white/70 tracking-wide">
+              <p className="mt-4 text-[14px] lg:text-[16px] text-white/70 tracking-wide">
                 모든 정보는 익명으로 안전하게 저장됩니다
               </p>
 
               {/* 데스크톱: 통계 인라인 */}
-              <div className="hidden lg:flex items-center gap-8 mt-10 pt-8 border-t border-white/15">
+              <div className="hidden lg:flex items-center gap-10 mt-12 pt-10 border-t border-white/15">
                 <div>
-                  <span className="text-[28px] font-bold text-white block tabular-nums">2분</span>
-                  <span className="text-[12px] text-white/50">소요 시간</span>
+                  <span className="text-[34px] font-bold text-white block tabular-nums">2분</span>
+                  <span className="text-[15px] text-white/50">소요 시간</span>
                 </div>
-                <div className="h-10 border-l border-white/20" />
+                <div className="h-12 border-l border-white/20" />
                 <div>
-                  <span className="text-[28px] font-bold text-white block tabular-nums">25개</span>
-                  <span className="text-[12px] text-white/50">분석 항목</span>
+                  <span className="text-[34px] font-bold text-white block tabular-nums">25개</span>
+                  <span className="text-[15px] text-white/50">분석 항목</span>
                 </div>
-                <div className="h-10 border-l border-white/20" />
+                <div className="h-12 border-l border-white/20" />
                 <div>
-                  <span className="text-[28px] font-bold text-white block tabular-nums">7개</span>
-                  <span className="text-[12px] text-white/50">카테고리</span>
+                  <span className="text-[34px] font-bold text-white block tabular-nums">7개</span>
+                  <span className="text-[15px] text-white/50">카테고리</span>
                 </div>
               </div>
             </div>
@@ -242,8 +242,8 @@ export function IntroStep() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-[14px] font-semibold text-neutral-800">독립 점수</p>
-                      <p className="text-[12px] text-neutral-500">재무 자립도 분석</p>
+                      <p className="text-[15px] font-semibold text-neutral-800">독립 점수</p>
+                      <p className="text-[13px] text-neutral-500">재무 자립도 분석</p>
                     </div>
                   </div>
 
@@ -273,14 +273,14 @@ export function IntroStep() {
                       { label: '저축', value: 75 },
                     ].map((item) => (
                       <div key={item.label} className="flex items-center gap-3">
-                        <span className="text-[12px] text-neutral-500 w-12">{item.label}</span>
+                        <span className="text-[13px] text-neutral-500 w-12">{item.label}</span>
                         <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#0F3D2E] rounded-full"
                             style={{ width: `${item.value}%` }}
                           />
                         </div>
-                        <span className="text-[12px] font-semibold text-neutral-700 w-8">{item.value}</span>
+                        <span className="text-[13px] font-semibold text-neutral-700 w-8">{item.value}</span>
                       </div>
                     ))}
                   </div>
@@ -296,19 +296,19 @@ export function IntroStep() {
 
         {/* 모바일: 하단 통계 */}
         <div className="lg:hidden w-full max-w-md mx-auto px-6 pb-8" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
-          <div className="pt-4 border-t border-white/15">
+          <div className="pt-5 border-t border-white/15">
             <div className="flex items-center">
               <div className="text-center flex-1 pr-4 border-r border-white/15">
-                <span className="text-[18px] font-semibold text-white block tabular-nums tracking-tight">2분</span>
-                <span className="text-[10px] text-white/50 mt-0.5 block tracking-wide">소요 시간</span>
+                <span className="text-[22px] font-bold text-white block tabular-nums tracking-tight">2분</span>
+                <span className="text-[13px] text-white/50 mt-1 block tracking-wide">소요 시간</span>
               </div>
               <div className="text-center flex-1 px-4 border-r border-white/15">
-                <span className="text-[18px] font-semibold text-white block tabular-nums tracking-tight">25개</span>
-                <span className="text-[10px] text-white/50 mt-0.5 block tracking-wide">분석 항목</span>
+                <span className="text-[22px] font-bold text-white block tabular-nums tracking-tight">25개</span>
+                <span className="text-[13px] text-white/50 mt-1 block tracking-wide">분석 항목</span>
               </div>
               <div className="text-center flex-1 pl-4">
-                <span className="text-[18px] font-semibold text-white block tabular-nums tracking-tight">7개</span>
-                <span className="text-[10px] text-white/50 mt-0.5 block tracking-wide">카테고리</span>
+                <span className="text-[22px] font-bold text-white block tabular-nums tracking-tight">7개</span>
+                <span className="text-[13px] text-white/50 mt-1 block tracking-wide">카테고리</span>
               </div>
             </div>
           </div>
@@ -316,7 +316,7 @@ export function IntroStep() {
 
         {/* 데스크톱: 하단 푸터 */}
         <footer className="hidden lg:block px-8 xl:px-16 py-6 border-t border-white/10">
-          <div className="flex items-center justify-between text-white/40 text-[13px]">
+          <div className="flex items-center justify-between text-white/40 text-[14px]">
             <p>© 2026 독립점수 ver2. All rights reserved.</p>
             <div className="flex items-center gap-6">
               <a href="mailto:canilivealone.help@gmail.com" className="hover:text-white/70 transition-colors">canilivealone.help@gmail.com</a>

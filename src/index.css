@@ -21,7 +21,23 @@ body {
   color: #1a1a1a;
   line-height: 1.55;
   letter-spacing: -0.01em;
-  background: #f7f7f7;
+  background: #0F3D2E;
+}
+
+/* 글래스 카드 (반투명) */
+.card-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+}
+
+/* 설문 카드 (가로 레이아웃 NumberInput용) */
+.card-survey {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  padding: 20px;
 }
 
 /* 카드 공통 */
@@ -121,19 +137,8 @@ input, select, textarea {
 }
 
 /* 원형 점수 게이지 */
-.score-ring-bg {
-  fill: none;
-  stroke: #e5e5e5;
-  stroke-width: 3;
-}
-
 .score-ring-progress {
   fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  transform: rotate(-90deg);
-  transform-origin: center;
-  transition: stroke-dashoffset 1s ease-out;
 }
 
 .score-ring-progress.emerald { stroke: #0F3D2E; }
@@ -180,12 +185,95 @@ input, select, textarea {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+/* 스태거드 등장 애니메이션 - 왼쪽에서 슬라이드 */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-stagger {
+  opacity: 0;
+  animation: slideInLeft 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* 그룹 1: 문구 */
+.animate-stagger-1 { animation-delay: 0.1s; }
+
+/* 그룹 2: 요약 카드 */
+.animate-stagger-2 { animation-delay: 0.4s; }
+
+/* 그룹 3: 흰색 카드들 */
+.animate-stagger-3 { animation-delay: 0.7s; }
+.animate-stagger-4 { animation-delay: 0.85s; }
+.animate-stagger-5 { animation-delay: 1.0s; }
+.animate-stagger-6 { animation-delay: 1.15s; }
+.animate-stagger-7 { animation-delay: 1.3s; }
+.animate-stagger-8 { animation-delay: 1.45s; }
+
+/* 그룹 4: 선택사항 구분 */
+.animate-stagger-9 { animation-delay: 1.7s; }
+.animate-stagger-10 { animation-delay: 1.9s; }
+
+/* 그룹 5: 선택 카드들 */
+.animate-stagger-11 { animation-delay: 2.1s; }
+.animate-stagger-12 { animation-delay: 2.25s; }
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+/* 결과창 동적 그라데이션 배경 */
+@keyframes gradientWave {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.result-gradient-bg {
+  background: linear-gradient(
+    -45deg,
+    #0a2e1f,
+    #0F3D2E,
+    #1a5c45,
+    #0F3D2E,
+    #0a2e1f,
+    #14493a
+  );
+  background-size: 400% 400%;
+  animation: gradientWave 15s ease infinite;
+}
+
+/* 보조 정보 (정보위계 낮음 - 배경 없이 가볍게) */
+.card-secondary {
+  background: transparent;
+  border: none;
+}
+
+/* 메인 카드 (정보위계 높음 - 흰색 카드) */
+.card-main {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* 결과 페이지 컨텐츠 영역 배경 */
+.result-content-bg {
+  background: #f5f5f5;
 }
 
 @keyframes overlayFadeIn {
@@ -242,6 +330,135 @@ input, select, textarea {
 
 .animate-halfway-pop {
   animation: halfwayPop 0.3s ease-out forwards;
+}
+
+/* 아이콘 선 사라지기 애니메이션 */
+@keyframes lineOut {
+  0% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 50;
+  }
+}
+
+.animate-line-out {
+  stroke-dasharray: 100;
+  animation: lineOut 0.25s ease-in forwards;
+}
+
+/* 아이콘 선 그리기 애니메이션 */
+@keyframes lineDraw {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.animate-line-draw {
+  animation: lineDraw 0.5s ease-out forwards;
+}
+
+/* 카테고리 텍스트 변경 애니메이션 - 다음(오른쪽에서) */
+@keyframes categorySlideFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 카테고리 텍스트 변경 애니메이션 - 이전(왼쪽에서) */
+@keyframes categorySlideFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-category-next {
+  animation: categorySlideFromRight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-category-prev {
+  animation: categorySlideFromLeft 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 상세 분석 어텐션 - 스윽 웨이브 효과 */
+@keyframes detailsWave {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: transparent;
+  }
+  40% {
+    transform: scale(1.015);
+    box-shadow: 0 8px 30px rgba(15, 61, 46, 0.2);
+    border-color: rgba(15, 61, 46, 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: transparent;
+  }
+}
+
+@keyframes shimmerWave {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+.animate-details-pulse {
+  animation: detailsWave 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-details-pulse::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(15, 61, 46, 0.06) 30%,
+    rgba(15, 61, 46, 0.12) 50%,
+    rgba(15, 61, 46, 0.06) 70%,
+    transparent 100%
+  );
+  animation: shimmerWave 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
 /* 인쇄 최적화 */
