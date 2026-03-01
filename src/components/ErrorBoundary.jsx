@@ -56,7 +56,7 @@ class ErrorBoundary extends Component {
               </div>
 
               {/* 텍스트 */}
-              <p className="text-[11px] tracking-[0.1em] text-neutral-500 uppercase font-medium mb-3">
+              <p className="text-[12px] tracking-[0.1em] text-neutral-500 uppercase font-medium mb-3">
                 Error
               </p>
               <h1 className="text-[22px] font-bold text-neutral-900 tracking-tight mb-2">

@@ -43,18 +43,18 @@ export function StepLayout({
     <div className="min-h-dvh flex flex-col bg-[#0F3D2E] relative overflow-hidden">
       {/* 데스크톱: 사이드 장식 - 왼쪽 가장자리에서 잘린 원호 */}
       <div className="hidden lg:block fixed -left-64 xl:-left-48 top-1/2 -translate-y-1/2 pointer-events-none">
-        <div className="w-[32rem] h-[32rem] rounded-full border border-white/[0.08]" />
+        <div className="w-[32rem] h-[32rem] rounded-full border-2 border-white/[0.15]" />
       </div>
       <div className="hidden lg:block fixed -left-80 xl:-left-64 top-[20%] pointer-events-none">
-        <div className="w-[40rem] h-[40rem] rounded-full border border-white/[0.05]" />
+        <div className="w-[40rem] h-[40rem] rounded-full border border-white/[0.10]" />
       </div>
 
       {/* 데스크톱: 사이드 장식 - 오른쪽 가장자리에서 잘린 원호 */}
       <div className="hidden lg:block fixed -right-64 xl:-right-48 top-[35%] pointer-events-none">
-        <div className="w-[32rem] h-[32rem] rounded-full border border-white/[0.08]" />
+        <div className="w-[32rem] h-[32rem] rounded-full border-2 border-white/[0.15]" />
       </div>
       <div className="hidden lg:block fixed -right-96 xl:-right-80 top-[55%] pointer-events-none">
-        <div className="w-[48rem] h-[48rem] rounded-full border border-white/[0.05]" />
+        <div className="w-[48rem] h-[48rem] rounded-full border border-white/[0.10]" />
       </div>
       {/* 데스크톱: 상단 네비게이션 - 딥그린 테마 */}
       <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-4 bg-[#0a2e22] border-b border-white/10">
@@ -71,13 +71,13 @@ export function StepLayout({
         {showProgress && (
           <div className="flex items-center gap-4">
             <span className="text-[16px] text-white/60">진행률</span>
-            <div className="w-48 h-2 bg-white/20 rounded-full overflow-hidden">
+            <div className="w-56 h-3 bg-white/20 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[15px] font-semibold text-white tabular-nums">{progressLabel}</span>
+            <span className="text-[16px] font-semibold text-white tabular-nums">{progressLabel}</span>
           </div>
         )}
       </nav>
@@ -93,13 +93,13 @@ export function StepLayout({
                 <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
               </svg>
             </div>
-            <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+            <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[12px] text-white/60 flex-shrink-0 tabular-nums">
+            <span className="text-[14px] text-white/70 font-medium flex-shrink-0 tabular-nums">
               {progressLabel}
             </span>
           </div>

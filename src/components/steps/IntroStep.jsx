@@ -147,7 +147,23 @@ export function IntroStep() {
         </div>
       )}
 
-      <div className="min-h-dvh flex flex-col" style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 40%, #1a5c45 70%, #0F3D2E 100%)' }}>
+      <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ background: 'linear-gradient(165deg, #0a2e1f 0%, #0F3D2E 40%, #1a5c45 70%, #0F3D2E 100%)' }}>
+
+        {/* 데스크톱: 사이드 장식 - 왼쪽 */}
+        <div className="hidden lg:block fixed -left-64 xl:-left-48 top-1/2 -translate-y-1/2 pointer-events-none">
+          <div className="w-[32rem] h-[32rem] rounded-full border-2 border-white/[0.15]" />
+        </div>
+        <div className="hidden lg:block fixed -left-80 xl:-left-64 top-[20%] pointer-events-none">
+          <div className="w-[40rem] h-[40rem] rounded-full border border-white/[0.10]" />
+        </div>
+
+        {/* 데스크톱: 사이드 장식 - 오른쪽 */}
+        <div className="hidden lg:block fixed -right-64 xl:-right-48 top-[35%] pointer-events-none">
+          <div className="w-[32rem] h-[32rem] rounded-full border-2 border-white/[0.15]" />
+        </div>
+        <div className="hidden lg:block fixed -right-96 xl:-right-80 top-[55%] pointer-events-none">
+          <div className="w-[48rem] h-[48rem] rounded-full border border-white/[0.10]" />
+        </div>
 
         {/* 데스크톱: 상단 네비게이션 */}
         <nav className="hidden lg:flex items-center justify-between px-8 xl:px-16 py-5">
@@ -184,7 +200,7 @@ export function IntroStep() {
               </div>
 
               {/* 타이틀 */}
-              <p className="text-[13px] lg:text-[15px] tracking-[0.14em] text-white/50 uppercase font-medium mb-2 lg:mb-3">
+              <p className="text-[14px] lg:text-[15px] tracking-[0.14em] text-white/50 uppercase font-medium mb-2 lg:mb-3">
                 Financial Independence Score
               </p>
               <h1 className="text-[34px] lg:text-[52px] xl:text-[58px] font-bold text-white leading-tight tracking-tight mb-4 lg:mb-5">
@@ -243,7 +259,7 @@ export function IntroStep() {
                     </div>
                     <div>
                       <p className="text-[15px] font-semibold text-neutral-800">독립 점수</p>
-                      <p className="text-[13px] text-neutral-500">재무 자립도 분석</p>
+                      <p className="text-[14px] text-neutral-500">재무 자립도 분석</p>
                     </div>
                   </div>
 
@@ -260,7 +276,7 @@ export function IntroStep() {
                         <span className="text-[36px] font-bold text-neutral-800">75</span>
                       </div>
                     </div>
-                    <span className="inline-block px-4 py-1.5 bg-[#E8F3EF] text-[#0F3D2E] rounded-full text-[13px] font-semibold">
+                    <span className="inline-block px-4 py-1.5 bg-[#E8F3EF] text-[#0F3D2E] rounded-full text-[14px] font-semibold">
                       안정
                     </span>
                   </div>
@@ -273,14 +289,14 @@ export function IntroStep() {
                       { label: '저축', value: 75 },
                     ].map((item) => (
                       <div key={item.label} className="flex items-center gap-3">
-                        <span className="text-[13px] text-neutral-500 w-12">{item.label}</span>
+                        <span className="text-[14px] text-neutral-500 w-12">{item.label}</span>
                         <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#0F3D2E] rounded-full"
                             style={{ width: `${item.value}%` }}
                           />
                         </div>
-                        <span className="text-[13px] font-semibold text-neutral-700 w-8">{item.value}</span>
+                        <span className="text-[14px] font-semibold text-neutral-700 w-8">{item.value}</span>
                       </div>
                     ))}
                   </div>
@@ -300,15 +316,15 @@ export function IntroStep() {
             <div className="flex items-center">
               <div className="text-center flex-1 pr-4 border-r border-white/15">
                 <span className="text-[22px] font-bold text-white block tabular-nums tracking-tight">2분</span>
-                <span className="text-[13px] text-white/50 mt-1 block tracking-wide">소요 시간</span>
+                <span className="text-[14px] text-white/50 mt-1 block tracking-wide">소요 시간</span>
               </div>
               <div className="text-center flex-1 px-4 border-r border-white/15">
                 <span className="text-[22px] font-bold text-white block tabular-nums tracking-tight">25개</span>
-                <span className="text-[13px] text-white/50 mt-1 block tracking-wide">분석 항목</span>
+                <span className="text-[14px] text-white/50 mt-1 block tracking-wide">분석 항목</span>
               </div>
               <div className="text-center flex-1 pl-4">
                 <span className="text-[22px] font-bold text-white block tabular-nums tracking-tight">7개</span>
-                <span className="text-[13px] text-white/50 mt-1 block tracking-wide">카테고리</span>
+                <span className="text-[14px] text-white/50 mt-1 block tracking-wide">카테고리</span>
               </div>
             </div>
           </div>

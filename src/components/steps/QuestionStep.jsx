@@ -272,22 +272,22 @@ export function QuestionStep({ question }) {
       <div className="min-h-dvh flex flex-col bg-[#0F3D2E] relative overflow-hidden">
         {/* 데스크톱: 사이드 장식 - 왼쪽 */}
         <div className="hidden lg:block fixed -left-64 xl:-left-48 top-1/2 -translate-y-1/2 pointer-events-none">
-          <div className="w-[32rem] h-[32rem] rounded-full border border-white/[0.08]" />
+          <div className="w-[32rem] h-[32rem] rounded-full border-2 border-white/[0.15]" />
         </div>
         <div className="hidden lg:block fixed -left-80 xl:-left-64 top-[20%] pointer-events-none">
-          <div className="w-[40rem] h-[40rem] rounded-full border border-white/[0.05]" />
+          <div className="w-[40rem] h-[40rem] rounded-full border border-white/[0.10]" />
         </div>
 
         {/* 데스크톱: 사이드 장식 - 오른쪽 */}
         <div className="hidden lg:block fixed -right-64 xl:-right-48 top-[35%] pointer-events-none">
-          <div className="w-[32rem] h-[32rem] rounded-full border border-white/[0.08]" />
+          <div className="w-[32rem] h-[32rem] rounded-full border-2 border-white/[0.15]" />
         </div>
         <div className="hidden lg:block fixed -right-96 xl:-right-80 top-[55%] pointer-events-none">
-          <div className="w-[48rem] h-[48rem] rounded-full border border-white/[0.05]" />
+          <div className="w-[48rem] h-[48rem] rounded-full border border-white/[0.10]" />
         </div>
 
         {/* 배경 로고 - 하단 위치 (버튼 위) */}
-        <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-[260px] h-[260px] opacity-[0.04] pointer-events-none lg:hidden">
+        <div className="absolute bottom-[85px] left-1/2 -translate-x-1/2 w-[260px] h-[260px] opacity-[0.04] pointer-events-none lg:hidden">
           <svg viewBox="0 0 100 100" className="w-full h-full">
             <path d="M50 15L15 35L50 55L85 35L50 15Z" fill="white"/>
             <path d="M15 50L50 70L85 50" stroke="white" strokeWidth="5" fill="none" strokeLinecap="round"/>
@@ -316,7 +316,7 @@ export function QuestionStep({ question }) {
                 {categoryCurrentIndex}/{categoryQuestionCount}
               </span>
             </div>
-            <div className="w-48 h-2 bg-white/20 rounded-full overflow-hidden">
+            <div className="w-56 h-3 bg-white/20 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white rounded-full"
                 style={{
@@ -342,8 +342,8 @@ export function QuestionStep({ question }) {
             </div>
 
             {/* 진행바 */}
-            <div className="w-36 flex-shrink-0">
-              <div className="h-3.5 bg-white/20 rounded-full overflow-hidden">
+            <div className="w-32 flex-shrink-0">
+              <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#6EE7B7] rounded-full"
                   style={{

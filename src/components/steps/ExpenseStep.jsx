@@ -165,16 +165,17 @@ export function ExpenseStep() {
               value={formatDisplayNumber(income)}
               onChange={(e) => setIncome(parseNumber(e.target.value))}
               placeholder="250"
-              className={`w-[140px] h-14 px-4 pr-14 text-[20px] font-bold text-neutral-800 tabular-nums text-right
+              style={{ fontSize: '22px' }}
+              className={`input-number w-[140px] h-14 px-4 pr-14 font-semibold text-neutral-800 tabular-nums text-right
                          bg-neutral-50 border-2 rounded-2xl
                          focus:outline-none focus:bg-white
-                         transition-all duration-200 placeholder:text-neutral-300 placeholder:font-normal
+                         transition-all duration-200 placeholder:text-neutral-400
                          ${isIncomeZero
                            ? 'border-red-300 focus:border-red-400'
                            : 'border-neutral-200 focus:border-[#0F3D2E]'
                          }`}
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 text-[16px] font-medium pointer-events-none">
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 text-[15px] font-medium pointer-events-none">
               만원
             </span>
           </div>
