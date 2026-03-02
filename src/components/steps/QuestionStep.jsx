@@ -240,28 +240,28 @@ export function QuestionStep({ question }) {
       {/* 설문 시작 안내 오버레이 - 첫 질문 진입 시에만 */}
       {showModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-overlay-bg px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-overlay-bg px-4"
           onClick={handleCloseModal}
         >
           <div
-            className="w-full max-w-[400px] bg-white rounded-2xl shadow-2xl p-7 text-center animate-overlay-content"
+            className="w-full max-w-[360px] sm:max-w-[400px] bg-white rounded-2xl sm:rounded-3xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.3)] p-5 sm:p-7 text-center animate-overlay-content"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-14 h-14 mx-auto bg-[#E8F3EF] border border-[#0F3D2E]/20 rounded-xl flex items-center justify-center">
-              <svg className="w-7 h-7 text-[#0F3D2E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-[#E8F3EF] rounded-2xl flex items-center justify-center shadow-sm">
+              <svg className="w-7 h-7 sm:w-8 sm:h-8 text-[#0F3D2E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
               </svg>
             </div>
-            <h2 className="text-[20px] font-bold text-neutral-800 mt-4 tracking-tight">
+            <h2 className="text-responsive-xl sm:text-[22px] font-bold text-neutral-800 mt-4 sm:mt-5 tracking-tight">
               생활 습관 진단
             </h2>
-            <p className="text-[16px] text-neutral-500 mt-2 leading-[1.6]">
+            <p className="text-responsive-md sm:text-[16px] text-neutral-500 mt-2 leading-relaxed">
               입력하신 금액을 바탕으로<br/>
               카테고리별 생활 습관을 진단합니다
             </p>
             <button
               onClick={handleCloseModal}
-              className="btn-primary w-full h-[56px] text-[18px] font-bold rounded-xl mt-5"
+              className="btn-primary w-full h-12 sm:h-14 text-responsive-lg font-bold rounded-xl mt-5 sm:mt-6 shadow-lg"
             >
               시작하기
             </button>
@@ -329,20 +329,20 @@ export function QuestionStep({ question }) {
         </nav>
 
         {/* 모바일: 상단 헤더 - 카테고리 + 진행바 */}
-        <header className="lg:hidden sticky top-0 z-30 bg-[#0F3D2E] py-4 px-5 border-b border-white/10">
-          <div className="flex items-center justify-end gap-4">
+        <header className="lg:hidden sticky top-0 z-30 bg-[#0F3D2E] py-3 sm:py-4 px-4 sm:px-5 border-b border-white/10">
+          <div className="flex items-center justify-end gap-3 sm:gap-4">
             {/* 카테고리 표시 */}
-            <div className={`flex items-center gap-2.5 ${iconAnimating ? (animationState.isForward ? 'animate-category-next' : 'animate-category-prev') : ''}`}>
-              <span className="text-[18px] font-bold text-white">
+            <div className={`flex items-center gap-2 sm:gap-2.5 ${iconAnimating ? (animationState.isForward ? 'animate-category-next' : 'animate-category-prev') : ''}`}>
+              <span className="text-responsive-lg font-bold text-white">
                 {question.categoryLabel}
               </span>
-              <span className="text-[15px] text-white/60 tabular-nums font-semibold">
+              <span className="text-responsive-base text-white/60 tabular-nums font-semibold">
                 {categoryCurrentIndex}/{categoryQuestionCount}
               </span>
             </div>
 
             {/* 진행바 */}
-            <div className="w-32 flex-shrink-0">
+            <div className="w-28 sm:w-32 flex-shrink-0">
               <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#6EE7B7] rounded-full"
@@ -357,23 +357,23 @@ export function QuestionStep({ question }) {
         </header>
 
         {/* 메인 컨텐츠 */}
-        <main className="flex-1 flex flex-col px-5 py-6 pb-28 lg:py-8 lg:pb-8 relative z-10 lg:justify-center lg:items-center">
+        <main className="flex-1 flex flex-col px-4 sm:px-5 py-5 sm:py-6 pb-24 sm:pb-28 lg:py-8 lg:pb-8 relative z-10 lg:justify-center lg:items-center">
           <div className="w-full lg:max-w-2xl lg:mx-auto">
           {/* 질문 영역 - 아이콘과 함께 */}
-          <div className="flex items-start gap-5 mb-10">
+          <div className="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
             {/* 질문 텍스트 */}
             <div className="flex-1">
-              <h2 className="text-[15px] font-semibold text-white/60 mb-3 tracking-wide">
+              <h2 className="text-responsive-base font-semibold text-white/60 mb-2 sm:mb-3 tracking-wide">
                 {question.title}
               </h2>
-              <h1 className="text-[26px] lg:text-[30px] font-bold text-white leading-snug tracking-tight">
+              <h1 className="text-responsive-3xl lg:text-[30px] font-bold text-white leading-snug tracking-tight">
                 {question.question}
               </h1>
             </div>
 
             {/* 카테고리 아이콘 - 선 그리기 애니메이션 */}
             <div
-              className="w-28 h-28 flex-shrink-0 text-white"
+              className="w-20 h-20 sm:w-28 sm:h-28 flex-shrink-0 text-white"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.3))'
               }}
@@ -387,14 +387,14 @@ export function QuestionStep({ question }) {
           </div>
 
           {/* 선택지 */}
-          <div className="space-y-3.5 flex-1">
+          <div className="space-y-3 sm:space-y-3.5 flex-1">
             {question.options.map((option, index) => (
               <button
                 key={option.value}
                 onClick={() => handleSelect(option.value)}
                 style={{ animationDelay: `${index * 0.04}s` }}
                 className={`
-                  w-full p-5 rounded-2xl text-left transition-all duration-150
+                  w-full p-4 sm:p-5 rounded-2xl text-left transition-all duration-150
                   focus:outline-none animate-option-in
                   ${
                     selectedValue === option.value
@@ -403,9 +403,9 @@ export function QuestionStep({ question }) {
                   }
                 `}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div className={`
-                    w-7 h-7 mt-0.5 rounded-full border-[2.5px] flex items-center justify-center flex-shrink-0
+                    w-6 h-6 sm:w-7 sm:h-7 mt-0.5 rounded-full border-[2.5px] flex items-center justify-center flex-shrink-0
                     transition-colors duration-150
                     ${
                       selectedValue === option.value
@@ -414,13 +414,13 @@ export function QuestionStep({ question }) {
                     }
                   `}>
                     {selectedValue === option.value && (
-                      <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
                   </div>
                   <div className="flex-1">
-                    <span className={`text-[18px] font-bold block tracking-tight ${
+                    <span className={`text-responsive-lg font-bold block tracking-tight ${
                       selectedValue === option.value
                         ? 'text-[#0F3D2E]'
                         : 'text-neutral-800'
@@ -428,7 +428,7 @@ export function QuestionStep({ question }) {
                       {option.label}
                     </span>
                     {option.description && (
-                      <span className="text-[15px] text-neutral-500 mt-1.5 block leading-relaxed">
+                      <span className="text-responsive-base text-neutral-500 mt-1 sm:mt-1.5 block leading-relaxed">
                         {option.description}
                       </span>
                     )}
@@ -462,18 +462,18 @@ export function QuestionStep({ question }) {
         </main>
 
         {/* 모바일: 하단 버튼 */}
-        <footer className="lg:hidden sticky bottom-0 z-20 bg-[#0F3D2E] border-t border-white/10 py-3 px-5" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-          <div className="flex gap-3">
+        <footer className="lg:hidden sticky bottom-0 z-20 bg-[#0F3D2E] border-t border-white/10 py-3 px-4 sm:px-5" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+          <div className="flex gap-2.5 sm:gap-3">
             <button
               onClick={handleBack}
-              className="flex-shrink-0 px-6 h-14 rounded-xl border-2 border-white/30 bg-white/10 text-white text-[17px] font-bold hover:bg-white/20 transition-colors"
+              className="flex-shrink-0 px-5 sm:px-6 h-12 sm:h-14 rounded-xl border border-white/20 bg-white/10 text-white text-responsive-md font-bold hover:bg-white/15 transition-colors"
             >
               이전
             </button>
             <button
               onClick={handleNext}
               disabled={!isSelected}
-              className={`flex-1 h-14 rounded-xl text-[18px] font-bold transition-all duration-200 ${
+              className={`flex-1 h-12 sm:h-14 rounded-xl text-responsive-lg font-bold transition-all duration-200 ${
                 !isSelected
                   ? 'bg-white/20 text-white/50 cursor-not-allowed'
                   : 'bg-white text-[#0F3D2E] hover:bg-white/90 shadow-xl'

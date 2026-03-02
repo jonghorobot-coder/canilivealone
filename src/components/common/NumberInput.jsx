@@ -40,11 +40,11 @@ export function NumberInput({
   const hasError = !!error;
 
   return (
-    <div className={`bg-white rounded-3xl shadow-sm border border-neutral-100 p-6 ${className}`}>
-      <div className="flex items-center gap-4">
+    <div className={`bg-white rounded-3xl shadow-sm border border-neutral-100 p-5 sm:p-6 ${className}`}>
+      <div className="flex items-center gap-3 sm:gap-4">
         {/* 왼쪽: 아이콘 */}
         {icon && (
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E8F3EF] to-[#D1E7DD] flex items-center justify-center flex-shrink-0">
+          <div className="size-responsive-icon-lg rounded-2xl bg-gradient-to-br from-[#E8F3EF] to-[#D1E7DD] flex items-center justify-center flex-shrink-0">
             {icon}
           </div>
         )}
@@ -53,9 +53,9 @@ export function NumberInput({
         <div className="flex-1 min-w-0">
           {label && (
             <label htmlFor={inputId} className="block">
-              <span className="text-[18px] font-bold text-neutral-800 tracking-tight block leading-tight">{label}</span>
+              <span className="text-responsive-lg font-bold text-neutral-800 tracking-tight block leading-tight">{label}</span>
               {description && (
-                <span className="block text-[15px] text-neutral-400 mt-1">{description}</span>
+                <span className="block text-responsive-base text-neutral-400 mt-0.5 sm:mt-1">{description}</span>
               )}
             </label>
           )}
@@ -74,8 +74,7 @@ export function NumberInput({
             placeholder={placeholder}
             aria-invalid={hasError}
             aria-describedby={hasError ? errorId : undefined}
-            style={{ fontSize: '22px' }}
-            className={`input-number w-[140px] h-14 px-4 pr-14 font-semibold text-neutral-800 tabular-nums text-right
+            className={`input-number text-responsive-2xl w-responsive-input h-responsive-input px-3 sm:px-4 pr-12 sm:pr-14 font-semibold text-neutral-800 tabular-nums text-right
                        bg-neutral-50 border-2 rounded-2xl
                        focus:outline-none focus:bg-white
                        transition-all duration-200 placeholder:text-neutral-400
@@ -84,14 +83,14 @@ export function NumberInput({
                          : 'border-neutral-200 focus:border-[#0F3D2E]'
                        }`}
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 text-[15px] font-medium pointer-events-none">
+          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-neutral-400 text-responsive-base font-medium pointer-events-none">
             {unit}
           </span>
         </div>
       </div>
 
       {hasError && (
-        <p id={errorId} className="mt-3 text-[15px] text-red-500 font-semibold">{error}</p>
+        <p id={errorId} className="mt-3 text-responsive-base text-red-500 font-semibold">{error}</p>
       )}
     </div>
   );

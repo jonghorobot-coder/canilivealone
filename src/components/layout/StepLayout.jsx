@@ -83,23 +83,23 @@ export function StepLayout({
       </nav>
 
       {/* 모바일: Header - 그린 배경 */}
-      <header className="lg:hidden sticky top-0 z-30 bg-[#0F3D2E] py-3 px-4">
+      <header className="lg:hidden sticky top-0 z-30 bg-[#0F3D2E] py-2.5 sm:py-3 px-4">
         {showProgress && (
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-white/12 rounded-[7px] flex items-center justify-center flex-shrink-0">
-              <svg width="14" height="14" viewBox="0 0 100 100">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg width="12" height="12" viewBox="0 0 100 100" className="sm:w-3.5 sm:h-3.5">
                 <path d="M50 20L20 35L50 50L80 35L50 20Z" fill="white" opacity="0.9"/>
                 <path d="M20 50L50 65L80 50" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.7"/>
                 <path d="M20 65L50 80L80 65" stroke="white" strokeWidth="6" fill="none" strokeLinecap="round" opacity="0.5"/>
               </svg>
             </div>
-            <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
+            <div className="flex-1 h-1.5 bg-white/15 rounded-full overflow-hidden">
               <div
-                className="h-full bg-white rounded-full transition-all duration-300"
+                className="h-full bg-[#6EE7B7] rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[14px] text-white/70 font-medium flex-shrink-0 tabular-nums">
+            <span className="text-responsive-xs text-white/60 font-medium flex-shrink-0 tabular-nums">
               {progressLabel}
             </span>
           </div>
@@ -107,18 +107,18 @@ export function StepLayout({
       </header>
 
       {/* Main Content - 모바일/데스크톱 통일 */}
-      <main className="flex-1 py-5 px-4 pb-24 space-y-5 lg:py-8 lg:pb-8 lg:flex lg:justify-center">
+      <main className="flex-1 py-4 sm:py-5 px-4 pb-22 sm:pb-24 space-y-4 sm:space-y-5 lg:py-8 lg:pb-8 lg:flex lg:justify-center">
         <div className="w-full lg:max-w-2xl">
           {/* 타이틀 영역 */}
           {(title || subtitle) && (
-            <div className={`mb-6 ${animateIn ? 'animate-stagger animate-stagger-1' : ''}`}>
+            <div className={`mb-5 sm:mb-6 ${animateIn ? 'animate-stagger animate-stagger-1' : ''}`}>
               {title && (
-                <h1 className="text-[28px] lg:text-[34px] font-bold text-white tracking-tight leading-snug">
+                <h1 className="text-responsive-3xl lg:text-[34px] font-bold text-white tracking-tight leading-snug">
                   {title}
                 </h1>
               )}
               {subtitle && (
-                <p className="text-[17px] lg:text-[18px] text-white/60 mt-2">
+                <p className="text-responsive-md lg:text-[18px] text-white/55 mt-1.5 sm:mt-2">
                   {subtitle}
                 </p>
               )}
@@ -126,7 +126,7 @@ export function StepLayout({
           )}
 
           {/* 컨텐츠 */}
-          <div className="space-y-4">
+          <div className="space-y-3.5 sm:space-y-4">
             {children}
           </div>
 
@@ -158,12 +158,12 @@ export function StepLayout({
       </main>
 
       {/* 모바일: Footer - 버튼 스타일 변경 */}
-      <footer className="lg:hidden sticky bottom-0 z-20 bg-[#0F3D2E] border-t border-white/10 py-3 px-4" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-        <div className="flex gap-3">
+      <footer className="lg:hidden sticky bottom-0 z-20 bg-[#0F3D2E] border-t border-white/10 py-2.5 sm:py-3 px-4" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
+        <div className="flex gap-2.5 sm:gap-3">
           {showBackButton && currentStep > 0 && (
             <button
               onClick={handleBack}
-              className="flex-shrink-0 px-6 h-14 rounded-[12px] border border-white/20 bg-white/10 text-white text-[17px] font-bold hover:bg-white/15 transition-colors"
+              className="flex-shrink-0 px-5 sm:px-6 h-12 sm:h-14 rounded-xl border border-white/20 bg-white/8 text-white text-responsive-md font-bold hover:bg-white/12 transition-colors"
             >
               이전
             </button>
@@ -172,10 +172,10 @@ export function StepLayout({
             <button
               onClick={onNext}
               disabled={nextDisabled}
-              className={`flex-1 h-14 rounded-[12px] text-[18px] font-bold transition-colors ${
+              className={`flex-1 h-12 sm:h-14 rounded-xl text-responsive-lg font-bold transition-all duration-200 ${
                 nextDisabled
-                  ? 'bg-white/20 text-white/50 cursor-not-allowed'
-                  : 'bg-white text-[#0F3D2E] hover:bg-white/90'
+                  ? 'bg-white/15 text-white/40 cursor-not-allowed'
+                  : 'bg-white text-[#0F3D2E] hover:bg-white/95 shadow-lg shadow-white/10'
               }`}
             >
               {nextLabel}

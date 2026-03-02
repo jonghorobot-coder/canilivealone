@@ -270,7 +270,7 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       {/* 배경 오버레이 */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-overlay-bg"
@@ -278,12 +278,30 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
       />
 
       {/* 모달 콘텐츠 */}
-      <div className="relative bg-white rounded-2xl w-full max-w-lg max-h-[85vh] overflow-hidden animate-overlay-content shadow-2xl">
+      <div className="relative bg-white rounded-2xl sm:rounded-3xl w-full max-w-lg max-h-[88vh] overflow-hidden animate-overlay-content shadow-[0_25px_60px_-12px_rgba(0,0,0,0.4)]">
         {/* 헤더 */}
-        <div className="sticky top-0 bg-[#0F3D2E] text-white p-4 z-10">
+        <div className="sticky top-0 bg-gradient-to-r from-[#0F3D2E] to-[#14493a] text-white px-4 sm:px-5 py-3.5 sm:py-4 z-10">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-[18px] font-bold">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-white/15 rounded-lg flex items-center justify-center">
+                {step === 'preview' && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                )}
+                {step === 'payment' && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                )}
+                {step === 'complete' && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <h2 className="text-responsive-lg sm:text-[18px] font-bold">
                 {step === 'preview' && '리포트 미리보기'}
                 {step === 'payment' && '결제하기'}
                 {step === 'complete' && '결제 완료'}
@@ -291,9 +309,9 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
             </div>
             <button
               onClick={handleClose}
-              className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -303,32 +321,36 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
         {/* Step 1: 미리보기 */}
         {step === 'preview' && (
           <>
-            <div className="overflow-y-auto max-h-[calc(85vh-200px)]">
+            <div className="overflow-y-auto max-h-[calc(88vh-200px)]">
               {/* 점수 변화 요약 */}
-              <div className="p-4 bg-gradient-to-r from-[#0F3D2E] to-[#1a5c45] text-white">
+              <div className="p-4 sm:p-5 bg-gradient-to-br from-[#0F3D2E] via-[#14493a] to-[#1a5c45] text-white">
                 <div className="flex items-center justify-between">
                   <div className="text-center flex-1">
-                    <p className="text-white/60 text-[12px]">현재</p>
-                    <p className="text-[32px] font-bold tabular-nums">{result.score}</p>
+                    <p className="text-white/60 text-[11px] sm:text-[12px] font-medium mb-1">현재 점수</p>
+                    <p className="text-[30px] sm:text-[36px] font-bold tabular-nums leading-none">{result.score}</p>
+                    <p className="text-white/50 text-[11px] sm:text-[12px] mt-1">점</p>
                   </div>
-                  <div className="flex flex-col items-center px-3">
-                    <svg className="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                    <span className="text-emerald-300 font-bold text-[14px]">+{scoreDiff}</span>
+                  <div className="flex flex-col items-center px-3 sm:px-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-400/20 rounded-full flex items-center justify-center mb-1">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </div>
+                    <span className="text-emerald-300 font-bold text-[13px] sm:text-[15px]">+{scoreDiff}점</span>
                   </div>
                   <div className="text-center flex-1">
-                    <p className="text-emerald-300/80 text-[12px]">목표</p>
-                    <p className="text-[32px] font-bold tabular-nums text-emerald-300">{targetScore}</p>
+                    <p className="text-emerald-300/70 text-[11px] sm:text-[12px] font-medium mb-1">목표 점수</p>
+                    <p className="text-[30px] sm:text-[36px] font-bold tabular-nums text-emerald-300 leading-none">{targetScore}</p>
+                    <p className="text-emerald-300/50 text-[11px] sm:text-[12px] mt-1">점</p>
                   </div>
                 </div>
               </div>
 
               {/* 섹션 1: 카테고리별 상세 분석 */}
-              <div className="p-4 border-b border-neutral-100">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-[#0F3D2E] text-white text-[11px] font-bold px-2 py-0.5 rounded">섹션 1</span>
-                  <span className="text-[15px] font-bold text-neutral-800">카테고리별 상세 분석</span>
+              <div className="p-4 sm:p-5 border-b border-neutral-100">
+                <div className="flex items-center gap-2 sm:gap-2.5 mb-3 sm:mb-4">
+                  <span className="bg-[#0F3D2E] text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md">섹션 1</span>
+                  <span className="text-responsive-md sm:text-[16px] font-bold text-neutral-800">카테고리별 상세 분석</span>
                 </div>
 
                 {/* 실제 카테고리 점수 기반 분석 */}
@@ -338,22 +360,22 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
                       .filter(([_, score]) => score < 70)
                       .slice(0, 2)
                       .map(([key, score]) => (
-                        <div key={key} className="bg-neutral-50 rounded-xl p-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[14px] font-semibold text-neutral-800">
+                        <div key={key} className="bg-neutral-50 rounded-xl sm:rounded-2xl p-3 sm:p-4">
+                          <div className="flex items-center justify-between mb-2 sm:mb-2.5">
+                            <span className="text-responsive-sm sm:text-[15px] font-semibold text-neutral-800">
                               {CATEGORY_LABELS[key] || key}
                             </span>
-                            <span className={`text-[14px] font-bold ${score < 50 ? 'text-red-500' : 'text-amber-500'}`}>
+                            <span className={`text-responsive-sm sm:text-[15px] font-bold ${score < 50 ? 'text-red-500' : 'text-amber-600'}`}>
                               {score}점
                             </span>
                           </div>
-                          <div className="h-2 bg-neutral-200 rounded-full overflow-hidden mb-2">
+                          <div className="h-2 sm:h-2.5 bg-neutral-200 rounded-full overflow-hidden mb-2 sm:mb-2.5">
                             <div
-                              className={`h-full rounded-full ${score < 50 ? 'bg-red-500' : 'bg-amber-500'}`}
+                              className={`h-full rounded-full transition-all duration-500 ${score < 50 ? 'bg-red-500' : 'bg-amber-500'}`}
                               style={{ width: `${score}%` }}
                             />
                           </div>
-                          <p className="text-[13px] text-neutral-600">
+                          <p className="text-responsive-xs sm:text-[14px] text-neutral-600 leading-relaxed">
                             {key === 'housing' && '주거비가 수입 대비 높아요. 리포트에서 최적 주거비 비율과 대안을 안내해드려요.'}
                             {key === 'savings' && '저축률이 목표 대비 낮아요. 자동저축 시스템 구축 방법을 알려드려요.'}
                             {key === 'food' && '식비 지출이 평균보다 높아요. 식비 절약 실전 팁을 제공해요.'}
@@ -369,57 +391,57 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
               </div>
 
               {/* 섹션 2: 맞춤 개선 전략 */}
-              <div className="p-4 border-b border-neutral-100">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-[#0F3D2E] text-white text-[11px] font-bold px-2 py-0.5 rounded">섹션 2</span>
-                  <span className="text-[15px] font-bold text-neutral-800">맞춤 개선 전략</span>
+              <div className="p-4 sm:p-5 border-b border-neutral-100">
+                <div className="flex items-center gap-2 sm:gap-2.5 mb-3 sm:mb-4">
+                  <span className="bg-[#0F3D2E] text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md">섹션 2</span>
+                  <span className="text-responsive-md sm:text-[16px] font-bold text-neutral-800">맞춤 개선 전략</span>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5 sm:space-y-3">
                   {preview?.adjustments?.slice(0, 3).map((adj, idx) => (
-                    <div key={idx} className="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl">
-                      <span className="w-6 h-6 bg-[#0F3D2E] text-white rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0 mt-0.5">
+                    <div key={idx} className="flex items-start gap-2.5 sm:gap-3 p-3 sm:p-4 bg-emerald-50/80 rounded-xl sm:rounded-2xl border border-emerald-100">
+                      <span className="w-6 h-6 sm:w-7 sm:h-7 bg-[#0F3D2E] text-white rounded-lg flex items-center justify-center text-[11px] sm:text-[12px] font-bold flex-shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
-                      <div className="flex-1">
-                        <p className="text-[14px] font-semibold text-neutral-800">{adj.description}</p>
-                        <p className="text-[13px] text-neutral-600 mt-1">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-responsive-sm sm:text-[15px] font-semibold text-neutral-800">{adj.description}</p>
+                        <p className="text-responsive-xs sm:text-[14px] text-neutral-600 mt-1 leading-relaxed">
                           {idx === 0 && '구체적인 실행 방법과 예상 절약 금액을 리포트에서 확인하세요.'}
                           {idx === 1 && '단계별 실행 가이드와 체크리스트를 제공해요.'}
                           {idx === 2 && '비슷한 상황의 성공 사례를 함께 안내해요.'}
                         </p>
                       </div>
-                      <span className="text-[#0F3D2E] font-bold text-[14px] flex-shrink-0">+{adj.scoreDiff}점</span>
+                      <span className="text-emerald-600 font-bold text-responsive-sm sm:text-[15px] flex-shrink-0 bg-white px-2 py-0.5 rounded-md">+{adj.scoreDiff}점</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* 섹션 3: 4주 실행 계획 (일부 블러) */}
-              <div className="p-4 border-b border-neutral-100">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-[#0F3D2E] text-white text-[11px] font-bold px-2 py-0.5 rounded">섹션 3</span>
-                  <span className="text-[15px] font-bold text-neutral-800">4주 실행 계획</span>
+              <div className="p-4 sm:p-5 border-b border-neutral-100">
+                <div className="flex items-center gap-2 sm:gap-2.5 mb-3 sm:mb-4">
+                  <span className="bg-[#0F3D2E] text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md">섹션 3</span>
+                  <span className="text-responsive-md sm:text-[16px] font-bold text-neutral-800">4주 실행 계획</span>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="p-3 border-l-4 border-[#0F3D2E] bg-neutral-50 rounded-r-lg">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[13px] font-bold text-[#0F3D2E]">1주차</span>
-                      <span className="text-[12px] text-neutral-500">현황 분석 & 목표 설정</span>
+                <div className="space-y-2.5 sm:space-y-3">
+                  <div className="p-3 sm:p-4 border-l-4 border-[#0F3D2E] bg-neutral-50 rounded-r-xl">
+                    <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                      <span className="text-responsive-sm sm:text-[14px] font-bold text-[#0F3D2E]">1주차</span>
+                      <span className="text-responsive-xs sm:text-[13px] text-neutral-500">현황 분석 & 목표 설정</span>
                     </div>
-                    <ul className="text-[13px] text-neutral-600 space-y-1">
+                    <ul className="text-responsive-xs sm:text-[14px] text-neutral-600 space-y-1">
                       <li>• 지출 카테고리별 상세 분석</li>
                       <li>• 개선 우선순위 선정</li>
                     </ul>
                   </div>
 
-                  <div className="p-3 border-l-4 border-emerald-400 bg-neutral-50 rounded-r-lg">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[13px] font-bold text-emerald-600">2주차</span>
-                      <span className="text-[12px] text-neutral-500">첫 번째 개선 실행</span>
+                  <div className="p-3 sm:p-4 border-l-4 border-emerald-400 bg-neutral-50 rounded-r-xl">
+                    <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                      <span className="text-responsive-sm sm:text-[14px] font-bold text-emerald-600">2주차</span>
+                      <span className="text-responsive-xs sm:text-[13px] text-neutral-500">첫 번째 개선 실행</span>
                     </div>
-                    <ul className="text-[13px] text-neutral-600 space-y-1">
+                    <ul className="text-responsive-xs sm:text-[14px] text-neutral-600 space-y-1">
                       <li>• 고정비 최적화 적용</li>
                       <li>• 자동저축 시스템 구축</li>
                     </ul>
@@ -427,43 +449,43 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
 
                   {/* 블러 처리 */}
                   <div className="relative">
-                    <div className="space-y-2 blur-sm select-none">
-                      <div className="p-3 border-l-4 border-amber-400 bg-neutral-50 rounded-r-lg">
-                        <span className="text-[13px] text-neutral-400">3주차: 습관 형성 & 모니터링...</span>
+                    <div className="space-y-2.5 blur-[6px] select-none pointer-events-none">
+                      <div className="p-3 sm:p-4 border-l-4 border-amber-400 bg-neutral-50 rounded-r-xl">
+                        <span className="text-responsive-xs sm:text-[14px] text-neutral-400">3주차: 습관 형성 & 모니터링...</span>
                       </div>
-                      <div className="p-3 border-l-4 border-blue-400 bg-neutral-50 rounded-r-lg">
-                        <span className="text-[13px] text-neutral-400">4주차: 점검 & 장기 전략...</span>
+                      <div className="p-3 sm:p-4 border-l-4 border-blue-400 bg-neutral-50 rounded-r-xl">
+                        <span className="text-responsive-xs sm:text-[14px] text-neutral-400">4주차: 점검 & 장기 전략...</span>
                       </div>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/60 to-white flex items-end justify-center pb-2">
-                      <span className="text-[13px] text-neutral-400">+ 상세 체크리스트 포함</span>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/70 to-white flex items-end justify-center pb-3">
+                      <span className="text-responsive-xs sm:text-[13px] text-neutral-500 font-medium">+ 상세 체크리스트 포함</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* 섹션 4: 추가 제공 내용 (블러) */}
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-neutral-300 text-white text-[11px] font-bold px-2 py-0.5 rounded">섹션 4-6</span>
-                  <span className="text-[15px] font-bold text-neutral-400">추가 제공 내용</span>
+              <div className="p-4 sm:p-5">
+                <div className="flex items-center gap-2 sm:gap-2.5 mb-3 sm:mb-4">
+                  <span className="bg-neutral-300 text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md">섹션 4-6</span>
+                  <span className="text-responsive-md sm:text-[16px] font-bold text-neutral-400">추가 제공 내용</span>
                 </div>
 
                 <div className="relative">
-                  <div className="space-y-2 blur-sm select-none">
-                    <div className="p-3 bg-neutral-100 rounded-lg">
-                      <span className="text-neutral-400">비상금 계획 & 안전망 구축</span>
+                  <div className="space-y-2 sm:space-y-2.5 blur-[6px] select-none pointer-events-none">
+                    <div className="p-3 sm:p-4 bg-neutral-100 rounded-xl">
+                      <span className="text-neutral-400 text-responsive-sm sm:text-[14px]">비상금 계획 & 안전망 구축</span>
                     </div>
-                    <div className="p-3 bg-neutral-100 rounded-lg">
-                      <span className="text-neutral-400">독립 후 예상 생활비 시뮬레이션</span>
+                    <div className="p-3 sm:p-4 bg-neutral-100 rounded-xl">
+                      <span className="text-neutral-400 text-responsive-sm sm:text-[14px]">독립 후 예상 생활비 시뮬레이션</span>
                     </div>
-                    <div className="p-3 bg-neutral-100 rounded-lg">
-                      <span className="text-neutral-400">장기 재무 목표 로드맵</span>
+                    <div className="p-3 sm:p-4 bg-neutral-100 rounded-xl">
+                      <span className="text-neutral-400 text-responsive-sm sm:text-[14px]">장기 재무 목표 로드맵</span>
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white flex items-center justify-center">
-                    <div className="bg-[#0F3D2E] text-white px-4 py-2 rounded-full text-[13px] font-semibold">
-                      🔒 결제 후 전체 내용 확인
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-white flex items-center justify-center">
+                    <div className="bg-[#0F3D2E] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-responsive-xs sm:text-[14px] font-semibold shadow-lg">
+                      결제 후 전체 내용 확인
                     </div>
                   </div>
                 </div>
@@ -471,21 +493,21 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
             </div>
 
             {/* 하단: 이메일 입력 & 구매 버튼 */}
-            <div className="sticky bottom-0 bg-white border-t border-neutral-200 p-4">
-              <div className="mb-3">
-                <label className="text-[13px] text-neutral-600 mb-1.5 block">리포트 받을 이메일</label>
+            <div className="sticky bottom-0 bg-white border-t border-neutral-200 p-4 sm:p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+              <div className="mb-3 sm:mb-4">
+                <label className="text-responsive-xs sm:text-[14px] text-neutral-600 font-medium mb-1.5 sm:mb-2 block">리포트 받을 이메일</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="example@email.com"
-                  className={`w-full h-12 px-4 rounded-lg border ${emailError ? 'border-red-400' : 'border-neutral-200'} text-[15px] focus:outline-none focus:border-[#0F3D2E]`}
+                  className={`w-full h-11 sm:h-12 px-3.5 sm:px-4 rounded-xl border-2 ${emailError ? 'border-red-400 bg-red-50' : 'border-neutral-200 bg-neutral-50 focus:bg-white'} text-responsive-md sm:text-[15px] focus:outline-none focus:border-[#0F3D2E] transition-colors`}
                 />
-                {emailError && <p className="text-[13px] text-red-500 mt-1">{emailError}</p>}
+                {emailError && <p className="text-responsive-xs sm:text-[13px] text-red-500 mt-1.5 font-medium">{emailError}</p>}
               </div>
               <button
                 onClick={handleProceedToPayment}
-                className="w-full h-13 py-3.5 rounded-xl bg-[#0F3D2E] text-white text-[15px] font-bold hover:bg-[#0a2e22] transition-colors flex items-center justify-center gap-2"
+                className="w-full h-12 sm:h-14 rounded-xl bg-[#0F3D2E] text-white text-responsive-md sm:text-[16px] font-bold hover:bg-[#0a2e22] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
               >
                 <span>4,900원 결제하기</span>
               </button>
@@ -495,41 +517,41 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
 
         {/* Step 2: 결제 */}
         {step === 'payment' && (
-          <div className="p-5">
-            <div className="text-center mb-5">
-              <div className="w-14 h-14 bg-[#FEE500] rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="#191919">
+          <div className="p-4 sm:p-6">
+            <div className="text-center mb-5 sm:mb-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#FEE500] rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
+                <svg className="w-7 h-7 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="#191919">
                   <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
                 </svg>
               </div>
-              <p className="text-[22px] font-bold text-neutral-800">4,900원</p>
-              <p className="text-[14px] text-neutral-500 mt-1">{email}</p>
+              <p className="text-[24px] sm:text-[28px] font-bold text-neutral-800 mb-1">4,900원</p>
+              <p className="text-responsive-sm sm:text-[15px] text-neutral-500 truncate max-w-[250px] mx-auto">{email}</p>
             </div>
 
             {/* 모바일: 버튼 / 데스크톱: QR */}
             {isMobileDevice() ? (
               <button
                 onClick={handlePayment}
-                className="w-full h-13 py-3.5 rounded-xl bg-[#FEE500] text-[#191919] text-[15px] font-bold hover:bg-[#F5DC00] transition-colors flex items-center justify-center gap-2"
+                className="w-full h-12 sm:h-14 rounded-xl bg-[#FEE500] text-[#191919] text-responsive-md sm:text-[16px] font-bold hover:bg-[#F5DC00] transition-all duration-200 flex items-center justify-center gap-2 shadow-md"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#191919">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="#191919">
                   <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
                 </svg>
                 카카오페이로 결제
               </button>
             ) : (
               <div className="text-center">
-                <p className="text-[14px] text-neutral-600 mb-3">휴대폰으로 QR 스캔</p>
-                <div className="bg-white p-3 rounded-xl inline-block shadow-md border border-neutral-200 mb-4">
+                <p className="text-responsive-sm sm:text-[15px] text-neutral-600 mb-3 sm:mb-4">휴대폰으로 QR 스캔</p>
+                <div className="bg-white p-3 sm:p-4 rounded-2xl inline-block shadow-lg border border-neutral-200 mb-4 sm:mb-5">
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(KAKAOPAY_LINK)}`}
                     alt="카카오페이 QR"
-                    className="w-[160px] h-[160px]"
+                    className="w-[140px] h-[140px] sm:w-[160px] sm:h-[160px]"
                   />
                 </div>
                 <button
                   onClick={() => setStep('complete')}
-                  className="w-full h-13 py-3.5 rounded-xl bg-[#0F3D2E] text-white text-[15px] font-bold hover:bg-[#0a2e22] transition-colors"
+                  className="w-full h-12 sm:h-14 rounded-xl bg-[#0F3D2E] text-white text-responsive-md sm:text-[16px] font-bold hover:bg-[#0a2e22] transition-all duration-200 shadow-lg"
                 >
                   결제 완료했어요
                 </button>
@@ -538,7 +560,7 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
 
             <button
               onClick={() => setStep('preview')}
-              className="w-full text-neutral-400 text-[14px] mt-3 hover:text-neutral-600 transition-colors"
+              className="w-full text-neutral-400 text-responsive-sm sm:text-[15px] mt-3 sm:mt-4 py-2 hover:text-neutral-600 transition-colors font-medium"
             >
               이전으로
             </button>
@@ -547,24 +569,24 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
 
         {/* Step 3: 완료 */}
         {step === 'complete' && (
-          <div className="p-5 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-5 sm:p-6 text-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-5 shadow-lg">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-[20px] font-bold text-neutral-800 mb-2">감사합니다!</h3>
-            <p className="text-[15px] text-neutral-600 leading-relaxed mb-2">
+            <h3 className="text-[22px] sm:text-[24px] font-bold text-neutral-800 mb-2 sm:mb-3">감사합니다!</h3>
+            <p className="text-responsive-md sm:text-[16px] text-neutral-600 leading-relaxed mb-2">
               결제 확인 후 24시간 내<br />
-              <strong>{email}</strong>로<br />
+              <strong className="text-neutral-800">{email}</strong>로<br />
               맞춤 리포트를 보내드릴게요.
             </p>
-            <p className="text-[13px] text-neutral-400 mb-6">
+            <p className="text-responsive-xs sm:text-[14px] text-neutral-400 mb-5 sm:mb-6">
               문의: canilivealone.help@gmail.com
             </p>
             <button
               onClick={handleClose}
-              className="w-full h-13 py-3.5 rounded-xl bg-[#0F3D2E] text-white text-[15px] font-bold hover:bg-[#0a2e22] transition-colors"
+              className="w-full h-12 sm:h-14 rounded-xl bg-[#0F3D2E] text-white text-responsive-md sm:text-[16px] font-bold hover:bg-[#0a2e22] transition-all duration-200 shadow-lg"
             >
               확인
             </button>
@@ -594,12 +616,12 @@ function PremiumScoreCard({ result, preview, onPreviewClick, isVisible }) {
   const isAnimating = isVisible && !hasAnimated && animatedScore > result.score;
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl overflow-hidden ring-1 ring-black/5">
+    <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden ring-1 ring-black/[0.06]">
       {/* 상단 그라데이션 영역 - 점수 애니메이션 */}
-      <div className="bg-gradient-to-br from-[#0F3D2E] via-[#14493a] to-[#1a5c45] p-6 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#0F3D2E] via-[#14493a] to-[#1a5c45] p-5 sm:p-6 relative overflow-hidden">
         {/* 배경 장식 */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-28 sm:w-36 h-28 sm:h-36 bg-white/[0.08] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-20 sm:w-28 h-20 sm:h-28 bg-white/[0.06] rounded-full translate-y-1/2 -translate-x-1/2" />
 
         {/* 애니메이션 중 파티클 효과 */}
         {isAnimating && (
@@ -623,21 +645,21 @@ function PremiumScoreCard({ result, preview, onPreviewClick, isVisible }) {
         )}
 
         {/* 프리미엄 배지 */}
-        <div className="flex items-center justify-between mb-4 relative">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center justify-between mb-4 sm:mb-5 relative">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-white/15 rounded-xl flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <span className="text-white font-bold text-[16px]">점수 상승 리포트</span>
+            <span className="text-white font-bold text-responsive-md sm:text-[17px]">점수 상승 리포트</span>
           </div>
-          <span className="bg-amber-400 text-amber-900 text-[12px] font-bold px-2.5 py-1 rounded-full">PRO</span>
+          <span className="bg-amber-400 text-amber-900 text-[11px] sm:text-[12px] font-bold px-2.5 py-1 rounded-full shadow-sm">PRO</span>
         </div>
 
         {/* 점수 애니메이션 */}
-        <div className="text-center py-4 relative">
-          <p className="text-white/70 text-[14px] mb-1">
+        <div className="text-center py-5 sm:py-6 relative">
+          <p className="text-white/70 text-responsive-sm sm:text-[15px] mb-2">
             {hasAnimated ? '목표 점수' : '현재 점수에서'}
           </p>
           <div className={`relative inline-block transition-transform duration-300 ${hasAnimated ? 'animate-bounce-once' : ''}`}>
@@ -648,24 +670,23 @@ function PremiumScoreCard({ result, preview, onPreviewClick, isVisible }) {
                 style={{ opacity: progress * 0.8 }}
               />
             )}
-            <p className={`text-[80px] font-bold tabular-nums leading-none relative ${
+            <p className={`text-[72px] sm:text-[88px] font-bold tabular-nums leading-none relative ${
               isAnimating ? 'text-emerald-300' : hasAnimated ? 'text-emerald-300' : 'text-white'
             } ${isAnimating ? 'scale-105' : ''} transition-all duration-200`}>
               {displayScore}
-              <span className="text-[36px] text-white/50">점</span>
             </p>
-            {/* 상승 표시 배지 */}
+            {/* 상승 표시 배지 - 숫자 바깥 오른쪽 위 */}
             {hasAnimated && (
-              <div className="absolute -top-1 -right-4 bg-emerald-400 text-[#0F3D2E] px-3 py-1.5 rounded-full text-[15px] font-bold shadow-lg animate-bounce-once">
+              <div className="absolute -top-3 -right-8 sm:-right-10 bg-emerald-400 text-[#0F3D2E] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[13px] sm:text-[15px] font-bold shadow-lg animate-bounce-once">
                 +{scoreDiff}
               </div>
             )}
           </div>
-          <p className={`text-[17px] mt-2 font-medium transition-all duration-300 ${
+          <p className={`text-responsive-md sm:text-[17px] mt-2 font-medium transition-all duration-300 ${
             hasAnimated ? 'text-emerald-300' : 'text-white'
           }`}>
             {hasAnimated
-              ? '까지 올릴 수 있어요! 🎯'
+              ? '점까지 올릴 수 있어요!'
               : isAnimating
                 ? '점수가 올라가는 중...'
                 : '점수를 높여보세요'}
@@ -674,52 +695,52 @@ function PremiumScoreCard({ result, preview, onPreviewClick, isVisible }) {
       </div>
 
       {/* 하단 흰색 영역 - 혜택 & CTA */}
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         {/* 핵심 혜택 */}
-        <div className="space-y-3 mb-5">
-          <div className="flex items-center gap-3">
-            <span className="w-7 h-7 bg-[#E8F3EF] rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-[#0F3D2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="space-y-2.5 sm:space-y-3 mb-4 sm:mb-5">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
               </svg>
             </span>
-            <span className="text-[15px] text-neutral-700">카테고리별 맞춤 개선 전략</span>
+            <span className="text-responsive-sm sm:text-[15px] text-neutral-700">카테고리별 맞춤 개선 전략</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="w-7 h-7 bg-[#E8F3EF] rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-[#0F3D2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
               </svg>
             </span>
-            <span className="text-[15px] text-neutral-700">4주 실행 계획 제공</span>
+            <span className="text-responsive-sm sm:text-[15px] text-neutral-700">4주 실행 계획 제공</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="w-7 h-7 bg-[#E8F3EF] rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-[#0F3D2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
               </svg>
             </span>
-            <span className="text-[15px] text-neutral-700">이메일로 PDF 리포트 발송</span>
+            <span className="text-responsive-sm sm:text-[15px] text-neutral-700">이메일로 PDF 리포트 발송</span>
           </div>
         </div>
 
         {/* 가격 & 미리보기 버튼 */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 p-3 sm:p-4 bg-neutral-50 rounded-xl sm:rounded-2xl">
           <div>
-            <p className="text-[13px] text-neutral-400">리포트 가격</p>
-            <p className="text-[24px] font-bold text-[#0F3D2E]">4,900원</p>
+            <p className="text-responsive-xs sm:text-[13px] text-neutral-400 mb-0.5">리포트 가격</p>
+            <p className="text-[22px] sm:text-[26px] font-bold text-[#0F3D2E] leading-tight">4,900원</p>
           </div>
           <div className="text-right">
-            <p className="text-[13px] text-neutral-400">예상 점수 상승</p>
-            <p className="text-[20px] font-bold text-emerald-600">+{scoreDiff}점</p>
+            <p className="text-responsive-xs sm:text-[13px] text-neutral-400 mb-0.5">예상 점수 상승</p>
+            <p className="text-[18px] sm:text-[22px] font-bold text-emerald-600 leading-tight">+{scoreDiff}점</p>
           </div>
         </div>
 
         <button
           onClick={onPreviewClick}
-          className="w-full h-14 rounded-xl bg-[#0F3D2E] text-white text-[16px] font-bold hover:bg-[#0a2e22] transition-colors flex items-center justify-center gap-2 shadow-lg"
+          className="w-full h-12 sm:h-14 rounded-xl bg-[#0F3D2E] text-white text-responsive-md sm:text-[16px] font-bold hover:bg-[#0a2e22] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
@@ -762,43 +783,43 @@ function AnalysisLoading({ onRetry }) {
 
   return (
     <div className="min-h-dvh flex items-center justify-center p-4 result-gradient-bg">
-      <div className="text-center max-w-sm">
+      <div className="text-center max-w-sm w-full">
         {!showTimeout ? (
           <>
-            <div className="relative w-14 h-14 mx-auto mb-6">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-5 sm:mb-6">
               <div className="absolute inset-0 border-2 border-white/20 rounded-full" />
               <div className="absolute inset-0 border-2 border-white border-t-transparent rounded-full animate-spin" />
             </div>
-            <p className="text-[20px] font-bold text-white mb-3 animate-fade-in" key={messageIndex}>
+            <p className="text-responsive-xl sm:text-[22px] font-bold text-white mb-2.5 sm:mb-3 animate-fade-in" key={messageIndex}>
               {LOADING_MESSAGES[messageIndex]}
             </p>
-            <p className="text-[15px] text-white/60">
+            <p className="text-responsive-md sm:text-[16px] text-white/60">
               입력하신 정보를 분석하고 있습니다
             </p>
           </>
         ) : (
           <>
-            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-7 h-7 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/15 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 sm:w-8 sm:h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-[18px] font-bold text-white mb-2">
+            <p className="text-responsive-xl sm:text-[20px] font-bold text-white mb-2">
               분석이 오래 걸리고 있어요
             </p>
-            <p className="text-[15px] text-white/70 mb-6 leading-relaxed">
+            <p className="text-responsive-md sm:text-[16px] text-white/70 mb-5 sm:mb-6 leading-relaxed">
               네트워크 상태를 확인하시고<br />
               아래 버튼을 눌러 다시 시도해주세요.
             </p>
             <button
               onClick={onRetry}
-              className="w-full h-12 rounded-xl bg-white text-[#0F3D2E] text-[15px] font-semibold hover:bg-white/90 transition-colors mb-3"
+              className="w-full h-11 sm:h-12 rounded-xl bg-white text-[#0F3D2E] text-responsive-md sm:text-[16px] font-bold hover:bg-white/95 transition-all duration-200 mb-3 shadow-lg"
             >
               다시 시도하기
             </button>
             <button
               onClick={() => window.location.href = '/'}
-              className="w-full text-white/60 text-[14px] hover:text-white/80 transition-colors"
+              className="w-full text-white/60 text-responsive-sm hover:text-white/80 transition-colors font-medium"
             >
               처음으로 돌아가기
             </button>
@@ -827,7 +848,7 @@ function ScoreGauge({ score, showScore }) {
   const colorClass = getScoreColor(score); // 최종 점수 기준으로 색상 결정
 
   return (
-    <div className="relative w-[200px] h-[200px] mx-auto">
+    <div className="relative w-[144px] h-[144px] sm:w-[176px] sm:h-[176px] mx-auto">
       <svg className="w-full h-full" viewBox="0 0 200 200">
         <circle cx="100" cy="100" r={radius} className="score-ring-bg" />
         <circle
@@ -839,12 +860,9 @@ function ScoreGauge({ score, showScore }) {
           strokeDashoffset={offset}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-[56px] font-bold tabular-nums text-neutral-800 ${showScore ? '' : 'opacity-0'}`}>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className={`text-[44px] sm:text-[54px] font-bold tabular-nums text-neutral-800 leading-none ${showScore ? '' : 'opacity-0'}`}>
           {displayScore}
-        </span>
-        <span className={`text-neutral-400 text-[15px] font-medium ${showScore ? '' : 'opacity-0'}`}>
-          점
         </span>
       </div>
     </div>
@@ -1083,40 +1101,44 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel, isSharedResult = fal
   // 공유 링크 방문자용 모달
   if (isSharedResult) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
         <div
-          className="absolute inset-0 bg-black/50 animate-overlay-bg"
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-overlay-bg"
           onClick={onCancel}
         />
-        <div className="relative bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content text-center">
+        <div className="relative bg-gradient-to-br from-[#0F3D2E] via-[#14493a] to-[#1a5c45] rounded-2xl sm:rounded-3xl p-5 sm:p-6 max-w-sm w-full shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] animate-overlay-content text-center overflow-hidden">
+          {/* 배경 장식 */}
+          <div className="absolute top-0 right-0 w-28 h-28 bg-white/[0.06] rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/[0.04] rounded-full translate-y-1/2 -translate-x-1/2" />
+
           {/* 점수 비교 시각화 */}
-          <div className="mb-4">
-            <div className="inline-flex items-center gap-3 bg-white/10 rounded-full px-4 py-2">
-              <span className="text-white/70 text-[14px]">친구</span>
-              <span className="text-white font-bold text-[18px]">{friendScore}점</span>
-              <span className="text-white/50">vs</span>
-              <span className="text-[#FEE500] font-bold text-[18px]">?점</span>
-              <span className="text-white/70 text-[14px]">나</span>
+          <div className="mb-4 sm:mb-5 relative">
+            <div className="inline-flex items-center gap-2.5 sm:gap-3 bg-white/10 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 border border-white/10">
+              <span className="text-white/60 text-responsive-xs sm:text-[14px]">친구</span>
+              <span className="text-white font-bold text-responsive-lg sm:text-[20px] tabular-nums">{friendScore}점</span>
+              <span className="text-white/40 text-responsive-sm">vs</span>
+              <span className="text-amber-300 font-bold text-responsive-lg sm:text-[20px]">?점</span>
+              <span className="text-white/60 text-responsive-xs sm:text-[14px]">나</span>
             </div>
           </div>
 
-          <h3 className="text-[18px] font-bold text-white mb-2">
+          <h3 className="text-responsive-xl sm:text-[20px] font-bold text-white mb-2 relative">
             나는 몇 점일까?
           </h3>
-          <p className="text-[15px] text-white/70 mb-5 leading-relaxed">
+          <p className="text-responsive-sm sm:text-[15px] text-white/70 mb-5 sm:mb-6 leading-relaxed relative">
             수입과 지출만 입력하면 끝!<br />
-            <span className="text-white/50 text-[14px]">2분 · 무료 · 회원가입 없음</span>
+            <span className="text-white/50 text-responsive-xs sm:text-[14px]">2분 · 무료 · 회원가입 없음</span>
           </p>
 
           <button
             onClick={onConfirm}
-            className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-100 transition-colors shadow-lg mb-3"
+            className="w-full h-11 sm:h-12 rounded-xl bg-white text-[#0F3D2E] text-responsive-md sm:text-[16px] font-bold hover:bg-white/95 transition-all duration-200 shadow-lg mb-3 relative"
           >
             나도 진단받기
           </button>
           <button
             onClick={onCancel}
-            className="w-full text-white/50 text-[14px] hover:text-white/70 transition-colors"
+            className="w-full text-white/50 text-responsive-sm sm:text-[15px] py-2 hover:text-white/70 transition-colors font-medium relative"
           >
             나중에 할게요
           </button>
@@ -1127,32 +1149,32 @@ function RestartConfirmModal({ isOpen, onConfirm, onCancel, isSharedResult = fal
 
   // 본인 재시작용 모달
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       <div
-        className="absolute inset-0 bg-black/50 animate-overlay-bg"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-overlay-bg"
         onClick={onCancel}
       />
-      <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content">
-        <h3 className="text-[17px] font-bold text-neutral-800 mb-2">
+      <div className="relative bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 max-w-sm w-full shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] animate-overlay-content">
+        <h3 className="text-responsive-lg sm:text-[18px] font-bold text-neutral-800 mb-2">
           다시 진단받으시겠어요?
         </h3>
-        <p className="text-[14px] text-neutral-500 mb-2 leading-relaxed">
+        <p className="text-responsive-sm sm:text-[15px] text-neutral-500 mb-2 leading-relaxed">
           수입이나 지출이 바뀌었다면<br />
           새로운 점수를 확인해보세요.
         </p>
-        <p className="text-[14px] text-neutral-500 mb-5">
+        <p className="text-responsive-sm sm:text-[15px] text-neutral-500 mb-5">
           현재 결과는 링크로 저장되어 있어요.
         </p>
-        <div className="flex gap-3">
+        <div className="flex gap-2.5 sm:gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 h-12 rounded-[10px] border border-neutral-200 text-neutral-600 text-[14px] font-semibold hover:bg-neutral-50 transition-colors"
+            className="flex-1 h-11 sm:h-12 rounded-xl border border-neutral-200 text-neutral-600 text-responsive-sm sm:text-[15px] font-semibold hover:bg-neutral-50 transition-colors"
           >
             취소
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors"
+            className="flex-1 h-11 sm:h-12 rounded-xl bg-[#0F3D2E] text-white text-responsive-sm sm:text-[15px] font-bold hover:bg-[#0a2e22] transition-all duration-200 shadow-lg"
           >
             다시 진단받기
           </button>
@@ -1426,30 +1448,30 @@ const SCORE_METHODOLOGY = {
 const ScoreMethodology = forwardRef(function ScoreMethodology(props, ref) {
   return (
     <details ref={ref} className="bg-white rounded-2xl shadow-md group">
-      <summary className="p-5 cursor-pointer flex items-center justify-between list-none">
+      <summary className="p-4 sm:p-5 cursor-pointer flex items-center justify-between list-none">
         <div className="flex-1">
-          <span className="text-[18px] font-bold text-neutral-800">점수 산정 방식</span>
-          <p className="text-[15px] text-neutral-500 mt-1">7개 카테고리 가중 평균</p>
+          <span className="text-responsive-lg font-bold text-neutral-800">점수 산정 방식</span>
+          <p className="text-responsive-base text-neutral-500 mt-1">7개 카테고리 가중 평균</p>
         </div>
-        <svg className="w-5 h-5 text-neutral-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>
       </summary>
-      <div className="px-5 pb-5 space-y-4 border-t border-neutral-200 pt-4">
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-4 border-t border-neutral-100 pt-4">
         {/* 카테고리별 가중치 */}
         <div className="space-y-3">
-          <p className="text-[15px] text-neutral-600 font-medium">카테고리별 가중치</p>
-          <div className="space-y-2.5">
+          <p className="text-responsive-sm sm:text-[15px] text-neutral-700 font-semibold">카테고리별 가중치</p>
+          <div className="space-y-2.5 sm:space-y-3">
             {SCORE_METHODOLOGY.categories.map((cat) => (
               <div key={cat.id} className="flex items-center gap-3">
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[15px] font-medium text-neutral-700">{cat.label}</span>
-                    <span className="text-[15px] font-semibold text-[#0F3D2E] tabular-nums">{cat.weight}%</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-responsive-sm sm:text-[15px] font-medium text-neutral-700">{cat.label}</span>
+                    <span className="text-responsive-sm sm:text-[15px] font-bold text-[#0F3D2E] tabular-nums">{cat.weight}%</span>
                   </div>
-                  <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                  <div className="h-2 sm:h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#0F3D2E] rounded-full"
+                      className="h-full bg-[#0F3D2E] rounded-full transition-all duration-500"
                       style={{ width: `${cat.weight * 4}%` }}
                     />
                   </div>
@@ -1460,21 +1482,21 @@ const ScoreMethodology = forwardRef(function ScoreMethodology(props, ref) {
         </div>
 
         {/* 평가 원칙 */}
-        <div className="space-y-3 pt-3 border-t border-neutral-200">
-          <p className="text-[15px] text-neutral-600 font-medium">평가 원칙</p>
-          <ul className="space-y-2">
+        <div className="space-y-3 pt-3 sm:pt-4 border-t border-neutral-100">
+          <p className="text-responsive-sm sm:text-[15px] text-neutral-700 font-semibold">평가 원칙</p>
+          <ul className="space-y-2 sm:space-y-2.5">
             {SCORE_METHODOLOGY.principles.map((principle, index) => (
-              <li key={index} className="flex items-start gap-2">
-                <span className="text-[#0F3D2E] text-[13px] mt-0.5">●</span>
-                <span className="text-[15px] text-neutral-600 leading-relaxed">{principle}</span>
+              <li key={index} className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0F3D2E] mt-2 flex-shrink-0" />
+                <span className="text-responsive-sm sm:text-[15px] text-neutral-600 leading-relaxed">{principle}</span>
               </li>
             ))}
           </ul>
         </div>
 
         {/* 한계 안내 */}
-        <div className="p-4 bg-neutral-50 rounded-xl">
-          <p className="text-[14px] text-neutral-500 leading-relaxed">
+        <div className="p-3.5 sm:p-4 bg-neutral-50 rounded-xl sm:rounded-2xl">
+          <p className="text-responsive-xs sm:text-[14px] text-neutral-500 leading-relaxed">
             {SCORE_METHODOLOGY.disclaimer}
           </p>
         </div>
@@ -2010,36 +2032,39 @@ export function ResultStep() {
             {/* 점수 카드 */}
             <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
               <ScoreGauge score={result.score} showScore={showScore} />
-              <div className={`inline-flex items-center gap-2 px-6 py-3 mt-5 rounded-full ${gradeStyle.bg} border-2 ${gradeStyle.border} ${showGrade ? 'animate-grade-reveal' : 'opacity-0'}`}>
-                <span className={`${gradeStyle.text} font-bold text-[18px]`}>{result.grade}</span>
+
+              <div className="mt-5">
+                <div className={`inline-flex items-center px-5 py-2 rounded-full ${gradeStyle.bg} ${showGrade ? 'animate-grade-reveal' : 'opacity-0'}`}>
+                  <span className={`${gradeStyle.text} font-bold text-[15px]`}>{result.grade}</span>
+                </div>
+                <p className="text-[20px] text-neutral-700 mt-3 font-semibold leading-snug">
+                  {GRADE_VERDICT[result.grade]}
+                </p>
               </div>
-              <p className="text-[24px] text-neutral-900 mt-5 font-bold leading-tight tracking-tight">
-                {GRADE_VERDICT[result.grade]}
-              </p>
 
               {/* 적자 경고 */}
               {result.details?.riskFlags?.some(flag => flag.type === 'income_insufficient') && (
-                <div className="bg-red-50 rounded-2xl p-4 mt-6 text-left">
+                <div className="bg-red-50 rounded-xl p-4 mt-6 text-left">
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-11 h-11 bg-red-100 rounded-full flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
                       <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-[17px] font-bold text-red-700">
+                      <p className="text-[16px] font-bold text-red-700">
                         매달 {Math.abs((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}만원 적자
                       </p>
-                      <p className="text-[14px] text-red-500 mt-0.5">독립 전 지출 조정이 필요해요</p>
+                      <p className="text-[13px] text-red-500 mt-0.5">독립 전 지출 조정이 필요해요</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* 상세 분석 확인하기 버튼 - 카드 안에 */}
+              {/* 상세 분석 버튼 */}
               <button
                 onClick={handleScrollToDetails}
-                className="w-full py-4 mt-6 rounded-2xl bg-[#0F3D2E] text-white font-bold text-[17px] flex items-center justify-center gap-2 hover:bg-[#0a2e22] transition-all active:scale-[0.98]"
+                className="w-full h-14 mt-6 rounded-xl bg-[#0F3D2E] text-white font-bold text-[16px] flex items-center justify-center gap-2 hover:bg-[#0a2e22] transition-colors active:scale-[0.98]"
               >
                 <span>상세 분석 보기</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2090,44 +2115,46 @@ export function ResultStep() {
           <div className="lg:col-span-2 space-y-5 mt-4 lg:mt-0">
 
         {/* ========== 모바일 히어로 섹션 ========== */}
-        {/* 점수 카드 - 충분한 여백, 핵심 정보만 */}
-        <div className="lg:hidden bg-white rounded-3xl shadow-xl p-8 text-center">
+        <div className="lg:hidden bg-white rounded-3xl shadow-xl p-5 sm:p-7 text-center">
+          {/* 점수 게이지 - 히어로 */}
           <ScoreGauge score={result.score} showScore={showScore} />
 
-          <div className={`inline-flex items-center gap-2 px-6 py-3 mt-5 rounded-full ${gradeStyle.bg} border-2 ${gradeStyle.border} ${showGrade ? 'animate-grade-reveal' : 'opacity-0'}`}>
-            <span className={`${gradeStyle.text} font-bold text-[18px]`}>{result.grade}</span>
+          {/* 등급 + 평가 */}
+          <div className="mt-4 sm:mt-5">
+            <div className={`inline-flex items-center px-4 py-1.5 rounded-full ${gradeStyle.bg} ${showGrade ? 'animate-grade-reveal' : 'opacity-0'}`}>
+              <span className={`${gradeStyle.text} font-bold text-[14px]`}>{result.grade}</span>
+            </div>
+            <p className="text-[17px] sm:text-[19px] text-neutral-700 mt-2.5 font-semibold leading-snug">
+              {GRADE_VERDICT[result.grade]}
+            </p>
           </div>
-
-          <p className="text-[24px] text-neutral-900 mt-5 font-bold leading-tight tracking-tight">
-            {GRADE_VERDICT[result.grade]}
-          </p>
 
           {/* 적자 경고 */}
           {result.details?.riskFlags?.some(flag => flag.type === 'income_insufficient') && (
-            <div className="bg-red-50 rounded-2xl p-4 mt-6 text-left">
+            <div className="bg-red-50 rounded-xl p-3.5 mt-5 text-left">
               <div className="flex items-center gap-3">
-                <div className="flex-shrink-0 w-11 h-11 bg-red-100 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex-shrink-0 w-9 h-9 bg-red-100 rounded-full flex items-center justify-center">
+                  <svg className="w-4.5 h-4.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[17px] font-bold text-red-700">
+                  <p className="text-[14px] font-bold text-red-700">
                     매달 {Math.abs((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}만원 적자
                   </p>
-                  <p className="text-[14px] text-red-500 mt-0.5">독립 전 지출 조정이 필요해요</p>
+                  <p className="text-[12px] text-red-500 mt-0.5">독립 전 지출 조정이 필요해요</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* 상세 분석 확인하기 버튼 - 카드 안에 배치 */}
+          {/* 상세 분석 버튼 - 프라이머리 */}
           <button
             onClick={handleScrollToDetails}
-            className="w-full py-4 mt-6 rounded-2xl bg-[#0F3D2E] text-white font-bold text-[17px] flex items-center justify-center gap-2 hover:bg-[#0a2e22] transition-all active:scale-[0.98]"
+            className="w-full h-12 mt-5 rounded-xl bg-[#0F3D2E] text-white font-bold text-[15px] flex items-center justify-center gap-2 hover:bg-[#0a2e22] transition-colors active:scale-[0.98]"
           >
             <span>상세 분석 보기</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
           </button>
@@ -2135,23 +2162,23 @@ export function ResultStep() {
 
         {/* 부가 정보 바 - 모바일 */}
         <div className="lg:hidden flex items-center justify-between px-2 print:hidden">
-          <span className="text-[13px] text-white/50">
+          <span className="text-responsive-xs text-white/50">
             <span className="font-semibold tabular-nums">{totalCount !== null ? totalCount.toLocaleString() : '...'}</span>명이 진단했어요
           </span>
           {isSharedResult ? (
             <button
               onClick={handleRestartClick}
-              className="text-[13px] text-white font-semibold hover:underline"
+              className="text-responsive-xs text-white font-semibold hover:underline"
             >
               나도 진단받기 →
             </button>
           ) : (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <button
                 onClick={handleKakaoShare}
-                className="flex items-center gap-1.5 text-[13px] text-white/70 font-medium hover:text-white transition-colors"
+                className="flex items-center gap-1.5 text-responsive-xs text-white/70 font-medium hover:text-white transition-colors"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
                 </svg>
                 공유
@@ -2159,9 +2186,9 @@ export function ResultStep() {
               <button
                 onClick={handleSaveImage}
                 disabled={isImageSaving}
-                className="flex items-center gap-1.5 text-[13px] text-white/70 font-medium hover:text-white transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 text-responsive-xs text-white/70 font-medium hover:text-white transition-colors disabled:opacity-50"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 저장
@@ -2171,43 +2198,43 @@ export function ResultStep() {
         </div>
 
       {/* 재정 요약 - 간소화 */}
-      <div className="bg-neutral-50 rounded-2xl p-5">
-        <div className="grid grid-cols-3 gap-3 text-center">
+      <div className="bg-neutral-50 rounded-2xl p-4 sm:p-5">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
           <div>
-            <p className="text-[15px] text-neutral-500 font-medium">월 수입</p>
-            <p className="text-[24px] font-bold text-neutral-800 tabular-nums mt-1">
-              {(result.income || 0).toLocaleString()}<span className="text-[15px] font-normal text-neutral-500">만</span>
+            <p className="text-responsive-xs sm:text-[13px] text-neutral-500 font-medium">월 수입</p>
+            <p className="text-responsive-xl sm:text-[22px] font-bold text-neutral-800 tabular-nums mt-1">
+              {(result.income || 0).toLocaleString()}<span className="text-responsive-sm sm:text-[14px] font-normal text-neutral-400 ml-0.5">만</span>
             </p>
           </div>
           <div>
-            <p className="text-[15px] text-neutral-500 font-medium">월 지출</p>
-            <p className="text-[24px] font-bold text-neutral-800 tabular-nums mt-1">
-              {(result.originalExpenses || 0).toLocaleString()}<span className="text-[15px] font-normal text-neutral-500">만</span>
+            <p className="text-responsive-xs sm:text-[13px] text-neutral-500 font-medium">월 지출</p>
+            <p className="text-responsive-xl sm:text-[22px] font-bold text-neutral-800 tabular-nums mt-1">
+              {(result.originalExpenses || 0).toLocaleString()}<span className="text-responsive-sm sm:text-[14px] font-normal text-neutral-400 ml-0.5">만</span>
             </p>
           </div>
           <div>
-            <p className="text-[15px] text-neutral-500 font-medium">여유자금</p>
-            <p className={`text-[24px] font-bold tabular-nums mt-1 ${
+            <p className="text-responsive-xs sm:text-[13px] text-neutral-500 font-medium">잔액</p>
+            <p className={`text-responsive-xl sm:text-[22px] font-bold tabular-nums mt-1 ${
               (result.income || 0) - (result.originalExpenses || 0) >= 0 ? 'text-[#0F3D2E]' : 'text-red-500'
             }`}>
-              {((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}<span className="text-[15px] font-normal">만</span>
+              {((result.income || 0) - (result.originalExpenses || 0)).toLocaleString()}<span className="text-responsive-sm sm:text-[14px] font-normal text-neutral-400 ml-0.5">만</span>
             </p>
           </div>
         </div>
       </div>
 
       {/* 카테고리별 점수 */}
-      <div className="bg-neutral-50 rounded-2xl p-5">
-        <p className="text-[16px] text-neutral-800 font-bold mb-4">카테고리별 점수</p>
-        <div className="space-y-3">
+      <div className="bg-neutral-50 rounded-2xl p-4 sm:p-5">
+        <p className="text-responsive-md text-neutral-800 font-bold mb-3.5 sm:mb-4">카테고리별 점수</p>
+        <div className="space-y-2.5 sm:space-y-3">
           {result.categoryScores && CATEGORY_ORDER.map((key) => {
             const score = result.categoryScores[key];
             return (
-              <div key={key} className="flex items-center gap-3">
-                <span className="text-[15px] text-neutral-600 w-16 flex-shrink-0 font-medium">
+              <div key={key} className="flex items-center gap-2.5 sm:gap-3">
+                <span className="text-responsive-base text-neutral-600 w-14 sm:w-16 flex-shrink-0 font-medium">
                   {CATEGORY_LABELS[key]}
                 </span>
-                <div className="flex-1 h-2.5 bg-neutral-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 sm:h-2.5 bg-neutral-200/70 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       score >= 70 ? 'bg-[#0F3D2E]' :
@@ -2216,7 +2243,7 @@ export function ResultStep() {
                     style={{ width: `${score}%` }}
                   />
                 </div>
-                <span className={`text-[16px] font-bold w-8 text-right tabular-nums ${
+                <span className={`text-responsive-md font-bold w-7 sm:w-8 text-right tabular-nums ${
                   score >= 70 ? 'text-[#0F3D2E]' :
                   score >= 50 ? 'text-amber-500' : 'text-red-500'
                 }`}>
@@ -2235,22 +2262,22 @@ export function ResultStep() {
           const topRisks = getTopRiskFactors(result);
           if (topRisks.length === 0) return null;
           return (
-            <div className="bg-neutral-50 rounded-2xl p-5">
-              <p className="text-[16px] text-neutral-800 font-bold mb-4">주요 리스크 요인</p>
-              <div className="flex gap-3">
+            <div className="bg-neutral-50 rounded-2xl p-4 sm:p-5">
+              <p className="text-responsive-md text-neutral-800 font-bold mb-3.5 sm:mb-4">주요 리스크 요인</p>
+              <div className="flex gap-2.5 sm:gap-3">
                 {topRisks.map((risk, idx) => (
                   <div
                     key={idx}
-                    className={`flex-1 p-4 rounded-xl ${
-                      risk.severity === 'critical' ? 'bg-red-50' : 'bg-amber-50'
+                    className={`flex-1 p-3.5 sm:p-4 rounded-xl ${
+                      risk.severity === 'critical' ? 'bg-red-50 border border-red-100' : 'bg-amber-50 border border-amber-100'
                     }`}
                   >
-                    <p className={`text-[28px] font-bold tabular-nums ${
+                    <p className={`text-responsive-3xl font-bold tabular-nums ${
                       risk.severity === 'critical' ? 'text-red-600' : 'text-amber-600'
                     }`}>
                       {risk.value}
                     </p>
-                    <p className="text-[15px] text-neutral-600 mt-1">{risk.label}</p>
+                    <p className="text-responsive-base text-neutral-500 mt-0.5 sm:mt-1">{risk.label}</p>
                   </div>
                 ))}
               </div>
@@ -2261,38 +2288,38 @@ export function ResultStep() {
         {/* 상세 개선 분석 */}
         {result.categoryScores && getAllCategoryAdvice(result.categoryScores).length > 0 && (
           <details ref={el => detailsRefs.current[0] = el} className="bg-white rounded-2xl shadow-md group">
-            <summary className="p-5 cursor-pointer flex items-center justify-between list-none">
+            <summary className="p-4 sm:p-5 cursor-pointer flex items-center justify-between list-none">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[18px] font-bold text-neutral-800">상세 개선 분석</span>
-                  <span className="text-[14px] bg-amber-100 text-amber-600 px-2.5 py-0.5 rounded-full font-semibold">
+                  <span className="text-responsive-lg font-bold text-neutral-800">상세 개선 분석</span>
+                  <span className="text-responsive-sm bg-amber-100 text-amber-600 px-2 sm:px-2.5 py-0.5 rounded-full font-semibold">
                     {getAllCategoryAdvice(result.categoryScores).length}개
                   </span>
                 </div>
-                <p className="text-[15px] text-neutral-500 mt-1">카테고리별 구체적인 개선 방안</p>
+                <p className="text-responsive-base text-neutral-500 mt-1">카테고리별 구체적인 개선 방안</p>
               </div>
-              <svg className="w-5 h-5 text-neutral-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div className="px-5 pb-5 space-y-3 border-t border-neutral-200 pt-4">
+            <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2.5 sm:space-y-3 border-t border-neutral-100 pt-3.5 sm:pt-4">
               {getAllCategoryAdvice(result.categoryScores).map((advice) => (
-                <div key={advice.categoryId} className="p-4 bg-neutral-50 rounded-xl space-y-2">
+                <div key={advice.categoryId} className="p-3.5 sm:p-4 bg-neutral-50 rounded-xl space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-[13px] font-bold ${
+                    <span className={`inline-flex items-center justify-center w-5.5 h-5.5 sm:w-6 sm:h-6 rounded text-responsive-xs font-bold ${
                       advice.level === 'critical' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
                     }`}>
                       {advice.level === 'critical' ? '!' : '△'}
                     </span>
-                    <span className="text-[17px] font-semibold text-neutral-800">{advice.label}</span>
-                    <span className={`text-[16px] font-semibold tabular-nums ${
+                    <span className="text-responsive-md font-semibold text-neutral-800">{advice.label}</span>
+                    <span className={`text-responsive-md font-semibold tabular-nums ${
                       advice.level === 'critical' ? 'text-red-500' : 'text-amber-500'
                     }`}>{advice.score}점</span>
                   </div>
-                  <p className="text-[15px] text-neutral-600 leading-relaxed">{advice.diagnosis}</p>
+                  <p className="text-responsive-base text-neutral-600 leading-relaxed">{advice.diagnosis}</p>
                   <ul className="space-y-1.5">
                     {advice.actions.slice(0, 2).map((action, idx) => (
-                      <li key={idx} className="text-[15px] text-neutral-500 flex items-start gap-1.5">
+                      <li key={idx} className="text-responsive-base text-neutral-500 flex items-start gap-1.5">
                         <span className="text-[#0F3D2E]">→</span>
                         <span>{action}</span>
                       </li>
@@ -2307,20 +2334,20 @@ export function ResultStep() {
         {/* 주거 유형별 분석 */}
         {result.housingAnalysis && (
           <details ref={el => detailsRefs.current[1] = el} className="bg-white rounded-2xl shadow-md group">
-            <summary className="p-5 cursor-pointer flex items-center justify-between list-none">
+            <summary className="p-4 sm:p-5 cursor-pointer flex items-center justify-between list-none">
               <div className="flex-1">
-                <span className="text-[18px] font-bold text-neutral-800">{result.housingAnalysis.title}</span>
-                <p className="text-[15px] text-neutral-500 mt-1">선택한 주거 형태 맞춤 전략</p>
+                <span className="text-responsive-lg font-bold text-neutral-800">{result.housingAnalysis.title}</span>
+                <p className="text-responsive-base text-neutral-500 mt-1">선택한 주거 형태 맞춤 전략</p>
               </div>
-              <svg className="w-5 h-5 text-neutral-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-neutral-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div className="px-5 pb-5 border-t border-neutral-200 pt-4">
-              <p className="text-[15px] text-neutral-600 leading-relaxed mb-4">{result.housingAnalysis.summary}</p>
+            <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-neutral-100 pt-3.5 sm:pt-4">
+              <p className="text-responsive-base text-neutral-600 leading-relaxed mb-3.5 sm:mb-4">{result.housingAnalysis.summary}</p>
               <div className="space-y-2">
                 {result.housingAnalysis.strategies.slice(0, 3).map((strategy, idx) => (
-                  <p key={idx} className="text-[15px] text-neutral-500 flex items-start gap-1.5">
+                  <p key={idx} className="text-responsive-base text-neutral-500 flex items-start gap-1.5">
                     <span className="text-[#0F3D2E]">→</span>
                     <span>{strategy}</span>
                   </p>
@@ -2330,60 +2357,63 @@ export function ResultStep() {
           </details>
         )}
 
+        {/* 점수 산정 방식 설명 - 주거 유형별 분석 바로 아래 배치 */}
+        <ScoreMethodology ref={el => detailsRefs.current[2] = el} />
+
       </div>
 
       {/* 9. 친구 점수 비교 (공유 링크로 들어온 후 직접 진단한 경우) */}
       {friendComparison && !isSharedResult && (
-        <div className="bg-gradient-to-br from-[#0F3D2E] via-[#1a5c45] to-[#0F3D2E] rounded-2xl p-5 text-white overflow-hidden relative">
+        <div className="bg-gradient-to-br from-[#0F3D2E] via-[#14493a] to-[#1a5c45] rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-white overflow-hidden relative shadow-lg">
           {/* 배경 장식 */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-28 sm:w-36 h-28 sm:h-36 bg-white/[0.06] rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-20 sm:w-28 h-20 sm:h-28 bg-white/[0.04] rounded-full translate-y-1/2 -translate-x-1/2" />
 
           {/* 헤더 */}
-          <div className="flex items-center gap-2 mb-4 relative">
-            <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2.5 mb-4 sm:mb-5 relative">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-white/15 rounded-xl flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <p className="text-[15px] font-semibold text-white/90">친구와 점수 비교</p>
+            <p className="text-responsive-md sm:text-[16px] font-bold text-white">친구와 점수 비교</p>
           </div>
 
           {/* 비교 카드 */}
-          <div className="flex items-stretch gap-3 relative">
+          <div className="flex items-stretch gap-2.5 sm:gap-4 relative">
             {/* 친구 */}
-            <div className="flex-1 bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-              <p className="text-[13px] text-white/60 mb-1">친구</p>
-              <p className="text-[32px] font-bold tabular-nums leading-none">{friendComparison.score}</p>
-              <p className="text-[14px] text-white/70 mt-1">{friendComparison.grade}</p>
+            <div className="flex-1 bg-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center backdrop-blur-sm border border-white/[0.08]">
+              <p className="text-responsive-xs sm:text-[13px] text-white/60 mb-1">친구</p>
+              <p className="text-[28px] sm:text-[34px] font-bold tabular-nums leading-none">{friendComparison.score}</p>
+              <p className="text-responsive-sm sm:text-[14px] text-white/70 mt-1.5">{friendComparison.grade}</p>
             </div>
 
             {/* VS 및 차이 */}
-            <div className="flex flex-col items-center justify-center px-2">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                friendComparison.diff > 0 ? 'bg-green-400/20' : friendComparison.diff < 0 ? 'bg-red-400/20' : 'bg-white/20'
+            <div className="flex flex-col items-center justify-center px-1 sm:px-2">
+              <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg ${
+                friendComparison.diff > 0 ? 'bg-emerald-400/25 ring-2 ring-emerald-400/30' : friendComparison.diff < 0 ? 'bg-red-400/25 ring-2 ring-red-400/30' : 'bg-white/20'
               }`}>
-                <span className={`text-[15px] font-bold ${
-                  friendComparison.diff > 0 ? 'text-green-300' : friendComparison.diff < 0 ? 'text-red-300' : 'text-white/80'
+                <span className={`text-responsive-sm sm:text-[16px] font-bold ${
+                  friendComparison.diff > 0 ? 'text-emerald-300' : friendComparison.diff < 0 ? 'text-red-300' : 'text-white/80'
                 }`}>
                   {friendComparison.diff > 0 ? '+' : ''}{friendComparison.diff}
                 </span>
               </div>
-              <p className="text-[12px] text-white/50 mt-1">
+              <p className="text-[11px] sm:text-[12px] text-white/50 mt-1.5 font-medium">
                 {friendComparison.diff > 0 ? '승리!' : friendComparison.diff < 0 ? '아쉬워요' : '무승부'}
               </p>
             </div>
 
             {/* 나 */}
-            <div className={`flex-1 rounded-xl p-4 text-center ${
-              friendComparison.diff >= 0 ? 'bg-white/20 ring-2 ring-white/30' : 'bg-white/10'
+            <div className={`flex-1 rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center relative ${
+              friendComparison.diff >= 0 ? 'bg-white/20 ring-2 ring-white/40 shadow-lg' : 'bg-white/10 border border-white/[0.08]'
             }`}>
-              <p className="text-[13px] text-white/60 mb-1">나</p>
-              <p className="text-[32px] font-bold tabular-nums leading-none">{result.score}</p>
-              <p className="text-[14px] text-white/70 mt-1">{result.grade}</p>
+              <p className="text-responsive-xs sm:text-[13px] text-white/60 mb-1">나</p>
+              <p className="text-[28px] sm:text-[34px] font-bold tabular-nums leading-none">{result.score}</p>
+              <p className="text-responsive-sm sm:text-[14px] text-white/70 mt-1.5">{result.grade}</p>
               {friendComparison.diff > 0 && (
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-[12px]">👑</span>
+                <div className="absolute -top-2 -right-2 w-7 h-7 bg-amber-400 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/20">
+                  <span className="text-[14px]">👑</span>
                 </div>
               )}
             </div>
@@ -2392,9 +2422,9 @@ export function ResultStep() {
           {/* 공유 유도 */}
           <button
             onClick={handleKakaoShare}
-            className="w-full mt-4 h-10 rounded-lg bg-white/20 hover:bg-white/30 text-white text-[14px] font-medium flex items-center justify-center gap-2 transition-colors"
+            className="w-full mt-4 sm:mt-5 h-11 sm:h-12 rounded-xl bg-white/15 hover:bg-white/25 text-white text-responsive-sm sm:text-[15px] font-semibold flex items-center justify-center gap-2 transition-all duration-200 border border-white/10"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
               <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
             </svg>
             다른 친구에게도 공유하기
@@ -2402,91 +2432,123 @@ export function ResultStep() {
         </div>
       )}
 
-      {/* 10. 이전 진단 대비 변화 (2회 이상 진단한 경우) */}
-      {previousComparison && !isSharedResult && (
-        <div className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between">
-          <div>
-            <p className="text-[15px] text-neutral-500 mb-1">
-              이전 진단 대비
-            </p>
-            <p className="text-[15px] text-neutral-700">
-              {new Date(previousComparison.previousDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} 진단 ({previousComparison.previousScore}점)
-            </p>
-          </div>
-          <div className={`text-right ${previousComparison.improved ? 'text-[#0F3D2E]' : previousComparison.diff < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
-            <p className="text-[24px] font-bold tabular-nums">
-              {previousComparison.diff > 0 ? '+' : ''}{previousComparison.diff}점
-            </p>
-            <p className="text-[14px]">
-              {previousComparison.improved ? '상승' : previousComparison.diff < 0 ? '하락' : '유지'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* 11. 진단 히스토리 (2회 이상 진단 기록이 있을 때만) */}
+      {/* 10. 진단 기록 (이전 진단 대비 + 히스토리 통합) */}
       {history.length > 1 && !isSharedResult && (
-        <div className="bg-white rounded-2xl shadow-md p-5">
-          <h3 className="text-[18px] font-bold text-neutral-800 mb-4">
-            진단 기록
-          </h3>
-          <div className="space-y-2">
-            {history.slice(0, 5).map((entry, index) => {
-              const isLatest = index === 0;
-              const prevEntry = history[index + 1];
-              const diff = prevEntry ? entry.score - prevEntry.score : null;
-
-              return (
-                <div
-                  key={entry.id}
-                  className={`flex items-center justify-between py-2.5 ${!isLatest ? 'border-t border-neutral-200' : ''}`}
-                >
-                  <div className="flex items-center gap-3">
-                    {isLatest && (
-                      <span className="px-2.5 py-1 bg-[#0F3D2E] text-white text-[13px] font-semibold rounded">
-                        NOW
-                      </span>
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-md ring-1 ring-black/[0.04] overflow-hidden">
+          {/* 이전 진단 대비 - 상단 요약 */}
+          {previousComparison && (
+            <div className={`p-4 sm:p-5 ${
+              previousComparison.improved ? 'bg-gradient-to-r from-emerald-50 to-white' :
+              previousComparison.diff < 0 ? 'bg-gradient-to-r from-red-50 to-white' :
+              'bg-gradient-to-r from-neutral-50 to-white'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center ${
+                    previousComparison.improved ? 'bg-emerald-100' : previousComparison.diff < 0 ? 'bg-red-100' : 'bg-neutral-100'
+                  }`}>
+                    {previousComparison.improved ? (
+                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                      </svg>
+                    ) : previousComparison.diff < 0 ? (
+                      <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 12h14" />
+                      </svg>
                     )}
-                    <span className="text-[15px] text-neutral-500">
-                      {new Date(entry.date).toLocaleDateString('ko-KR', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {diff !== null && (
-                      <span className={`text-[15px] ${diff > 0 ? 'text-[#0F3D2E]' : diff < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
-                        {diff > 0 ? '+' : ''}{diff}
-                      </span>
-                    )}
-                    <span className={`text-[16px] font-bold tabular-nums ${isLatest ? 'text-[#0F3D2E]' : 'text-neutral-600'}`}>
-                      {entry.score}점
-                    </span>
-                    <span className={`text-[13px] px-2.5 py-1 rounded-full font-medium ${
-                      entry.grade === '매우 안정' || entry.grade === '안정'
-                        ? 'bg-[#E8F3EF] text-[#0F3D2E]'
-                        : entry.grade === '주의'
-                        ? 'bg-[#FFF7E5] text-[#9A6B00]'
-                        : 'bg-[#FDECEC] text-[#912018]'
-                    }`}>
-                      {entry.grade}
-                    </span>
+                  <div>
+                    <p className="text-responsive-sm sm:text-[15px] font-semibold text-neutral-800 mb-0.5">
+                      이전 진단 대비
+                    </p>
+                    <p className="text-responsive-xs sm:text-[14px] text-neutral-500">
+                      {new Date(previousComparison.previousDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} ({previousComparison.previousScore}점)
+                    </p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-          {history.length > 5 && (
-            <p className="text-[14px] text-neutral-500 text-center mt-3">
-              최근 5회 기록만 표시됩니다
-            </p>
+                <div className={`text-right ${previousComparison.improved ? 'text-emerald-600' : previousComparison.diff < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
+                  <p className="text-[22px] sm:text-[26px] font-bold tabular-nums leading-tight">
+                    {previousComparison.diff > 0 ? '+' : ''}{previousComparison.diff}점
+                  </p>
+                  <p className="text-responsive-xs sm:text-[14px] font-medium">
+                    {previousComparison.improved ? '점수 상승' : previousComparison.diff < 0 ? '점수 하락' : '변동 없음'}
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
+
+          {/* 진단 기록 리스트 */}
+          <div className="p-4 sm:p-5 pt-3 sm:pt-4">
+            <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-responsive-md sm:text-[16px] font-bold text-neutral-800">
+                진단 기록
+              </h3>
+            </div>
+            <div className="space-y-0">
+              {history.slice(0, 5).map((entry, index) => {
+                const isLatest = index === 0;
+                const prevEntry = history[index + 1];
+                const diff = prevEntry ? entry.score - prevEntry.score : null;
+
+                return (
+                  <div
+                    key={entry.id}
+                    className={`flex items-center justify-between py-2.5 sm:py-3 ${!isLatest ? 'border-t border-neutral-100' : ''}`}
+                  >
+                    <div className="flex items-center gap-2 sm:gap-2.5">
+                      {isLatest && (
+                        <span className="px-1.5 sm:px-2 py-0.5 bg-[#0F3D2E] text-white text-[10px] sm:text-[11px] font-bold rounded tracking-wide">
+                          NOW
+                        </span>
+                      )}
+                      <span className={`text-responsive-xs sm:text-[14px] ${isLatest ? 'text-neutral-700 font-medium' : 'text-neutral-500'}`}>
+                        {new Date(entry.date).toLocaleDateString('ko-KR', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      {diff !== null && (
+                        <span className={`text-responsive-xs sm:text-[14px] font-semibold tabular-nums ${diff > 0 ? 'text-emerald-600' : diff < 0 ? 'text-red-500' : 'text-neutral-400'}`}>
+                          {diff > 0 ? '+' : ''}{diff}
+                        </span>
+                      )}
+                      <span className={`text-responsive-sm sm:text-[15px] font-bold tabular-nums ${isLatest ? 'text-[#0F3D2E]' : 'text-neutral-600'}`}>
+                        {entry.score}점
+                      </span>
+                      <span className={`text-[10px] sm:text-[12px] px-1.5 sm:px-2 py-0.5 rounded-full font-semibold ${
+                        entry.grade === '매우 안정' || entry.grade === '안정'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : entry.grade === '주의'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {entry.grade}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {history.length > 5 && (
+              <p className="text-responsive-xs sm:text-[13px] text-neutral-400 text-center mt-2 pt-2 border-t border-neutral-100">
+                최근 5회 기록만 표시됩니다
+              </p>
+            )}
+          </div>
         </div>
       )}
-
-      {/* 점수 산정 방식 설명 */}
-      <ScoreMethodology ref={el => detailsRefs.current[2] = el} />
 
       {/* 점수 상승 설계 리포트 - 본인 결과일 때만 표시 (모든 무료 콘텐츠 후에 배치) */}
       {!isSharedResult && (() => {
@@ -2530,27 +2592,27 @@ export function ResultStep() {
 
       {/* 진단받기 CTA - 공유 링크로 들어온 경우 (모바일만, 데스크톱은 사이드바에 있음) */}
       {isSharedResult && (
-        <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-xl p-5 print:hidden">
+        <div className="lg:hidden bg-gradient-to-br from-[#0F3D2E] to-[#1a5c45] rounded-2xl p-5 print:hidden">
           {/* 점수 비교 시각화 */}
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="text-center">
-              <p className="text-white/60 text-[13px] mb-1">친구</p>
-              <p className="text-white font-bold text-[22px]">{result?.score}점</p>
+              <p className="text-white/60 text-responsive-xs mb-1">친구</p>
+              <p className="text-white font-bold text-[22px] tabular-nums">{result?.score}점</p>
             </div>
-            <div className="text-white/40 text-[20px] font-light">vs</div>
+            <div className="text-white/40 text-responsive-lg font-light">vs</div>
             <div className="text-center">
-              <p className="text-[#FEE500]/80 text-[13px] mb-1">나</p>
-              <p className="text-[#FEE500] font-bold text-[22px]">?점</p>
+              <p className="text-amber-300/80 text-responsive-xs mb-1">나</p>
+              <p className="text-amber-300 font-bold text-[22px]">?점</p>
             </div>
           </div>
 
-          <p className="text-white/70 text-[14px] text-center mb-4">
+          <p className="text-white/70 text-responsive-sm text-center mb-4">
             2분 · 무료 · 회원가입 없음
           </p>
 
           <button
             onClick={handleRestartClick}
-            className="w-full h-12 rounded-[10px] bg-white text-[#0F3D2E] text-[15px] font-bold hover:bg-neutral-50 transition-colors shadow-lg"
+            className="w-full h-12 rounded-xl bg-white text-[#0F3D2E] text-responsive-md font-bold hover:bg-neutral-50 transition-colors shadow-lg"
           >
             나도 진단받기
           </button>
