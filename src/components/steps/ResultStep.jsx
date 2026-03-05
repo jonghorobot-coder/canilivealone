@@ -2459,7 +2459,7 @@ export function ResultStep() {
       )}
 
       {/* 10. 진단 기록 (이전 진단 대비 + 히스토리 통합) */}
-      {history.length > 1 && !isSharedResult && (
+      {history.length >= 1 && !isSharedResult && (
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-md ring-1 ring-black/[0.04] overflow-hidden">
           {/* 이전 진단 대비 - 상단 요약 */}
           {previousComparison && (
