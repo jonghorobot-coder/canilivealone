@@ -1585,21 +1585,29 @@ export function ResultStep() {
 
   // 프리미엄 카드 가시성 감지 (점수 애니메이션 트리거)
   useEffect(() => {
-    if (!premiumCardRef.current) return;
+    // 이미 visible이면 스킵
+    if (isPremiumCardVisible) return;
+    if (!result || isSharedResult || isLoading) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsPremiumCardVisible(true);
-          observer.disconnect(); // 한 번만 트리거
-        }
-      },
-      { threshold: 0.5 }
-    );
+    // DOM이 준비될 때까지 약간 대기
+    const timer = setTimeout(() => {
+      if (!premiumCardRef.current) return;
 
-    observer.observe(premiumCardRef.current);
-    return () => observer.disconnect();
-  }, [result]); // result가 로드된 후에 관찰 시작
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsPremiumCardVisible(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.3 }
+      );
+
+      observer.observe(premiumCardRef.current);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [result, isSharedResult, isLoading, isPremiumCardVisible]);
 
   // 공유된 결과 조회 (처음 마운트 시 URL에 id가 있었던 경우만)
   useEffect(() => {
@@ -2560,15 +2568,17 @@ export function ResultStep() {
                       }`}>
                         {entry.grade}
                       </span>
-                      <button
-                        onClick={handleDelete}
-                        className="ml-1 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full text-neutral-300 hover:text-neutral-500 hover:bg-neutral-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-150"
-                        aria-label="기록 삭제"
-                      >
-                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                      {!isLatest && (
+                        <button
+                          onClick={handleDelete}
+                          className="ml-1 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full text-neutral-300 hover:text-neutral-500 hover:bg-neutral-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-150"
+                          aria-label="기록 삭제"
+                        >
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
