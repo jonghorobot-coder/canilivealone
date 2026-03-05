@@ -2462,7 +2462,7 @@ export function ResultStep() {
       {history.length >= 1 && !isSharedResult && (
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-md ring-1 ring-black/[0.04] overflow-hidden">
           {/* 이전 진단 대비 - 상단 요약 */}
-          {previousComparison && (
+          {previousComparison ? (
             <div className={`p-4 sm:p-5 ${
               previousComparison.improved ? 'bg-gradient-to-r from-emerald-50 to-white' :
               previousComparison.diff < 0 ? 'bg-gradient-to-r from-red-50 to-white' :
@@ -2502,6 +2502,24 @@ export function ResultStep() {
                   </p>
                   <p className="text-responsive-xs sm:text-[14px] font-medium">
                     {previousComparison.improved ? '점수 상승' : previousComparison.diff < 0 ? '점수 하락' : '변동 없음'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : history.length === 1 && (
+            <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-50 to-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center bg-blue-100">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-responsive-sm sm:text-[15px] font-semibold text-neutral-800 mb-0.5">
+                    첫 진단을 완료했어요!
+                  </p>
+                  <p className="text-responsive-xs sm:text-[14px] text-neutral-500">
+                    다음에 다시 진단하면 변화를 확인할 수 있어요
                   </p>
                 </div>
               </div>
