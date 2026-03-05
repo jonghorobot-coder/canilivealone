@@ -281,11 +281,12 @@ function ReportPreviewModal({ isOpen, onClose, result, preview, onSubmit }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
       {/* 배경 오버레이 */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-overlay-bg"
         onClick={handleClose}
+        aria-hidden="true"
       />
 
       {/* 모달 콘텐츠 */}
@@ -312,7 +313,7 @@ function ReportPreviewModal({ isOpen, onClose, result, preview, onSubmit }) {
                   </svg>
                 )}
               </div>
-              <h2 className="text-responsive-lg sm:text-[18px] font-bold">
+              <h2 id="report-modal-title" className="text-responsive-lg sm:text-[18px] font-bold">
                 {step === 'preview' && '리포트 미리보기'}
                 {step === 'payment' && '결제하기'}
                 {step === 'complete' && '결제 완료'}
@@ -320,6 +321,7 @@ function ReportPreviewModal({ isOpen, onClose, result, preview, onSubmit }) {
             </div>
             <button
               onClick={handleClose}
+              aria-label="모달 닫기"
               className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1203,240 +1205,6 @@ const isMobileDevice = () => {
 
 const KAKAOPAY_LINK = 'https://qr.kakaopay.com/FC3Bnn1CY99202888';
 
-// 프리미엄 리포트 이메일 입력 모달
-function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade }) {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [step, setStep] = useState('email'); // 'email' | 'payment' | 'complete'
-  const [savedEmail, setSavedEmail] = useState('');
-
-  // 모달 열릴 때 이벤트
-  useEffect(() => {
-    if (isOpen) {
-      AnalyticsEvents.premiumModalOpen(score, grade);
-    }
-  }, [isOpen, score, grade]);
-
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const handleSubmit = async () => {
-    if (!email.trim()) {
-      setError('이메일을 입력해주세요');
-      return;
-    }
-    if (!validateEmail(email)) {
-      setError('올바른 이메일 형식이 아닙니다');
-      return;
-    }
-    setError('');
-
-    // 이메일 저장
-    const success = await onSubmit(email);
-    if (!success) return;
-
-    setSavedEmail(email);
-    setStep('payment');
-  };
-
-  const handlePayment = () => {
-    if (isMobileDevice()) {
-      // 모바일: 새 탭에서 열어서 돌아올 수 있게
-      window.open(KAKAOPAY_LINK, '_blank');
-    } else {
-      // 데스크톱: 새 탭에서 열기 (QR 대신 직접 결제)
-      window.open(KAKAOPAY_LINK, '_blank');
-    }
-    setStep('complete');
-  };
-
-  const handleClose = () => {
-    // 완료 단계가 아닐 때만 이탈 이벤트 추적
-    if (step !== 'complete') {
-      AnalyticsEvents.premiumModalClose(score, grade, step);
-    }
-    setStep('email');
-    setEmail('');
-    setSavedEmail('');
-    setError('');
-    onClose();
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 animate-overlay-bg"
-        onClick={handleClose}
-      />
-      <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-overlay-content">
-
-        {/* Step 1: 이메일 입력 */}
-        {step === 'email' && (
-          <>
-            <h3 className="text-[17px] font-bold text-neutral-800 mb-2">
-              리포트 받을 이메일
-            </h3>
-            <p className="text-[14px] text-neutral-500 mb-4 leading-relaxed">
-              결제 확인 후 입력하신 이메일로<br />
-              맞춤 리포트를 발송해드립니다.
-            </p>
-
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError('');
-              }}
-              placeholder="example@email.com"
-              className={`w-full h-12 px-4 rounded-[10px] border ${error ? 'border-red-400' : 'border-neutral-200'} text-[15px] focus:outline-none focus:border-[#0F3D2E] transition-colors`}
-              autoFocus
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            />
-            {error && (
-              <p className="text-[14px] text-red-500 mt-1">{error}</p>
-            )}
-
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={handleClose}
-                className="flex-1 h-12 rounded-[10px] border border-neutral-200 text-neutral-600 text-[14px] font-semibold hover:bg-neutral-50 transition-colors"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="flex-1 h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors disabled:opacity-50"
-              >
-                {isLoading ? '저장 중...' : '다음'}
-              </button>
-            </div>
-
-            <p className="text-[13px] text-neutral-500 text-center mt-3">
-              결제 금액: 4,900원 (카카오페이)
-            </p>
-          </>
-        )}
-
-        {/* Step 2: 결제 진행 */}
-        {step === 'payment' && (
-          <>
-            <div className="text-center mb-4">
-              <div className="w-12 h-12 bg-[#FEE500] rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#191919">
-                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-                </svg>
-              </div>
-              <h3 className="text-[17px] font-bold text-neutral-800 mb-1">
-                카카오페이로 결제
-              </h3>
-              <p className="text-[20px] font-bold text-[#0F3D2E]">4,900원</p>
-            </div>
-
-            <div className="bg-neutral-50 rounded-xl p-4 mb-4">
-              <p className="text-[13px] text-neutral-500 mb-1">리포트 발송 이메일</p>
-              <p className="text-[15px] font-semibold text-neutral-800">{savedEmail}</p>
-            </div>
-
-            {/* 모바일: 버튼 / 데스크톱: QR 코드 */}
-            {isMobileDevice() ? (
-              <button
-                onClick={handlePayment}
-                className="w-full h-12 rounded-[10px] bg-[#FEE500] text-[#191919] text-[15px] font-bold hover:bg-[#F5DC00] transition-colors flex items-center justify-center gap-2 mb-3"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#191919">
-                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.89 5.31 4.71 6.72-.18.67-.7 2.42-.8 2.8-.13.47.17.47.36.34.15-.1 2.37-1.6 3.33-2.25.78.11 1.58.17 2.4.17 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
-                </svg>
-                카카오페이 결제하기
-              </button>
-            ) : (
-              <div className="text-center mb-4">
-                <p className="text-[14px] text-neutral-600 mb-3">휴대폰으로 QR 코드를 스캔하세요</p>
-                <div className="bg-white p-3 rounded-xl inline-block shadow-md border border-neutral-200">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(KAKAOPAY_LINK)}`}
-                    alt="카카오페이 결제 QR"
-                    className="w-[180px] h-[180px]"
-                  />
-                </div>
-                <p className="text-[13px] text-neutral-400 mt-3">카카오톡 &gt; 스캔 또는 카메라 앱 사용</p>
-                <button
-                  onClick={() => setStep('complete')}
-                  className="w-full h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[15px] font-bold hover:bg-[#0a2e22] transition-colors mt-4"
-                >
-                  결제 완료했어요
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={() => setStep('email')}
-              className="w-full text-neutral-500 text-[14px] hover:text-neutral-600 transition-colors"
-            >
-              이메일 수정하기
-            </button>
-          </>
-        )}
-
-        {/* Step 3: 결제 완료 안내 */}
-        {step === 'complete' && (
-          <>
-            <div className="text-center mb-4">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-[18px] font-bold text-neutral-800 mb-2">
-                결제 요청 완료
-              </h3>
-              <p className="text-[14px] text-neutral-500 leading-relaxed">
-                결제가 정상적으로 완료되면<br />
-                아래 이메일로 리포트를 보내드려요.
-              </p>
-            </div>
-
-            <div className="bg-[#0F3D2E]/5 rounded-xl p-4 mb-4">
-              <p className="text-[13px] text-[#0F3D2E]/60 mb-1">발송 예정 이메일</p>
-              <p className="text-[16px] font-bold text-[#0F3D2E]">{savedEmail}</p>
-            </div>
-
-            <div className="bg-neutral-50 rounded-lg p-3 mb-4">
-              <div className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-neutral-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            <p className="text-[13px] text-neutral-500 leading-relaxed">
-                  결제 확인 후 <strong>24시간 내</strong> 발송됩니다.<br />
-                  스팸함도 확인해주세요.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={handleClose}
-              className="w-full h-12 rounded-[10px] bg-[#0F3D2E] text-white text-[14px] font-semibold hover:bg-[#0a2e22] transition-colors"
-            >
-              확인
-            </button>
-
-            <button
-              onClick={handlePayment}
-              className="w-full text-neutral-500 text-[14px] mt-3 hover:text-neutral-600 transition-colors"
-            >
-              결제창 다시 열기
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // 점수 산정 방식 데이터 (실제 코드 가중치 기준)
 const SCORE_METHODOLOGY = {
   categories: [
@@ -1533,7 +1301,6 @@ export function ResultStep() {
   const [friendComparison, setFriendComparison] = useState(null);
   const [history, setHistory] = useState([]);
   const [showGradeRange, setShowGradeRange] = useState(false);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showReportPreview, setShowReportPreview] = useState(false);
   const [isPremiumCardVisible, setIsPremiumCardVisible] = useState(false);
   const [isPremiumLoading, setIsPremiumLoading] = useState(false);
@@ -1995,16 +1762,6 @@ export function ResultStep() {
         onCancel={handleRestartCancel}
         isSharedResult={isSharedResult}
         friendScore={result?.score}
-      />
-
-      {/* 프리미엄 리포트 이메일 모달 */}
-      <PremiumEmailModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        onSubmit={handlePremiumSubmit}
-        isLoading={isPremiumLoading}
-        score={result?.score}
-        grade={result?.grade}
       />
 
       {/* 토스트 */}

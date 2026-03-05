@@ -345,7 +345,7 @@ export function QuestionStep({ question }) {
             <div className="w-28 sm:w-32 flex-shrink-0">
               <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#6EE7B7] rounded-full"
+                  className="h-full bg-white rounded-full"
                   style={{
                     width: `${displayProgress}%`,
                     transition: 'width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'

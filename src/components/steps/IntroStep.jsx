@@ -40,6 +40,9 @@ export function IntroStep() {
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-[2px] animate-overlay-bg px-0 sm:px-4"
           onClick={handleCloseModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="consent-modal-title"
         >
           <div
             className="w-full sm:max-w-[400px] bg-white rounded-t-2xl sm:rounded-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.15)] sm:shadow-[0_20px_50px_rgba(0,0,0,0.2)] animate-overlay-content overflow-hidden"
@@ -54,7 +57,7 @@ export function IntroStep() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-[18px] sm:text-[19px] font-bold text-white tracking-[-0.01em]">
+                  <h2 id="consent-modal-title" className="text-[18px] sm:text-[19px] font-bold text-white tracking-[-0.01em]">
                     서비스 이용 동의
                   </h2>
                   <p className="text-[13px] sm:text-[14px] text-white/50 mt-0.5">
