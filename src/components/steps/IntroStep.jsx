@@ -38,26 +38,26 @@ export function IntroStep() {
       {/* 동의 모달 */}
       {showConsentModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-overlay-bg px-4"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-[2px] animate-overlay-bg px-0 sm:px-4"
           onClick={handleCloseModal}
         >
           <div
-            className="w-full max-w-[360px] sm:max-w-[400px] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] animate-overlay-content overflow-hidden"
+            className="w-full sm:max-w-[400px] bg-white rounded-t-2xl sm:rounded-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.15)] sm:shadow-[0_20px_50px_rgba(0,0,0,0.2)] animate-overlay-content overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 모달 헤더 */}
-            <div className="bg-[#0F3D2E] px-5 sm:px-6 py-4 sm:py-5">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/15 flex items-center justify-center">
-                  <svg className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            <div className="bg-[#0F3D2E] px-5 sm:px-6 py-5 sm:py-6">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/[0.12] flex items-center justify-center">
+                  <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-responsive-xl font-bold text-white tracking-tight">
+                  <h2 className="text-[18px] sm:text-[19px] font-bold text-white tracking-[-0.01em]">
                     서비스 이용 동의
                   </h2>
-                  <p className="text-responsive-base text-white/60 mt-0.5">
+                  <p className="text-[13px] sm:text-[14px] text-white/50 mt-0.5">
                     진단을 시작하기 전에 확인해주세요
                   </p>
                 </div>
@@ -65,9 +65,9 @@ export function IntroStep() {
             </div>
 
             {/* 모달 본문 */}
-            <div className="px-5 sm:px-6 py-5">
+            <div className="px-5 sm:px-6 py-5 sm:py-6">
               {/* 전체 동의 체크박스 */}
-              <label className="flex items-center gap-3 cursor-pointer group p-3.5 rounded-xl bg-neutral-50 hover:bg-neutral-100 transition-colors border border-transparent hover:border-neutral-200">
+              <label className="flex items-center gap-3.5 cursor-pointer group p-4 rounded-xl bg-neutral-50 hover:bg-neutral-100/80 transition-all duration-150 border border-neutral-100 hover:border-neutral-200">
                 <div className="relative flex-shrink-0">
                   <input
                     type="checkbox"
@@ -75,40 +75,40 @@ export function IntroStep() {
                     onChange={(e) => setAgreedAll(e.target.checked)}
                     className="sr-only"
                   />
-                  <div className={`w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${
+                  <div className={`w-[22px] h-[22px] rounded-md border-2 flex items-center justify-center transition-all duration-150 ${
                     agreedAll
-                      ? 'bg-[#0F3D2E] border-[#0F3D2E] scale-105'
-                      : 'border-neutral-300 group-hover:border-neutral-400'
+                      ? 'bg-[#0F3D2E] border-[#0F3D2E]'
+                      : 'border-neutral-300 bg-white group-hover:border-neutral-400'
                   }`}>
                     {agreedAll && (
-                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
                   </div>
                 </div>
-                <span className="text-responsive-md font-bold text-neutral-800">약관 전체 동의</span>
+                <span className="text-[15px] sm:text-[16px] font-semibold text-neutral-800">약관 전체 동의</span>
               </label>
 
               {/* 약관 상세 */}
-              <div className="mt-4 space-y-2.5">
+              <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-responsive-base text-neutral-500">개인정보 처리방침</span>
+                  <span className="text-[14px] text-neutral-500">개인정보 처리방침</span>
                   <Link
                     to="/privacy"
                     target="_blank"
-                    className="text-responsive-sm text-[#0F3D2E] font-semibold hover:underline"
+                    className="text-[13px] text-[#0F3D2E] font-semibold hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     보기
                   </Link>
                 </div>
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-responsive-base text-neutral-500">서비스 이용약관</span>
+                  <span className="text-[14px] text-neutral-500">서비스 이용약관</span>
                   <Link
                     to="/terms"
                     target="_blank"
-                    className="text-responsive-sm text-[#0F3D2E] font-semibold hover:underline"
+                    className="text-[13px] text-[#0F3D2E] font-semibold hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     보기
@@ -116,20 +116,20 @@ export function IntroStep() {
                 </div>
               </div>
 
-              <p className="text-responsive-sm text-neutral-400 mt-4 leading-relaxed">
+              <p className="text-[13px] text-neutral-400 mt-5 leading-relaxed">
                 입력하신 정보는 결과 분석에만 활용되며, 진단 결과는 참고용입니다.
               </p>
             </div>
 
             {/* 모달 푸터 */}
-            <div className="px-5 sm:px-6 pb-5 sm:pb-6 space-y-2.5">
+            <div className="px-5 sm:px-6 pb-6 sm:pb-6 space-y-2.5" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
               <button
                 onClick={handleConfirm}
                 disabled={!canProceed}
-                className={`w-full h-12 sm:h-14 rounded-xl text-responsive-lg font-bold transition-all duration-200 tracking-tight ${
+                className={`w-full h-[52px] sm:h-[54px] rounded-xl text-[16px] font-bold transition-all duration-150 tracking-[-0.01em] ${
                   canProceed
-                    ? 'bg-[#0F3D2E] hover:bg-[#0a2e22] text-white shadow-lg shadow-[#0F3D2E]/20 hover:shadow-xl hover:shadow-[#0F3D2E]/25'
-                    : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                    ? 'bg-[#0F3D2E] hover:bg-[#0a2e22] text-white shadow-[0_4px_12px_rgba(15,61,46,0.2)] active:scale-[0.98]'
+                    : 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
                 }`}
                 aria-label="동의하고 진단 시작"
               >
@@ -137,7 +137,7 @@ export function IntroStep() {
               </button>
               <button
                 onClick={handleCloseModal}
-                className="w-full h-11 sm:h-12 rounded-xl text-responsive-md font-semibold text-neutral-500 hover:bg-neutral-100 transition-colors"
+                className="w-full h-[46px] sm:h-[48px] rounded-xl text-[15px] font-semibold text-neutral-500 hover:bg-neutral-100 active:bg-neutral-150 transition-colors"
                 aria-label="취소하고 돌아가기"
               >
                 취소
@@ -200,13 +200,13 @@ export function IntroStep() {
               </div>
 
               {/* 타이틀 */}
-              <p className="text-responsive-xs lg:text-[15px] tracking-[0.12em] text-white/40 uppercase font-medium mb-2 lg:mb-3">
+              <p className="text-[11px] sm:text-[12px] lg:text-[13px] tracking-[0.2em] text-white/35 uppercase font-semibold mb-3 lg:mb-4">
                 Financial Independence Score
               </p>
-              <h1 className="text-responsive-4xl lg:text-[52px] xl:text-[58px] font-bold text-white leading-[1.15] tracking-tight mb-3 sm:mb-4 lg:mb-5">
+              <h1 className="text-[28px] sm:text-[32px] lg:text-[48px] xl:text-[54px] font-bold text-white leading-[1.1] tracking-[-0.02em] mb-4 sm:mb-5 lg:mb-6">
                 독립 점수 진단
               </h1>
-              <p className="text-responsive-md lg:text-[20px] text-white/55 leading-relaxed mb-7 sm:mb-8 lg:mb-10">
+              <p className="text-[15px] sm:text-[16px] lg:text-[18px] text-white/50 leading-[1.6] mb-8 sm:mb-10 lg:mb-12 font-normal">
                 <span className="lg:hidden">월 수입·지출 구조 기반<br />재무 자립 가능성 분석</span>
                 <span className="hidden lg:inline">월 수입과 지출 구조를 분석하여<br />재무적 독립 가능성을 진단합니다</span>
               </p>
@@ -214,32 +214,35 @@ export function IntroStep() {
               {/* CTA 버튼 */}
               <button
                 onClick={handleStartClick}
-                className="w-full lg:w-auto lg:px-14 h-13 sm:h-14 lg:h-[62px] rounded-2xl bg-white text-[#0F3D2E] text-responsive-lg lg:text-[20px] font-bold shadow-[0_8px_32px_rgba(255,255,255,0.25)] hover:shadow-[0_12px_40px_rgba(255,255,255,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 tracking-tight"
+                className="group relative w-full lg:w-auto lg:px-16 h-[52px] sm:h-14 lg:h-[60px] rounded-[14px] bg-white text-[#0F3D2E] text-[16px] sm:text-[17px] lg:text-[18px] font-bold shadow-[0_4px_20px_rgba(255,255,255,0.2)] hover:shadow-[0_8px_30px_rgba(255,255,255,0.3)] hover:bg-[#f8f8f8] active:scale-[0.98] active:shadow-[0_2px_10px_rgba(255,255,255,0.15)] transition-all duration-150 ease-out tracking-[-0.01em]"
                 aria-label="독립점수 진단 시작하기"
               >
-                무료 진단 시작하기
+                <span className="relative z-10">무료 진단 시작하기</span>
               </button>
 
               {/* 신뢰 문구 */}
-              <p className="mt-3.5 sm:mt-4 text-responsive-sm lg:text-[15px] text-white/50">
-                모든 정보는 익명으로 안전하게 저장됩니다
+              <p className="mt-4 sm:mt-5 flex items-center justify-center lg:justify-start gap-1.5 text-[13px] sm:text-[14px] text-white/40">
+                <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>모든 정보는 익명으로 안전하게 처리됩니다</span>
               </p>
 
               {/* 데스크톱: 통계 인라인 */}
-              <div className="hidden lg:flex items-center gap-10 mt-12 pt-10 border-t border-white/15">
+              <div className="hidden lg:flex items-center gap-12 mt-14 pt-10 border-t border-white/10">
                 <div>
-                  <span className="text-[34px] font-bold text-white block tabular-nums">2분</span>
-                  <span className="text-[15px] text-white/50">소요 시간</span>
+                  <span className="text-[32px] font-bold text-white block tabular-nums tracking-tight">2분</span>
+                  <span className="text-[13px] text-white/40 mt-1 block tracking-wide uppercase">소요 시간</span>
                 </div>
-                <div className="h-12 border-l border-white/20" />
+                <div className="h-10 border-l border-white/15" />
                 <div>
-                  <span className="text-[34px] font-bold text-white block tabular-nums">25개</span>
-                  <span className="text-[15px] text-white/50">분석 항목</span>
+                  <span className="text-[32px] font-bold text-white block tabular-nums tracking-tight">25개</span>
+                  <span className="text-[13px] text-white/40 mt-1 block tracking-wide uppercase">분석 항목</span>
                 </div>
-                <div className="h-12 border-l border-white/20" />
+                <div className="h-10 border-l border-white/15" />
                 <div>
-                  <span className="text-[34px] font-bold text-white block tabular-nums">7개</span>
-                  <span className="text-[15px] text-white/50">카테고리</span>
+                  <span className="text-[32px] font-bold text-white block tabular-nums tracking-tight">7개</span>
+                  <span className="text-[13px] text-white/40 mt-1 block tracking-wide uppercase">카테고리</span>
                 </div>
               </div>
             </div>
@@ -311,20 +314,22 @@ export function IntroStep() {
         </div>
 
         {/* 모바일: 하단 통계 */}
-        <div className="lg:hidden w-full max-w-sm sm:max-w-md mx-auto px-5 sm:px-6 pb-6 sm:pb-8" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
-          <div className="pt-4 sm:pt-5 border-t border-white/10">
-            <div className="flex items-center">
-              <div className="text-center flex-1 pr-3 sm:pr-4 border-r border-white/10">
-                <span className="text-responsive-2xl font-bold text-white block tabular-nums tracking-tight">2분</span>
-                <span className="text-responsive-xs text-white/40 mt-0.5 block">소요 시간</span>
+        <div className="lg:hidden w-full max-w-[360px] mx-auto px-6 pb-6" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
+          <div className="pt-5 border-t border-white/[0.08]">
+            <div className="flex items-center justify-between">
+              <div className="text-center flex-1">
+                <span className="text-[22px] sm:text-[24px] font-bold text-white block tabular-nums tracking-tight">2분</span>
+                <span className="text-[10px] sm:text-[11px] text-white/35 mt-1 block uppercase tracking-wider">소요 시간</span>
               </div>
-              <div className="text-center flex-1 px-3 sm:px-4 border-r border-white/10">
-                <span className="text-responsive-2xl font-bold text-white block tabular-nums tracking-tight">25개</span>
-                <span className="text-responsive-xs text-white/40 mt-0.5 block">분석 항목</span>
+              <div className="h-8 border-l border-white/[0.08]" />
+              <div className="text-center flex-1">
+                <span className="text-[22px] sm:text-[24px] font-bold text-white block tabular-nums tracking-tight">25개</span>
+                <span className="text-[10px] sm:text-[11px] text-white/35 mt-1 block uppercase tracking-wider">분석 항목</span>
               </div>
-              <div className="text-center flex-1 pl-3 sm:pl-4">
-                <span className="text-responsive-2xl font-bold text-white block tabular-nums tracking-tight">7개</span>
-                <span className="text-responsive-xs text-white/40 mt-0.5 block">카테고리</span>
+              <div className="h-8 border-l border-white/[0.08]" />
+              <div className="text-center flex-1">
+                <span className="text-[22px] sm:text-[24px] font-bold text-white block tabular-nums tracking-tight">7개</span>
+                <span className="text-[10px] sm:text-[11px] text-white/35 mt-1 block uppercase tracking-wider">카테고리</span>
               </div>
             </div>
           </div>

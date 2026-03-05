@@ -360,13 +360,13 @@ export function QuestionStep({ question }) {
         <main className="flex-1 flex flex-col px-4 sm:px-5 py-5 sm:py-6 pb-24 sm:pb-28 lg:py-8 lg:pb-8 relative z-10 lg:justify-center lg:items-center">
           <div className="w-full lg:max-w-2xl lg:mx-auto">
           {/* 질문 영역 - 아이콘과 함께 */}
-          <div className="flex items-start gap-4 sm:gap-5 mb-8 sm:mb-10">
+          <div className="flex items-start gap-4 sm:gap-5 mb-7 sm:mb-9">
             {/* 질문 텍스트 */}
             <div className="flex-1">
-              <h2 className="text-responsive-base font-semibold text-white/60 mb-2 sm:mb-3 tracking-wide">
+              <h2 className="text-[12px] sm:text-[13px] font-medium text-white/45 mb-2 sm:mb-2.5 tracking-wide uppercase">
                 {question.title}
               </h2>
-              <h1 className="text-responsive-3xl lg:text-[30px] font-bold text-white leading-snug tracking-tight">
+              <h1 className="text-[22px] sm:text-[26px] lg:text-[28px] font-bold text-white leading-[1.35] tracking-[-0.02em]">
                 {question.question}
               </h1>
             </div>
@@ -387,40 +387,40 @@ export function QuestionStep({ question }) {
           </div>
 
           {/* 선택지 */}
-          <div className="space-y-3 sm:space-y-3.5 flex-1">
+          <div className="space-y-2.5 sm:space-y-3 flex-1">
             {question.options.map((option, index) => (
               <button
                 key={option.value}
                 onClick={() => handleSelect(option.value)}
                 style={{ animationDelay: `${index * 0.04}s` }}
                 className={`
-                  w-full p-4 sm:p-5 rounded-2xl text-left transition-all duration-150
+                  w-full p-4 sm:p-5 rounded-xl text-left transition-all duration-150 ease-out
                   focus:outline-none animate-option-in
                   ${
                     selectedValue === option.value
-                      ? 'bg-[#E8F3EF] border-2 border-[#0F3D2E] shadow-lg ring-2 ring-[#0F3D2E]/20'
-                      : 'bg-white border-2 border-transparent shadow-md hover:shadow-lg hover:scale-[1.01]'
+                      ? 'bg-white border-[1.5px] border-[#0F3D2E] shadow-[0_4px_12px_rgba(15,61,46,0.15)]'
+                      : 'bg-white/95 border-[1.5px] border-transparent shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:bg-white active:scale-[0.99]'
                   }
                 `}
               >
-                <div className="flex items-start gap-3 sm:gap-4">
+                <div className="flex items-start gap-3 sm:gap-3.5">
                   <div className={`
-                    w-6 h-6 sm:w-7 sm:h-7 mt-0.5 rounded-full border-[2.5px] flex items-center justify-center flex-shrink-0
-                    transition-colors duration-150
+                    w-5 h-5 sm:w-[22px] sm:h-[22px] mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                    transition-all duration-150
                     ${
                       selectedValue === option.value
-                        ? 'border-[#0F3D2E] bg-[#0F3D2E]'
-                        : 'border-neutral-300'
+                        ? 'border-[#0F3D2E] bg-[#0F3D2E] scale-110'
+                        : 'border-neutral-300 bg-white'
                     }
                   `}>
                     {selectedValue === option.value && (
-                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
                   </div>
                   <div className="flex-1">
-                    <span className={`text-responsive-lg font-bold block tracking-tight ${
+                    <span className={`text-[15px] sm:text-[16px] font-semibold block tracking-[-0.01em] ${
                       selectedValue === option.value
                         ? 'text-[#0F3D2E]'
                         : 'text-neutral-800'
@@ -428,7 +428,7 @@ export function QuestionStep({ question }) {
                       {option.label}
                     </span>
                     {option.description && (
-                      <span className="text-responsive-base text-neutral-500 mt-1 sm:mt-1.5 block leading-relaxed">
+                      <span className="text-[13px] sm:text-[14px] text-neutral-500 mt-1 block leading-relaxed">
                         {option.description}
                       </span>
                     )}
@@ -439,20 +439,20 @@ export function QuestionStep({ question }) {
           </div>
 
           {/* 데스크톱: 인라인 버튼 */}
-          <div className="hidden lg:flex gap-3 mt-8">
+          <div className="hidden lg:flex gap-3 mt-10">
             <button
               onClick={handleBack}
-              className="flex-shrink-0 px-6 h-14 rounded-[12px] border border-white/20 bg-white/10 text-white text-[17px] font-bold hover:bg-white/15 transition-colors"
+              className="flex-shrink-0 px-7 h-[54px] rounded-xl border border-white/15 bg-white/[0.08] text-white text-[16px] font-semibold hover:bg-white/[0.12] active:scale-[0.98] transition-all duration-150"
             >
               이전
             </button>
             <button
               onClick={handleNext}
               disabled={!isSelected}
-              className={`flex-1 h-14 rounded-[12px] text-[18px] font-bold transition-colors ${
+              className={`flex-1 h-[54px] rounded-xl text-[17px] font-bold transition-all duration-150 ${
                 !isSelected
-                  ? 'bg-white/20 text-white/40 cursor-not-allowed'
-                  : 'bg-white text-[#0F3D2E] hover:bg-white/90'
+                  ? 'bg-white/15 text-white/40 cursor-not-allowed'
+                  : 'bg-white text-[#0F3D2E] hover:bg-[#f8f8f8] active:scale-[0.98] shadow-[0_4px_16px_rgba(255,255,255,0.12)]'
               }`}
             >
               다음
@@ -462,21 +462,21 @@ export function QuestionStep({ question }) {
         </main>
 
         {/* 모바일: 하단 버튼 */}
-        <footer className="lg:hidden sticky bottom-0 z-20 bg-[#0F3D2E] border-t border-white/10 py-3 px-4 sm:px-5" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-          <div className="flex gap-2.5 sm:gap-3">
+        <footer className="lg:hidden sticky bottom-0 z-20 bg-[#0F3D2E]/95 backdrop-blur-sm border-t border-white/[0.08] py-3 px-4" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+          <div className="flex gap-2.5">
             <button
               onClick={handleBack}
-              className="flex-shrink-0 px-5 sm:px-6 h-12 sm:h-14 rounded-xl border border-white/20 bg-white/10 text-white text-responsive-md font-bold hover:bg-white/15 transition-colors"
+              className="flex-shrink-0 px-5 h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/[0.08] text-white text-[15px] font-semibold hover:bg-white/[0.12] active:scale-[0.98] transition-all duration-150"
             >
               이전
             </button>
             <button
               onClick={handleNext}
               disabled={!isSelected}
-              className={`flex-1 h-12 sm:h-14 rounded-xl text-responsive-lg font-bold transition-all duration-200 ${
+              className={`flex-1 h-[48px] sm:h-[52px] rounded-xl text-[16px] font-bold transition-all duration-150 ${
                 !isSelected
-                  ? 'bg-white/20 text-white/50 cursor-not-allowed'
-                  : 'bg-white text-[#0F3D2E] hover:bg-white/90 shadow-xl'
+                  ? 'bg-white/15 text-white/40 cursor-not-allowed'
+                  : 'bg-white text-[#0F3D2E] hover:bg-[#f8f8f8] active:scale-[0.98] shadow-[0_4px_12px_rgba(255,255,255,0.15)]'
               }`}
             >
               다음

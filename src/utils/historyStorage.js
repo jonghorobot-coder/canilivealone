@@ -124,6 +124,24 @@ export function clearFriendScore() {
 }
 
 /**
+ * 히스토리에서 특정 항목 삭제
+ * @param {string} id - 삭제할 항목의 id
+ * @returns {Array} 업데이트된 히스토리 배열
+ */
+export function deleteFromHistory(id) {
+  const history = getHistory();
+  const updatedHistory = history.filter(entry => entry.id !== id);
+
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
+  } catch (e) {
+    console.warn('Failed to delete from history:', e);
+  }
+
+  return updatedHistory;
+}
+
+/**
  * 히스토리 전체 삭제
  */
 export function clearHistory() {

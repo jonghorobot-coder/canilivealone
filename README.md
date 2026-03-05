@@ -2,7 +2,7 @@
 
 > 월 수입과 지출 구조를 기반으로 재무 독립 가능성을 분석하는 웹 서비스
 
-[![Version](https://img.shields.io/badge/version-2.1.0-0F3D2E)](https://github.com/jonghorobot-coder/canilivealone/releases/tag/v2.1.0)
+[![Version](https://img.shields.io/badge/version-2.2.0-0F3D2E)](https://github.com/jonghorobot-coder/canilivealone/releases/tag/v2.2.0)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black)](https://canilivealone.com)
 
 ## 서비스 소개
@@ -86,6 +86,7 @@ canilivealone/
 │   │   ├── format.js           # 숫자 포맷팅
 │   │   ├── generatePdf.js      # PDF 리포트 생성
 │   │   ├── goalSimulation.js   # 목표 시뮬레이션
+│   │   ├── historyStorage.js   # 진단 히스토리 관리
 │   │   ├── reportData.js       # 리포트 데이터 분석
 │   │   ├── reportTemplate.js   # 리포트 템플릿
 │   │   ├── saveResult.js       # 결과 저장/조회
@@ -151,6 +152,26 @@ npm run build
 Vercel에 연결하면 `main` 브랜치 push 시 자동 배포됩니다.
 
 ## 변경 이력 (Changelog)
+
+### v2.2.0 (2025-03-05)
+
+**UI/UX 전면 개선**
+- 스타트업 서비스 수준의 디자인 시스템 적용
+- Typography hierarchy 개선 (고정 픽셀 + tighter tracking)
+- Button hierarchy 통일 (CTA, Secondary, Ghost 스타일)
+- Spacing system 정리 및 Visual hierarchy 강화
+- 모바일 최적화 (safe-area-inset 적용)
+
+**마이크로 인터랙션**
+- 카테고리 점수 바 애니메이션 (stagger delay)
+- 입력 필드 포커스 효과 개선
+- 버튼 호버/클릭 상태 피드백 강화
+
+**기능 개선**
+- 진단 히스토리 개별 삭제 기능 추가
+- 프리미엄 리포트 모달 Supabase 연동 수정
+- 카카오페이 결제 링크 갱신
+- 공유 링크 새로고침 시 히스토리 유지
 
 ### v2.1.0 (2025-02-25)
 

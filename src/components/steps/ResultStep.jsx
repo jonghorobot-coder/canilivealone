@@ -14,6 +14,7 @@ import {
   saveFriendScore,
   getFriendScore,
   clearFriendScore,
+  deleteFromHistory,
 } from '../../utils/historyStorage';
 import { generatePremiumPreview } from '../../utils/scoreSimulation';
 
@@ -217,10 +218,11 @@ function useScoreRiseAnimation(startValue, endValue, duration = 2000, enabled = 
 }
 
 // 리포트 미리보기 & 구매 통합 모달 컴포넌트
-function ReportPreviewModal({ isOpen, onClose, result, preview }) {
+function ReportPreviewModal({ isOpen, onClose, result, preview, onSubmit }) {
   const [step, setStep] = useState('preview'); // 'preview' | 'payment' | 'complete'
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const targetScore = preview?.targetScore || Math.min(result.score + 20, 100);
   const scoreDiff = targetScore - result.score;
@@ -246,7 +248,7 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
   };
 
   // 이메일 유효성 검사 및 결제 단계로 이동
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = async () => {
     if (!email.trim()) {
       setEmailError('이메일을 입력해주세요');
       return;
@@ -256,6 +258,15 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
       return;
     }
     setEmailError('');
+
+    // Supabase에 저장
+    if (onSubmit) {
+      setIsSubmitting(true);
+      const success = await onSubmit(email);
+      setIsSubmitting(false);
+      if (!success) return;
+    }
+
     setStep('payment');
   };
 
@@ -507,9 +518,10 @@ function ReportPreviewModal({ isOpen, onClose, result, preview }) {
               </div>
               <button
                 onClick={handleProceedToPayment}
-                className="w-full h-12 sm:h-14 rounded-xl bg-[#0F3D2E] text-white text-responsive-md sm:text-[16px] font-bold hover:bg-[#0a2e22] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+                disabled={isSubmitting}
+                className="w-full h-12 sm:h-14 rounded-xl bg-[#0F3D2E] text-white text-responsive-md sm:text-[16px] font-bold hover:bg-[#0a2e22] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
               >
-                <span>4,900원 결제하기</span>
+                <span>{isSubmitting ? '처리 중...' : '4,900원 결제하기'}</span>
               </button>
             </div>
           </>
@@ -1189,7 +1201,7 @@ const isMobileDevice = () => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 };
 
-const KAKAOPAY_LINK = 'https://qr.kakaopay.com/FC3Bnn1CY99206264';
+const KAKAOPAY_LINK = 'https://qr.kakaopay.com/FC3Bnn1CY99202888';
 
 // 프리미엄 리포트 이메일 입력 모달
 function PremiumEmailModal({ isOpen, onClose, onSubmit, isLoading, score, grade }) {
@@ -1614,6 +1626,9 @@ export function ResultStep() {
           AnalyticsEvents.sharedResultView(sharedResult.score, sharedResult.grade);
         }
       }
+
+      // 히스토리 로드 (본인 결과인 경우에도 표시)
+      setHistory(getHistory());
 
       // 로딩 해제 후 애니메이션 시작
       setIsLoading(false);
@@ -2227,7 +2242,7 @@ export function ResultStep() {
       <div className="bg-neutral-50 rounded-2xl p-4 sm:p-5">
         <p className="text-responsive-md text-neutral-800 font-bold mb-3.5 sm:mb-4">카테고리별 점수</p>
         <div className="space-y-2.5 sm:space-y-3">
-          {result.categoryScores && CATEGORY_ORDER.map((key) => {
+          {result.categoryScores && CATEGORY_ORDER.map((key, index) => {
             const score = result.categoryScores[key];
             return (
               <div key={key} className="flex items-center gap-2.5 sm:gap-3">
@@ -2236,11 +2251,14 @@ export function ResultStep() {
                 </span>
                 <div className="flex-1 h-2 sm:h-2.5 bg-neutral-200/70 rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${
+                    className={`h-full rounded-full animate-bar-fill ${
                       score >= 70 ? 'bg-[#0F3D2E]' :
                       score >= 50 ? 'bg-amber-500' : 'bg-red-500'
                     }`}
-                    style={{ width: `${score}%` }}
+                    style={{
+                      width: `${score}%`,
+                      animationDelay: `${0.3 + index * 0.1}s`
+                    }}
                   />
                 </div>
                 <span className={`text-responsive-md font-bold w-7 sm:w-8 text-right tabular-nums ${
@@ -2500,10 +2518,16 @@ export function ResultStep() {
                 const prevEntry = history[index + 1];
                 const diff = prevEntry ? entry.score - prevEntry.score : null;
 
+                const handleDelete = (e) => {
+                  e.stopPropagation();
+                  const updated = deleteFromHistory(entry.id);
+                  setHistory(updated);
+                };
+
                 return (
                   <div
                     key={entry.id}
-                    className={`flex items-center justify-between py-2.5 sm:py-3 ${!isLatest ? 'border-t border-neutral-100' : ''}`}
+                    className={`group flex items-center justify-between py-2.5 sm:py-3 ${!isLatest ? 'border-t border-neutral-100' : ''}`}
                   >
                     <div className="flex items-center gap-2 sm:gap-2.5">
                       {isLatest && (
@@ -2536,6 +2560,15 @@ export function ResultStep() {
                       }`}>
                         {entry.grade}
                       </span>
+                      <button
+                        onClick={handleDelete}
+                        className="ml-1 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full text-neutral-300 hover:text-neutral-500 hover:bg-neutral-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-150"
+                        aria-label="기록 삭제"
+                      >
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
                 );
@@ -2585,6 +2618,7 @@ export function ResultStep() {
               onClose={() => setShowReportPreview(false)}
               result={result}
               preview={preview}
+              onSubmit={handlePremiumSubmit}
             />
           </div>
         );
@@ -2638,7 +2672,7 @@ export function ResultStep() {
 
       {/* 데스크톱: 하단 푸터 */}
       <footer className="hidden lg:block px-8 xl:px-16 py-6 border-t border-neutral-200 bg-white mt-8">
-        <div className="max-w-5xl mx-auto flex items-center justify-between text-neutral-500 text-[14px]">
+        <div className="flex items-center justify-between text-neutral-400 text-[14px]">
           <p>© 2026 독립점수 ver2. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <a href="mailto:canilivealone.help@gmail.com" className="hover:text-neutral-600 transition-colors">canilivealone.help@gmail.com</a>
